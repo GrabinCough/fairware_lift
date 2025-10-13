@@ -1,0 +1,73 @@
+# --- Flutter / Dart ---
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+flutter_export_environment.sh
+
+# Generated plugin registrants / lockfiles
+**/GeneratedPluginRegistrant.*
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+
+# --- Android ---
+android/.gradle/
+android/.idea/
+android/local.properties
+android/**/gradle-wrapper.jar
+android/app/*.keystore
+android/app/*.jks
+android/app/**/google-services.json# keep? -> see "Firebase note" below
+
+# AGP build outputs
+android/**/captures/
+android/**/outputs/
+android/**/intermediates/
+
+# --- iOS / macOS ---
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
+ios/.generated/
+ios/Runner/GeneratedPluginRegistrant.*
+ios/Runner.xcworkspace/
+macos/Flutter/ephemeral/
+macos/Pods/
+macos/Runner/GeneratedPluginRegistrant.*
+
+# Keep Xcode user data out of git
+**/*.xcuserdatad/
+**/*.xcscmblueprint
+**/*.xccheckout
+
+# --- Windows / Linux / Web (generated stuff) ---
+windows/flutter/
+windows/runner/Debug/
+windows/runner/Release/
+linux/flutter/
+linux/x64/
+web/.dart_tool/
+
+# --- IDEs / Editors ---
+.vscode/
+.idea/
+*.iml
+
+# --- System files ---
+.DS_Store
+Thumbs.db
+
+# --- Env / secrets you create ---
+.env
+.env.*
+*.secrets.*
+*.private.*
+
+# --- PDFs, exports, mock images (optional—uncomment if these get large) ---
+# exports/
+# mockups/*.png

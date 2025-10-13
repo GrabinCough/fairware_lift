@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "2182695689",
+    "project_id": "fairware-lift",
+    "storage_bucket": "fairware-lift.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:2182695689:android:69f96335cc844bc47d21d8",
+        "android_client_info": {
+          "package_name": "com.fairware.fairware_lift"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQ1sHvdiNgkOzsU8KD076g97uA95dmrtQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
