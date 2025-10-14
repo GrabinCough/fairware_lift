@@ -59,4 +59,5 @@ class DefaultFirebaseOptions {
     projectId: 'fairware-lift',
     storageBucket: 'fairware-lift.firebasestorage.app',
   );
+
 }
