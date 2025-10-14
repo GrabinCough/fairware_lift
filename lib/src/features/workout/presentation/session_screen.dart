@@ -18,33 +18,42 @@ import '../application/session_state.dart';
 import 'widgets/workout_dock.dart';
 import 'widgets/exercise_list_item.dart';
 
+// The summary screen to navigate to.
+import 'workout_summary_screen.dart';
+
+// --- THIS IS THE CORRECTED IMPORT ---
+// The import path now correctly points to data/presentation.
+import 'package:fairware_lift/src/features/exercises/data/presentation/exercise_picker_screen.dart';
+import 'package:fairware_lift/src/features/exercises/data/mock_exercise_repository.dart';
+
 // -----------------------------------------------------------------------------
 // --- SESSION SCREEN WIDGET ---------------------------------------------------
 // -----------------------------------------------------------------------------
 
 /// The full-screen UI for an active workout session.
-///
-/// This is a ConsumerWidget, which means it can listen to Riverpod providers.
-/// It will automatically rebuild whenever the session state changes.
 class SessionScreen extends ConsumerWidget {
   const SessionScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // --- STATE INTEGRATION ---
-    // We are now "watching" the sessionStateProvider. `ref.watch` gets the
-    // current state (the list of exercises) and subscribes to any future changes.
     final sessionExercises = ref.watch(sessionStateProvider);
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppTheme.colors.background,
         elevation: 0,
-        title: const Text('Push Day - Block A'), // Placeholder
+        title: const Text('Quick Workout'),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              final completedWorkout = ref.read(sessionStateProvider);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => WorkoutSummaryScreen(
+                    completedExercises: completedWorkout,
+                  ),
+                ),
+              );
             },
             child: Text(
               'Finish',
@@ -57,25 +66,68 @@ class SessionScreen extends ConsumerWidget {
         ],
       ),
       bottomNavigationBar: const WorkoutDock(),
-      // The body now uses a ListView.builder to efficiently create the list.
-      body: ListView.builder(
+      body: ListView(
         padding: const EdgeInsets.fromLTRB(8, 8, 8, 80),
-        // The number of items in the list is the length of our state list.
-        itemCount: sessionExercises.length,
-        // The builder function is called for each item in the list.
-        itemBuilder: (context, index) {
-          // Get the specific exercise for this list item.
-          final exercise = sessionExercises[index];
-          // --- STATE INTEGRATION ---
-          // We pass the dynamic data from our state down to the
-          // ExerciseListItem widget.
-          return ExerciseListItem(
-            exerciseName: exercise.name,
-            target: exercise.target,
-            loggedSets: exercise.loggedSets,
-            isCurrent: exercise.isCurrent,
-          );
-        },
+        children: [
+          if (sessionExercises.isEmpty)
+            _buildEmptyState(ref)
+          else
+            ...sessionExercises.map((exercise) {
+              return ExerciseListItem(
+                exerciseName: exercise.name,
+                target: exercise.target,
+                loggedSets: exercise.loggedSets,
+                isCurrent: exercise.isCurrent,
+              );
+            }),
+          const SizedBox(height: 16),
+          TextButton.icon(
+            onPressed: () async {
+              final selectedExercise = await Navigator.of(context).push<Exercise>(
+                MaterialPageRoute(
+                  fullscreenDialog: true,
+                  builder: (context) => const ExercisePickerScreen(),
+                ),
+              );
+
+              if (selectedExercise != null) {
+                ref.read(sessionStateProvider.notifier).addExercise(selectedExercise);
+              }
+            },
+            icon: const Icon(Icons.add_circle_outline_rounded),
+            label: const Text('Add Exercise'),
+            style: TextButton.styleFrom(
+              foregroundColor: AppTheme.colors.accent,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(WidgetRef ref) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 64.0),
+        child: Column(
+          children: [
+            Icon(
+              Icons.fitness_center_rounded,
+              size: 64,
+              color: AppTheme.colors.textMuted,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Your session is empty.',
+              style: AppTheme.typography.title,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Tap "Add Exercise" to get started.',
+              style: AppTheme.typography.body,
+            ),
+          ],
+        ),
       ),
     );
   }

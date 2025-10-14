@@ -16,7 +16,7 @@ import 'package:fairware_lift/src/features/workout/application/session_state.dar
 import 'package:fairware_lift/src/features/workout/domain/session_exercise.dart';
 import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 
-// The new timer state provider.
+// The timer state provider.
 import 'package:fairware_lift/src/features/workout/application/timer_state.dart';
 
 // The SetSheet UI.
@@ -42,7 +42,6 @@ class WorkoutDock extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Watch the session state to get exercise data for the SetSheet.
     final sessionExercises = ref.watch(sessionStateProvider);
     final currentExercise = sessionExercises.firstWhere(
       (ex) => ex.isCurrent,
@@ -52,9 +51,6 @@ class WorkoutDock extends ConsumerWidget {
         ? currentExercise.loggedSets.last
         : null;
 
-    // --- TIMER INTEGRATION ---
-    // Watch the new timerStateProvider to get the current timer state.
-    // The `WorkoutDock` will now rebuild every time the timer state changes.
     final timerState = ref.watch(timerStateProvider);
 
     return BottomAppBar(
@@ -65,9 +61,6 @@ class WorkoutDock extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // --- TIMER DISPLAY ---
-            // The text now dynamically displays the formatted time remaining.
-            // It also changes color and text based on whether the timer is running.
             Text(
               timerState.isRunning
                   ? 'Rest: ${_formatDuration(timerState.secondsRemaining)}'
@@ -83,14 +76,17 @@ class WorkoutDock extends ConsumerWidget {
               children: [
                 TextButton(
                   onPressed: () {
-                    print('+30s tapped');
+                    // --- FUNCTIONALITY INTEGRATION ---
+                    // This now calls the method in our timer notifier to add
+                    // 30 seconds to the currently running timer.
+                    ref.read(timerStateProvider.notifier).addTime(seconds: 30);
                   },
                   child: const Text('+30s'),
                 ),
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: () {
-                    print('Next tapped');
+                    ref.read(sessionStateProvider.notifier).selectNextExercise();
                   },
                   child: const Text('Next'),
                 ),

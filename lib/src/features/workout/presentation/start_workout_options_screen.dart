@@ -5,8 +5,14 @@
 // Core Flutter material design library.
 import 'package:flutter/material.dart';
 
+// Riverpod for state management.
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 // The application's design system for consistent styling.
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
+
+// The session state provider, so we can invalidate it.
+import '../application/session_state.dart';
 
 // Import the session screen to navigate to it.
 import 'session_screen.dart';
@@ -15,17 +21,12 @@ import 'session_screen.dart';
 // --- START WORKOUT OPTIONS SCREEN WIDGET -------------------------------------
 // -----------------------------------------------------------------------------
 
-/// A screen that allows the user to choose how to begin their workout.
-///
-/// As per SSOT Section 4.4, after the user initiates a workout, they must
-/// choose between starting a "Quick Workout" (an empty session) or selecting
-/// a pre-defined day from one of their programs.
-class StartWorkoutOptionsScreen extends StatelessWidget {
+/// This is now a ConsumerWidget so it can interact with providers.
+class StartWorkoutOptionsScreen extends ConsumerWidget {
   const StartWorkoutOptionsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // SafeArea is essential to avoid the system navigation bar at the bottom.
+  Widget build(BuildContext context, WidgetRef ref) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -41,39 +42,33 @@ class StartWorkoutOptionsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 32),
-
-                // --- OPTION 1: QUICK WORKOUT ---
                 _buildOptionCard(
                   context: context,
                   icon: Icons.play_circle_outline_rounded,
                   title: 'Quick Workout',
                   subtitle: 'Start an empty session',
                   onTap: () {
-                    // --- NAVIGATION LOGIC ---
-                    // This is the new functionality. When tapped, it will push
-                    // the full-screen SessionScreen onto the navigation stack.
+                    // --- STATE MANAGEMENT ---
+                    // Invalidate the provider to reset the session to a fresh,
+                    // empty state before navigating.
+                    ref.invalidate(sessionStateProvider);
+
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        // We set fullscreenDialog to true to have the new screen
-                        // animate up from the bottom, which is a common UX
-                        // pattern for entering a distinct "mode" like a workout.
                         fullscreenDialog: true,
                         builder: (context) => const SessionScreen(),
                       ),
                     );
                   },
                 ),
-
                 const SizedBox(height: 16),
-
-                // --- OPTION 2: CHOOSE FROM PROGRAM ---
                 _buildOptionCard(
                   context: context,
                   icon: Icons.list_alt_rounded,
                   title: 'Choose from Program',
                   subtitle: 'Select a planned day',
                   onTap: () {
-                    // TODO: Navigate to the program selection list.
+                    // TODO: Implement logic for starting a programmed workout.
                     print('Choose from Program selected');
                   },
                 ),
@@ -85,7 +80,6 @@ class StartWorkoutOptionsScreen extends StatelessWidget {
     );
   }
 
-  /// Private helper to build a consistent, tappable card for each option.
   Widget _buildOptionCard({
     required BuildContext context,
     required IconData icon,
