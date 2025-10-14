@@ -1,44 +1,40 @@
+// lib/src/features/settings/presentation/settings_screen.dart
+
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// Core Flutter material design library.
 import 'package:flutter/material.dart';
-
-// The application's design system for consistent styling.
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
+
+// --- NEW IMPORT ---
+// Import the HistoryScreen so we can navigate to it.
+import 'package:fairware_lift/src/features/history/presentation/history_screen.dart';
 
 // -----------------------------------------------------------------------------
 // --- SETTINGS SCREEN WIDGET --------------------------------------------------
 // -----------------------------------------------------------------------------
 
 /// The screen for managing application settings and user-related options.
-///
-/// This screen provides a list of actions and navigation points for various
-/// settings, such as profile, preferences, and data management.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // A Scaffold provides the basic visual layout structure for the screen.
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
         backgroundColor: AppTheme.colors.background,
         elevation: 0,
       ),
-      // A ListView is used to create a scrollable list of settings options.
       body: ListView(
         children: [
-          // --- ACCOUNT SECTION ---
           _buildSectionHeader('Account'),
           _buildListTile(
             icon: Icons.person_outline_rounded,
             title: 'Profile',
             subtitle: 'Manage your name, email, and goals',
             onTap: () {
-              // TODO: Navigate to Profile screen.
               print('Profile tapped');
             },
           ),
@@ -47,22 +43,22 @@ class SettingsScreen extends StatelessWidget {
             title: 'Sync Status',
             subtitle: 'View data sync and conflict logs',
             onTap: () {
-              // TODO: Navigate to Sync Status screen.
               print('Sync Status tapped');
             },
           ),
-
-          // --- DATA SECTION ---
           _buildSectionHeader('Data'),
-          // --- NEW ENTRY ---
-          // "History" is now a list tile within the Settings screen.
           _buildListTile(
             icon: Icons.bar_chart_rounded,
             title: 'Workout History',
             subtitle: 'Review all your past sessions',
+            // --- UI FIX ---
+            // The onTap callback now navigates to the HistoryScreen.
             onTap: () {
-              // TODO: Navigate to the History screen.
-              print('Workout History tapped');
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const HistoryScreen(),
+                ),
+              );
             },
           ),
           _buildListTile(
@@ -70,19 +66,15 @@ class SettingsScreen extends StatelessWidget {
             title: 'Export Data',
             subtitle: 'Export your workout history as CSV or PDF',
             onTap: () {
-              // TODO: Navigate to Export screen.
               print('Export Data tapped');
             },
           ),
-
-          // --- GENERAL SECTION ---
           _buildSectionHeader('General'),
           _buildListTile(
             icon: Icons.palette_outlined,
             title: 'Appearance',
             subtitle: 'Switch between dark and light themes',
             onTap: () {
-              // TODO: Show theme switcher dialog.
               print('Appearance tapped');
             },
           ),
@@ -91,7 +83,6 @@ class SettingsScreen extends StatelessWidget {
             title: 'About',
             subtitle: 'View app version and licenses',
             onTap: () {
-              // TODO: Navigate to About screen.
               print('About tapped');
             },
           ),

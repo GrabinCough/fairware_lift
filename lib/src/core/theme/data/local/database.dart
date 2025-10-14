@@ -4,85 +4,54 @@
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// Core Drift library for database operations.
 import 'package:drift/drift.dart';
-
-// Provides `Isar` for the underlying database engine on mobile.
 import 'package:drift/native.dart';
-
-// Path provider for finding the correct database file location.
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-
-// Dart's IO library for file system operations.
 import 'dart:io';
-
-// Riverpod for creating a global provider for our database.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:collection/collection.dart'; // For groupBy
 
-// -----------------------------------------------------------------------------
-// --- DRIFT PART DIRECTIVE ----------------------------------------------------
-// -----------------------------------------------------------------------------
-
-// This is required by Drift's code generator. It will generate the file
-// `database.g.dart` which contains the actual implementation of the database.
 part 'database.g.dart';
+
+// -----------------------------------------------------------------------------
+// --- NEW DATA CLASS FOR HISTORY ----------------------------------------------
+// -----------------------------------------------------------------------------
+
+/// A helper class to hold a complete workout session, including the parent
+/// session object and a list of all the set entries that belong to it.
+class FullWorkoutSession {
+  final Session session;
+  final List<SetEntry> sets;
+
+  FullWorkoutSession({required this.session, required this.sets});
+}
 
 // -----------------------------------------------------------------------------
 // --- TABLE DEFINITIONS (from SSOT 6.1) ---------------------------------------
 // -----------------------------------------------------------------------------
 
-/// Defines the `sessions` table in the local database.
-///
-/// This table stores a record for each workout session the user completes.
-/// The fields are based on the `Session` entity from the SSOT. For now, we are
-/// implementing a subset of fields relevant to saving a basic workout.
 @DataClassName('Session')
 class Sessions extends Table {
-  // A unique ID for the session, which will serve as the primary key.
   TextColumn get id => text()();
-
-  // --- FIX ---
-  // The getter for the session's date and time has been renamed from `dateTime`
-  // to `sessionDateTime` to avoid a name conflict with the `dateTime()` method
-  // inherited from Drift's `Table` class. The `.named('date_time')` call
-  // ensures the actual column name in the database remains `date_time`.
   DateTimeColumn get sessionDateTime => dateTime().named('date_time')();
-
-  // A general notes field for the session.
   TextColumn get notes => text().nullable()();
-  // Timestamps for creation and updates.
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
-
   @override
   Set<Column> get primaryKey => {id};
 }
 
-/// Defines the `set_entries` table in the local database.
-///
-/// This table stores every single set the user logs. Each row is linked to a
-/// parent `Session` and contains the performance data for that set.
-/// The fields are based on the `SetEntry` entity from the SSOT.
 @DataClassName('SetEntry')
 class SetEntries extends Table {
-  // A unique ID for this specific set entry.
   TextColumn get id => text()();
-  // A foreign key linking this set back to the parent `sessions` table.
   TextColumn get sessionId => text().references(Sessions, #id)();
-  // For simplicity in a "Quick Workout", we'll store the exercise name directly.
-  // In a full program, this would likely be a foreign key to an `exercises` table.
   TextColumn get exerciseName => text()();
-  // The order of this set within the exercise (e.g., 1st set, 2nd set).
   IntColumn get setOrder => integer()();
-  // The weight used for the set.
   RealColumn get weight => real()();
-  // The number of repetitions performed.
   IntColumn get reps => integer()();
-  // Timestamps for creation and updates.
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
-
   @override
   Set<Column> get primaryKey => {id};
 }
@@ -91,26 +60,50 @@ class SetEntries extends Table {
 // --- DATABASE CLASS ----------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// The main database class for the application.
-///
-/// Drift will use this class to generate all the necessary code for queries,
-/// table creation, and data manipulation. The annotation specifies which tables
-/// are part of this database.
 @DriftDatabase(tables: [Sessions, SetEntries])
 class AppDatabase extends _$AppDatabase {
-  // The constructor takes the database executor as an argument.
   AppDatabase() : super(_openConnection());
 
-  // This schema version is used for migrations. When you change your table
-  // definitions, you must increment this number.
   @override
   int get schemaVersion => 1;
+
+  /// Queries the database to retrieve all sessions and their associated sets.
+  Future<List<FullWorkoutSession>> getWorkoutHistory() async {
+    final query = select(sessions).join([
+      innerJoin(setEntries, setEntries.sessionId.equalsExp(sessions.id)),
+    ]);
+    query.orderBy([OrderingTerm.desc(sessions.sessionDateTime)]);
+
+    final rows = await query.get();
+
+    final groupedData = groupBy(
+      rows,
+      (row) => row.readTable(sessions),
+    );
+
+    final result = groupedData.entries.map((entry) {
+      final session = entry.key;
+      final sets = entry.value.map((row) => row.readTable(setEntries)).toList();
+      return FullWorkoutSession(session: session, sets: sets);
+    }).toList();
+
+    return result;
+  }
+
+  /// --- NEW METHOD ---
+  /// Deletes a session and all of its associated set entries from the database.
+  /// This is done in a transaction to ensure data integrity.
+  Future<void> deleteWorkoutSession(String sessionId) async {
+    await transaction(() async {
+      // Delete the sets associated with the session first.
+      await (delete(setEntries)..where((tbl) => tbl.sessionId.equals(sessionId))).go();
+      // Then, delete the parent session record.
+      await (delete(sessions)..where((tbl) => tbl.id.equals(sessionId))).go();
+    });
+  }
 }
 
 /// A private helper function to create the database connection.
-///
-/// This function determines the correct location for the database file on the
-/// device's file system and opens a connection to it.
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
@@ -123,11 +116,6 @@ LazyDatabase _openConnection() {
 // --- PROVIDER ----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// A Riverpod provider that creates and exposes a single, app-wide instance
-/// of the [AppDatabase].
-///
-/// This allows other parts of the app (like repositories or state notifiers)
-/// to easily access the database without needing to instantiate it manually.
 final databaseProvider = Provider<AppDatabase>((ref) {
   return AppDatabase();
 });
