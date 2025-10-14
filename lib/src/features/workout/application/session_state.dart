@@ -4,21 +4,11 @@
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// Riverpod for state management.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// Our data models for the session.
 import '../domain/session_exercise.dart';
 import '../domain/logged_set.dart';
-
-// The timer notifier, so we can interact with it.
 import 'timer_state.dart';
-
-// --- FIX ---
-// The import now points to our new, detailed Exercise model.
 import '../../exercises/domain/exercise.dart';
-
-// A package for generating unique IDs.
 import 'package:uuid/uuid.dart';
 
 // -----------------------------------------------------------------------------
@@ -33,28 +23,43 @@ class SessionStateNotifier extends Notifier<List<SessionExercise>> {
     return [];
   }
 
-  /// --- UPDATED METHOD ---
-  /// Adds a new exercise to the current session based on the user's selection.
-  /// It now accepts the detailed `Exercise` object and uses its properties.
+  /// Adds a new exercise to the current session.
   void addExercise(Exercise exercise) {
-    // Create a new SessionExercise using the data from the selected exercise.
     final newExercise = SessionExercise(
-      id: _uuid.v4(), // A unique ID for this specific instance in the session
+      id: _uuid.v4(),
       name: exercise.name,
-      target: '3 sets x 10 reps', // Default target for now
-      howTo: exercise.howTo, // Pass the "how-to" guide
-      // If this is the first exercise being added, make it the current one.
+      target: '3 sets x 10 reps',
+      howTo: exercise.howTo,
+      // If this is the first exercise, make it current. Otherwise, don't.
       isCurrent: state.isEmpty,
     );
 
-    // Add the new exercise to the existing list of exercises in the state.
-    state = [...state, newExercise];
+    // Set all other exercises to not be current before adding the new one.
+    final updatedState = [
+      for (final ex in state) ex.copyWith(isCurrent: false),
+      newExercise.copyWith(isCurrent: true) // Make the new one current
+    ];
+    state = updatedState;
   }
 
+  /// --- NEW METHOD ---
+  /// Sets the specified exercise as the current one for logging sets.
+  void setCurrentExercise(String exerciseId) {
+    // Stop any running timer when switching exercises.
+    ref.read(timerStateProvider.notifier).stopTimer();
+
+    final newState = [
+      for (final exercise in state)
+        exercise.copyWith(isCurrent: exercise.id == exerciseId)
+    ];
+    state = newState;
+  }
+
+  /// Logs a new set for the currently active exercise.
   void logSet({required double weight, required int reps}) {
     final currentState = state;
     final currentIndex = currentState.indexWhere((ex) => ex.isCurrent);
-    if (currentIndex == -1) return;
+    if (currentIndex == -1) return; // No active exercise.
 
     final currentExercise = currentState[currentIndex];
 
@@ -73,28 +78,11 @@ class SessionStateNotifier extends Notifier<List<SessionExercise>> {
 
     state = newState;
 
+    // Auto-start the rest timer.
     ref.read(timerStateProvider.notifier).startTimer();
   }
 
-  void selectNextExercise() {
-    ref.read(timerStateProvider.notifier).stopTimer();
-
-    final currentState = state;
-    final currentIndex = currentState.indexWhere((ex) => ex.isCurrent);
-
-    if (currentIndex != -1 && currentIndex < currentState.length - 1) {
-      final newState = [
-        for (int i = 0; i < currentState.length; i++)
-          if (i == currentIndex)
-            currentState[i].copyWith(isCurrent: false)
-          else if (i == currentIndex + 1)
-            currentState[i].copyWith(isCurrent: true)
-          else
-            currentState[i]
-      ];
-      state = newState;
-    }
-  }
+  // The old `selectNextExercise` method has been removed.
 }
 
 // -----------------------------------------------------------------------------

@@ -45,15 +45,8 @@ class WorkoutDock extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sessionExercises = ref.watch(sessionStateProvider);
-    final currentExercise = sessionExercises.firstWhere(
-      (ex) => ex.isCurrent,
-      orElse: () => const SessionExercise(id: '', name: '', target: ''),
-    );
-    final LoggedSet? lastSet = currentExercise.loggedSets.isNotEmpty
-        ? currentExercise.loggedSets.last
-        : null;
-
+    // Note: We no longer need to watch the session state here, as we don't
+    // need the `lastSet` information anymore.
     final timerState = ref.watch(timerStateProvider);
     final settings = ref.watch(settingsProvider);
 
@@ -83,19 +76,15 @@ class WorkoutDock extends ConsumerWidget {
             ),
 
             // --- ACTION BUTTON ---
-            // --- UI FIX ---
-            // The "+30s" and "Next" buttons have been removed to fix the
-            // overflow and simplify the UI.
             ElevatedButton.icon(
               onPressed: () async {
                 final result = await showModalBottomSheet<Map<String, num>>(
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: AppTheme.colors.surface,
-                  builder: (context) => SetSheet(
-                    initialWeight: lastSet?.weight,
-                    initialReps: lastSet?.reps,
-                  ),
+                  // --- FIX ---
+                  // The SetSheet is now called without any initial values.
+                  builder: (context) => const SetSheet(),
                 );
 
                 if (result != null) {

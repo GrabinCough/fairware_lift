@@ -1,11 +1,10 @@
+// lib/src/features/workout/presentation/widgets/set_sheet.dart
+
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// Core Flutter material design library.
 import 'package:flutter/material.dart';
-
-// The application's design system for consistent styling.
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
 
 // -----------------------------------------------------------------------------
@@ -13,40 +12,23 @@ import 'package:fairware_lift/src/core/theme/app_theme.dart';
 // -----------------------------------------------------------------------------
 
 /// A stateful bottom sheet for entering the details of a single set.
-///
-/// It can now accept initial values for weight and reps to pre-fill the form.
 class SetSheet extends StatefulWidget {
-  // --- STATE INTEGRATION ---
-  // New properties to accept the data from the last set.
-  final double? initialWeight;
-  final int? initialReps;
-
-  const SetSheet({
-    super.key,
-    this.initialWeight,
-    this.initialReps,
-  });
+  // --- FIX ---
+  // The constructor no longer accepts initial values.
+  const SetSheet({super.key});
 
   @override
   State<SetSheet> createState() => _SetSheetState();
 }
 
 class _SetSheetState extends State<SetSheet> {
-  // Controllers are now initialized in initState.
-  late final TextEditingController _weightController;
-  late final TextEditingController _repsController;
+  // Controllers are initialized directly.
+  final _weightController = TextEditingController();
+  final _repsController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    // --- STATE INTEGRATION ---
-    // The controllers are initialized with the values passed to the widget.
-    // If no values are provided (e.g., for the first set), they default to empty strings.
-    _weightController =
-        TextEditingController(text: widget.initialWeight?.toString() ?? '');
-    _repsController =
-        TextEditingController(text: widget.initialReps?.toString() ?? '');
-  }
+  // --- FIX ---
+  // The initState method is no longer needed as the controllers are
+  // initialized directly and will always start blank.
 
   @override
   void dispose() {

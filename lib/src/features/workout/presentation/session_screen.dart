@@ -12,8 +12,6 @@ import 'widgets/workout_dock.dart';
 import 'widgets/exercise_list_item.dart';
 import 'workout_summary_screen.dart';
 
-// --- FIX ---
-// These imports are now correct, pointing to our new, real files.
 import 'package:fairware_lift/src/features/exercises/data/presentation/exercise_picker_screen.dart';
 import 'package:fairware_lift/src/features/exercises/domain/exercise.dart';
 
@@ -25,7 +23,6 @@ import 'package:fairware_lift/src/features/exercises/domain/exercise.dart';
 class SessionScreen extends ConsumerWidget {
   const SessionScreen({super.key});
 
-  /// --- NEW ---
   /// Shows an AlertDialog with the exercise's "how-to" instructions.
   void _showExerciseInfo(BuildContext context, {required String name, required String howTo}) {
     showDialog(
@@ -85,25 +82,37 @@ class SessionScreen extends ConsumerWidget {
             _buildEmptyState()
           else
             ...sessionExercises.map((exercise) {
-              return ExerciseListItem(
-                exerciseName: exercise.name,
-                target: exercise.target,
-                loggedSets: exercise.loggedSets,
-                isCurrent: exercise.isCurrent,
-                // --- NEW ---
-                // Pass the new properties to the list item widget.
-                howTo: exercise.howTo,
-                onInfoTap: () => _showExerciseInfo(
-                  context,
-                  name: exercise.name,
-                  howTo: exercise.howTo,
+              // --- UI FIX ---
+              // The ExerciseListItem is now wrapped in a GestureDetector.
+              return GestureDetector(
+                onTap: () {
+                  // When tapped, this calls the new method to set this
+                  // exercise as the current one.
+                  ref.read(sessionStateProvider.notifier).setCurrentExercise(exercise.id);
+                },
+                // Use a transparent color to ensure the tap is detected
+                // across the entire widget area.
+                child: AbsorbPointer(
+                  // AbsorbPointer prevents the IconButton from interfering
+                  // with the GestureDetector, but the button is still tappable.
+                  child: ExerciseListItem(
+                    exerciseName: exercise.name,
+                    target: exercise.target,
+                    loggedSets: exercise.loggedSets,
+                    isCurrent: exercise.isCurrent,
+                    howTo: exercise.howTo,
+                    onInfoTap: () => _showExerciseInfo(
+                      context,
+                      name: exercise.name,
+                      howTo: exercise.howTo,
+                    ),
+                  ),
                 ),
               );
             }),
           const SizedBox(height: 16),
           TextButton.icon(
             onPressed: () async {
-              // The navigator now expects our detailed Exercise object.
               final selectedExercise = await Navigator.of(context).push<Exercise>(
                 MaterialPageRoute(
                   fullscreenDialog: true,
