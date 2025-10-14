@@ -37,7 +37,8 @@ dependencies:
   file_picker: ^8.3.5            # Upgrade to current stable to avoid build issues.
   open_filex: ^4.7.0             # Upgrade to latest with modern Gradle compatibility.
   
-  # Pure Dart / Already Compatible - Unchanged
+  # Pure Dart / Already Compatible
+  uuid: ^4.4.0                   # NEW: For generating unique IDs for database records.
   pdf: ^3.10.4
   printing: ^5.11.0
   csv: ^6.0.0
