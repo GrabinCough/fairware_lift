@@ -1,3 +1,5 @@
+// lib/src/features/workout/application/session_state.dart
+
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
@@ -12,8 +14,9 @@ import '../domain/logged_set.dart';
 // The timer notifier, so we can interact with it.
 import 'timer_state.dart';
 
-// The Exercise model from the exercise feature.
-import '../../exercises/data/mock_exercise_repository.dart';
+// --- FIX ---
+// The import now points to our new, detailed Exercise model.
+import '../../exercises/domain/exercise.dart';
 
 // A package for generating unique IDs.
 import 'package:uuid/uuid.dart';
@@ -30,15 +33,16 @@ class SessionStateNotifier extends Notifier<List<SessionExercise>> {
     return [];
   }
 
-  /// --- MODIFIED METHOD ---
+  /// --- UPDATED METHOD ---
   /// Adds a new exercise to the current session based on the user's selection.
-  /// It now accepts an `Exercise` object as a parameter.
+  /// It now accepts the detailed `Exercise` object and uses its properties.
   void addExercise(Exercise exercise) {
     // Create a new SessionExercise using the data from the selected exercise.
     final newExercise = SessionExercise(
       id: _uuid.v4(), // A unique ID for this specific instance in the session
       name: exercise.name,
       target: '3 sets x 10 reps', // Default target for now
+      howTo: exercise.howTo, // Pass the "how-to" guide
       // If this is the first exercise being added, make it the current one.
       isCurrent: state.isEmpty,
     );

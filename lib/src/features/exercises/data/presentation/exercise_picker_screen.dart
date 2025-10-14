@@ -1,33 +1,77 @@
+// lib/src/features/exercises/data/presentation/exercise_picker_screen.dart
+
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// Core Flutter material design library.
 import 'package:flutter/material.dart';
-
-// Riverpod for state management.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// The application's design system.
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
 
-// --- THIS IS THE CORRECTED IMPORT ---
-// The path now correctly goes up one level from 'presentation' to find the
-// mock repository in the 'data' directory.
-import '../mock_exercise_repository.dart';
+// --- FIX ---
+// These imports now use the full package path, which is the most reliable
+// way to ensure the files are found by the compiler.
+import 'package:fairware_lift/src/features/exercises/data/exercise_repository.dart';
+import 'package:fairware_lift/src/features/exercises/domain/exercise.dart';
 
 // -----------------------------------------------------------------------------
 // --- EXERCISE PICKER SCREEN WIDGET -------------------------------------------
 // -----------------------------------------------------------------------------
 
 /// A screen that displays a searchable list of exercises for the user to select.
-class ExercisePickerScreen extends ConsumerWidget {
+/// This is now a stateful widget to manage the search query.
+class ExercisePickerScreen extends ConsumerStatefulWidget {
   const ExercisePickerScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // Read the list of exercises from our repository provider.
-    final exercises = ref.watch(exerciseRepositoryProvider).getExercises();
+  ConsumerState<ExercisePickerScreen> createState() => _ExercisePickerScreenState();
+}
+
+class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
+  String _searchQuery = '';
+  final _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Update the search query whenever the text in the search bar changes.
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  /// Shows an AlertDialog with the exercise's "how-to" instructions.
+  void _showExerciseInfo(BuildContext context, Exercise exercise) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.colors.surface,
+          title: Text(exercise.name),
+          content: Text(exercise.howTo),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Watch the FutureProvider for the exercise repository.
+    final exerciseRepoAsync = ref.watch(exerciseRepositoryProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -36,10 +80,11 @@ class ExercisePickerScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // --- SEARCH BAR (Placeholder) ---
+          // --- SEARCH BAR ---
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+              controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Search exercises...',
                 prefixIcon: const Icon(Icons.search),
@@ -50,27 +95,46 @@ class ExercisePickerScreen extends ConsumerWidget {
                   borderSide: BorderSide.none,
                 ),
               ),
-              // TODO: Implement search functionality.
             ),
           ),
 
           // --- EXERCISE LIST ---
-          // The list is wrapped in an Expanded widget to make it fill the
-          // remaining vertical space.
+          // Handle the different states of the FutureProvider.
           Expanded(
-            child: ListView.builder(
-              itemCount: exercises.length,
-              itemBuilder: (context, index) {
-                final exercise = exercises[index];
-                return ListTile(
-                  title: Text(exercise.name),
-                  onTap: () {
-                    // When an exercise is tapped, pop the screen and return
-                    // the selected exercise object to the caller.
-                    Navigator.of(context).pop(exercise);
+            child: exerciseRepoAsync.when(
+              // --- DATA LOADED STATE ---
+              data: (repo) {
+                // Filter the full list based on the current search query.
+                final allExercises = repo.getAllExercises();
+                final filteredExercises = allExercises.where((exercise) {
+                  return exercise.name
+                      .toLowerCase()
+                      .contains(_searchQuery.toLowerCase());
+                }).toList();
+
+                return ListView.builder(
+                  itemCount: filteredExercises.length,
+                  itemBuilder: (context, index) {
+                    final exercise = filteredExercises[index];
+                    return ListTile(
+                      title: Text(exercise.name),
+                      // --- NEW INFO BUTTON ---
+                      trailing: IconButton(
+                        icon: const Icon(Icons.info_outline_rounded),
+                        onPressed: () => _showExerciseInfo(context, exercise),
+                      ),
+                      onTap: () {
+                        // Return the selected exercise to the previous screen.
+                        Navigator.of(context).pop(exercise);
+                      },
+                    );
                   },
                 );
               },
+              // --- LOADING STATE ---
+              loading: () => const Center(child: CircularProgressIndicator()),
+              // --- ERROR STATE ---
+              error: (err, stack) => Center(child: Text('Error: $err')),
             ),
           ),
         ],

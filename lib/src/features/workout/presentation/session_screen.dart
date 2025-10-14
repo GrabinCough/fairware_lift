@@ -1,30 +1,21 @@
+// lib/src/features/workout/presentation/session_screen.dart
+
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// Core Flutter material design library.
 import 'package:flutter/material.dart';
-
-// Riverpod for state management.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// The application's design system for consistent styling.
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
-
-// The session state provider (our app's "brain").
 import '../application/session_state.dart';
-
-// The widgets for this screen.
 import 'widgets/workout_dock.dart';
 import 'widgets/exercise_list_item.dart';
-
-// The summary screen to navigate to.
 import 'workout_summary_screen.dart';
 
-// --- THIS IS THE CORRECTED IMPORT ---
-// The import path now correctly points to data/presentation.
+// --- FIX ---
+// These imports are now correct, pointing to our new, real files.
 import 'package:fairware_lift/src/features/exercises/data/presentation/exercise_picker_screen.dart';
-import 'package:fairware_lift/src/features/exercises/data/mock_exercise_repository.dart';
+import 'package:fairware_lift/src/features/exercises/domain/exercise.dart';
 
 // -----------------------------------------------------------------------------
 // --- SESSION SCREEN WIDGET ---------------------------------------------------
@@ -33,6 +24,27 @@ import 'package:fairware_lift/src/features/exercises/data/mock_exercise_reposito
 /// The full-screen UI for an active workout session.
 class SessionScreen extends ConsumerWidget {
   const SessionScreen({super.key});
+
+  /// --- NEW ---
+  /// Shows an AlertDialog with the exercise's "how-to" instructions.
+  void _showExerciseInfo(BuildContext context, {required String name, required String howTo}) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.colors.surface,
+          title: Text(name),
+          content: Text(howTo),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -70,7 +82,7 @@ class SessionScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(8, 8, 8, 80),
         children: [
           if (sessionExercises.isEmpty)
-            _buildEmptyState(ref)
+            _buildEmptyState()
           else
             ...sessionExercises.map((exercise) {
               return ExerciseListItem(
@@ -78,11 +90,20 @@ class SessionScreen extends ConsumerWidget {
                 target: exercise.target,
                 loggedSets: exercise.loggedSets,
                 isCurrent: exercise.isCurrent,
+                // --- NEW ---
+                // Pass the new properties to the list item widget.
+                howTo: exercise.howTo,
+                onInfoTap: () => _showExerciseInfo(
+                  context,
+                  name: exercise.name,
+                  howTo: exercise.howTo,
+                ),
               );
             }),
           const SizedBox(height: 16),
           TextButton.icon(
             onPressed: () async {
+              // The navigator now expects our detailed Exercise object.
               final selectedExercise = await Navigator.of(context).push<Exercise>(
                 MaterialPageRoute(
                   fullscreenDialog: true,
@@ -105,7 +126,7 @@ class SessionScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState(WidgetRef ref) {
+  Widget _buildEmptyState() {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 64.0),

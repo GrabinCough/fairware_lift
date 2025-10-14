@@ -10,9 +10,10 @@ import 'dart:async';
 // Riverpod for state management.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// --- FINAL FIX ---
-// Reverting to the standard, correct package-style imports.
+// The service responsible for playing sounds and vibrating the device.
 import 'package:fairware_lift/src/core/services/alert_service.dart';
+
+// The provider that manages the user's default settings.
 import 'package:fairware_lift/src/features/settings/application/settings_provider.dart';
 
 // -----------------------------------------------------------------------------
@@ -77,16 +78,21 @@ class TimerStateNotifier extends Notifier<TimerState> {
 
   /// Starts the rest timer.
   ///
-  /// If a [duration] is provided, it will be used. Otherwise, it will attempt
-  /// to fetch the user's preferred rest duration from the settings provider.
-  /// If that is not available, it falls back to the `kDefaultRestDuration`.
+  /// If a [duration] is provided, it will be used. Otherwise, it will default
+  /// to the first quick-select timer preset.
   void startTimer({int? duration}) {
     _timer?.cancel(); // Cancel any existing timer.
 
-    // Determine the duration for this rest period.
-    // Note: We use .value to access the data from the AsyncValue provided by settingsProvider.
-    final userPreferredDuration = ref.read(settingsProvider).value?.defaultRestDuration;
-    final timerDuration = duration ?? userPreferredDuration ?? kDefaultRestDuration;
+    // --- FIX ---
+    // Instead of looking for the old 'defaultRestDuration', we now read the list
+    // of 'quickRestTimers' and default to the first one if it exists.
+    final settings = ref.read(settingsProvider).value;
+    final defaultTimerPreset =
+        (settings != null && settings.quickRestTimers.isNotEmpty)
+            ? settings.quickRestTimers[0]
+            : kDefaultRestDuration;
+
+    final timerDuration = duration ?? defaultTimerPreset;
 
     // Set the initial state for the new timer.
     state = TimerState(
@@ -98,10 +104,14 @@ class TimerStateNotifier extends Notifier<TimerState> {
     // Start the periodic timer to tick down every second.
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (state.secondsRemaining > 0) {
-        // If time is left, decrement the remaining seconds.
+        // The warning alert now triggers at exactly 3 seconds.
+        if (state.secondsRemaining == 3) {
+          ref.read(alertServiceProvider).triggerTimerWarningAlert();
+        }
+
+        // Decrement the remaining seconds.
         state = state.copyWith(secondsRemaining: state.secondsRemaining - 1);
       } else {
-        // --- ALERT LOGIC ---
         // When the timer hits zero, stop it and trigger the completion alert.
         ref.read(alertServiceProvider).triggerTimerCompletionAlert();
         stopTimer(isFinished: true);
@@ -119,10 +129,6 @@ class TimerStateNotifier extends Notifier<TimerState> {
   }
 
   /// Stops the timer and resets its state.
-  ///
-  /// The [isFinished] flag is used to differentiate between a user-cancelled
-  /// timer and one that completed its countdown. We can use this later to
-  /// control haptics or other feedback.
   void stopTimer({bool isFinished = false}) {
     _timer?.cancel();
     state = const TimerState(secondsRemaining: 0, isRunning: false);

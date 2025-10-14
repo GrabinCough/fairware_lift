@@ -14,11 +14,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 // --- CONSTANTS ---------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// The key used to store the default rest duration in SharedPreferences.
-const String _kDefaultRestDurationKey = 'defaultRestDuration';
+/// The key prefix used to store the quick rest timers in SharedPreferences.
+const String _kQuickRestTimerKeyPrefix = 'quickRestTimer_';
 
-/// The fallback rest duration in seconds if no preference is set.
-const int kDefaultRestDuration = 90;
+/// The default values for the three quick-select timers in seconds.
+const List<int> kDefaultQuickRestTimers = [60, 90, 180];
 
 // -----------------------------------------------------------------------------
 // --- SETTINGS STATE DATA MODEL -----------------------------------------------
@@ -26,19 +26,20 @@ const int kDefaultRestDuration = 90;
 
 /// An immutable class to hold all user-configurable settings.
 class AppSettings {
-  /// The user's preferred default rest time in seconds.
-  final int defaultRestDuration;
+  /// --- UPDATED ---
+  /// A list of the user's three preferred quick-select rest times in seconds.
+  final List<int> quickRestTimers;
 
   const AppSettings({
-    this.defaultRestDuration = kDefaultRestDuration,
+    this.quickRestTimers = kDefaultQuickRestTimers,
   });
 
   /// Creates a copy of the settings with some values replaced.
   AppSettings copyWith({
-    int? defaultRestDuration,
+    List<int>? quickRestTimers,
   }) {
     return AppSettings(
-      defaultRestDuration: defaultRestDuration ?? this.defaultRestDuration,
+      quickRestTimers: quickRestTimers ?? this.quickRestTimers,
     );
   }
 }
@@ -62,21 +63,27 @@ class SettingsNotifier extends AsyncNotifier<AppSettings> {
   /// Loads the settings from SharedPreferences.
   Future<AppSettings> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    final restDuration = prefs.getInt(_kDefaultRestDurationKey) ?? kDefaultRestDuration;
-    return AppSettings(defaultRestDuration: restDuration);
+    final timers = [
+      prefs.getInt('${_kQuickRestTimerKeyPrefix}0') ?? kDefaultQuickRestTimers[0],
+      prefs.getInt('${_kQuickRestTimerKeyPrefix}1') ?? kDefaultQuickRestTimers[1],
+      prefs.getInt('${_kQuickRestTimerKeyPrefix}2') ?? kDefaultQuickRestTimers[2],
+    ];
+    return AppSettings(quickRestTimers: timers);
   }
 
-  /// Updates the user's default rest duration.
-  ///
-  /// This method saves the new value to SharedPreferences and then updates
-  /// the in-memory state to reflect the change.
-  Future<void> updateDefaultRestDuration(int newDuration) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_kDefaultRestDurationKey, newDuration);
+  /// --- NEW METHOD ---
+  /// Updates a specific quick rest timer at a given index.
+  Future<void> updateQuickRestTimer({required int index, required int newDuration}) async {
+    if (index < 0 || index > 2) return; // Guard against invalid index.
 
-    // Update the state with the new value.
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('${_kQuickRestTimerKeyPrefix}$index', newDuration);
+
+    // Update the state with the new list of timers.
     state = await AsyncValue.guard(() async {
-      return state.value!.copyWith(defaultRestDuration: newDuration);
+      final currentTimers = List<int>.from(state.value!.quickRestTimers);
+      currentTimers[index] = newDuration;
+      return state.value!.copyWith(quickRestTimers: currentTimers);
     });
   }
 }

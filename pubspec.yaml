@@ -62,7 +62,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # --- FIX ---
-  # This section declares the new assets folder so Flutter can find the sound file.
+  # This section declares the asset folders so Flutter can find the files.
   assets:
     - assets/audio/
+    - assets/data/

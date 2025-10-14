@@ -1,3 +1,5 @@
+// lib/src/features/workout/domain/session_exercise.dart
+
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
@@ -29,6 +31,10 @@ class SessionExercise {
   /// The prescribed target for the exercise (e.g., "4 sets x 5-8 reps").
   final String target;
 
+  /// --- NEW ---
+  /// The "how-to" instructions for the exercise.
+  final String howTo;
+
   /// The list of sets that the user has logged for this exercise.
   final List<LoggedSet> loggedSets;
 
@@ -39,6 +45,7 @@ class SessionExercise {
     required this.id,
     required this.name,
     required this.target,
+    this.howTo = '', // Defaults to an empty string.
     this.loggedSets = const [], // Defaults to an empty list.
     this.isCurrent = false,
   });
@@ -52,6 +59,7 @@ class SessionExercise {
     String? id,
     String? name,
     String? target,
+    String? howTo,
     List<LoggedSet>? loggedSets,
     bool? isCurrent,
   }) {
@@ -59,6 +67,7 @@ class SessionExercise {
       id: id ?? this.id,
       name: name ?? this.name,
       target: target ?? this.target,
+      howTo: howTo ?? this.howTo,
       loggedSets: loggedSets ?? this.loggedSets,
       isCurrent: isCurrent ?? this.isCurrent,
     );

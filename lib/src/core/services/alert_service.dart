@@ -24,20 +24,24 @@ class AlertService {
 
   AlertService(this._audioPlayer);
 
+  /// --- UPDATED METHOD ---
+  /// Triggers only a warning sound, without haptic feedback.
+  Future<void> triggerTimerWarningAlert() async {
+    // Play the warning sound asset.
+    await _audioPlayer.play(AssetSource('audio/timer_warning.mp3'));
+  }
+
   /// Triggers a combination of haptic feedback and an audible alert to notify
   /// the user that their rest timer has finished.
   Future<void> triggerTimerCompletionAlert() async {
     // --- HAPTIC FEEDBACK ---
-    // Check if the device is capable of vibrating.
     final bool? hasVibrator = await Vibration.hasVibrator();
     if (hasVibrator ?? false) {
-      // If so, trigger a standard vibration pattern.
+      // Trigger a standard, longer vibration pattern.
       Vibration.vibrate();
     }
 
     // --- AUDIO FEEDBACK ---
-    // The audio playback line is now uncommented and will play the asset
-    // you added in the previous step.
     await _audioPlayer.play(AssetSource('audio/timer_complete.mp3'));
   }
 }

@@ -4,29 +4,16 @@
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// Core Flutter material design library.
 import 'package:flutter/material.dart';
-
-// Riverpod for state management.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// The application's design system for consistent styling.
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
-
-// The session state provider and data models.
 import 'package:fairware_lift/src/features/workout/application/session_state.dart';
 import 'package:fairware_lift/src/features/workout/domain/session_exercise.dart';
 import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
-
-// The timer state provider.
 import 'package:fairware_lift/src/features/workout/application/timer_state.dart';
-
-// The SetSheet UI.
+import 'package:fairware_lift/src/features/settings/application/settings_provider.dart';
 import 'set_sheet.dart';
-
-// --- NEW IMPORT ---
-// Import our new custom duration picker.
-import 'duration_picker_sheet.dart';
+import 'keypad_duration_picker.dart';
 
 // -----------------------------------------------------------------------------
 // --- WORKOUT DOCK WIDGET -----------------------------------------------------
@@ -36,34 +23,23 @@ import 'duration_picker_sheet.dart';
 class WorkoutDock extends ConsumerWidget {
   const WorkoutDock({super.key});
 
-  /// A helper to format the seconds into a "90s" format.
-  String _formatDuration(int totalSeconds) {
-    return '${totalSeconds}s';
-  }
-
-  /// --- UPDATED METHOD ---
-  /// Shows our new custom bottom sheet for picking a duration.
-  void _showTimerPicker(BuildContext context, WidgetRef ref) async {
-    // Get the current duration to pre-fill the picker.
-    final currentDuration = Duration(
-      seconds: ref.read(timerStateProvider).initialDuration,
-    );
-
-    // `showModalBottomSheet` now returns the `Duration` selected by the user.
-    final selectedDuration = await showModalBottomSheet<Duration>(
+  /// Shows the new keypad-style picker to set a new duration for a timer preset.
+  void _showKeypadPicker(BuildContext context, WidgetRef ref, int timerIndex) async {
+    final newDuration = await showModalBottomSheet<Duration>(
       context: context,
+      isScrollControlled: true,
       backgroundColor: AppTheme.colors.surface,
-      builder: (BuildContext builder) {
-        return DurationPickerSheet(initialDuration: currentDuration);
-      },
+      builder: (context) => const KeypadDurationPicker(),
     );
 
-    // If the user selected a duration (didn't just dismiss the sheet),
-    // start the timer with that new duration.
-    if (selectedDuration != null) {
-      ref.read(timerStateProvider.notifier).startTimer(
-            duration: selectedDuration.inSeconds,
+    if (newDuration != null && newDuration.inSeconds > 0) {
+      // Update the preset value in settings.
+      await ref.read(settingsProvider.notifier).updateQuickRestTimer(
+            index: timerIndex,
+            newDuration: newDuration.inSeconds,
           );
+      // Immediately start the timer with the new duration.
+      ref.read(timerStateProvider.notifier).startTimer(duration: newDuration.inSeconds);
     }
   }
 
@@ -79,12 +55,7 @@ class WorkoutDock extends ConsumerWidget {
         : null;
 
     final timerState = ref.watch(timerStateProvider);
-    final timerNotifier = ref.read(timerStateProvider.notifier);
-
-    // Calculate the progress for the circular indicator.
-    final double timerProgress = timerState.isRunning && timerState.initialDuration > 0
-        ? timerState.secondsRemaining / timerState.initialDuration
-        : 0.0;
+    final settings = ref.watch(settingsProvider);
 
     return BottomAppBar(
       color: AppTheme.colors.background,
@@ -94,90 +65,110 @@ class WorkoutDock extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // --- TIMER DISPLAY ---
-            GestureDetector(
-              onTap: () => _showTimerPicker(context, ref),
-              child: SizedBox(
-                width: 70,
-                height: 40,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Progress Indicator
-                    if (timerState.isRunning)
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: CircularProgressIndicator(
-                          value: timerProgress,
-                          strokeWidth: 2.0,
-                          backgroundColor: AppTheme.colors.surface,
-                          color: AppTheme.colors.accent,
-                        ),
-                      ),
-                    // Timer Text
-                    Text(
-                      timerState.isRunning
-                          ? _formatDuration(timerState.secondsRemaining)
-                          : 'Rest',
-                      style: AppTheme.typography.body.copyWith(
-                        fontSize: 14,
-                        color: timerState.isRunning
-                            ? AppTheme.colors.accent
-                            : AppTheme.colors.textMuted,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+            // --- THREE QUICK-SELECT TIMERS ---
+            settings.when(
+              data: (appSettings) => Row(
+                children: List.generate(3, (index) {
+                  return _buildQuickTimer(
+                    context: context,
+                    ref: ref,
+                    timerIndex: index,
+                    presetDuration: appSettings.quickRestTimers[index],
+                    timerState: timerState,
+                  );
+                }),
               ),
+              loading: () => const Row(children: [SizedBox(width: 150)]),
+              error: (err, stack) => const Text('Error'),
             ),
 
-            // --- ACTION BUTTONS ---
-            Row(
-              children: [
-                TextButton(
-                  onPressed: timerState.isRunning
-                      ? () => timerNotifier.addTime(seconds: 30)
-                      : null,
-                  child: const Text('+30s'),
-                ),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: () {
-                    // Stop any running timer when moving to the next exercise.
-                    timerNotifier.stopTimer();
-                    ref.read(sessionStateProvider.notifier).selectNextExercise();
-                  },
-                  child: const Text('Next'),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    final result = await showModalBottomSheet<Map<String, num>>(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: AppTheme.colors.surface,
-                      builder: (context) => SetSheet(
-                        initialWeight: lastSet?.weight,
-                        initialReps: lastSet?.reps,
-                      ),
-                    );
-
-                    if (result != null) {
-                      ref.read(sessionStateProvider.notifier).logSet(
-                            weight: result['weight']!.toDouble(),
-                            reps: result['reps']!.toInt(),
-                          );
-                    }
-                  },
-                  icon: const Icon(Icons.add_rounded),
-                  label: const Text('Set'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+            // --- ACTION BUTTON ---
+            // --- UI FIX ---
+            // The "+30s" and "Next" buttons have been removed to fix the
+            // overflow and simplify the UI.
+            ElevatedButton.icon(
+              onPressed: () async {
+                final result = await showModalBottomSheet<Map<String, num>>(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: AppTheme.colors.surface,
+                  builder: (context) => SetSheet(
+                    initialWeight: lastSet?.weight,
+                    initialReps: lastSet?.reps,
                   ),
+                );
+
+                if (result != null) {
+                  ref.read(sessionStateProvider.notifier).logSet(
+                        weight: result['weight']!.toDouble(),
+                        reps: result['reps']!.toInt(),
+                      );
+                }
+              },
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Set'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// A helper widget to build one of the three quick-select timer circles.
+  Widget _buildQuickTimer({
+    required BuildContext context,
+    required WidgetRef ref,
+    required int timerIndex,
+    required int presetDuration,
+    required TimerState timerState,
+  }) {
+    // Determine if this specific timer is the one currently running.
+    final bool isThisTimerActive =
+        timerState.isRunning && timerState.initialDuration == presetDuration;
+
+    final double timerProgress = isThisTimerActive && timerState.initialDuration > 0
+        ? timerState.secondsRemaining / timerState.initialDuration
+        : 0.0;
+
+    return GestureDetector(
+      // A simple tap starts the timer with its preset duration.
+      onTap: () => ref.read(timerStateProvider.notifier).startTimer(duration: presetDuration),
+      // A long press opens the keypad to set a new duration for this preset.
+      onLongPress: () => _showKeypadPicker(context, ref, timerIndex),
+      child: Container(
+        width: 50,
+        height: 40,
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Progress Indicator
+            if (isThisTimerActive)
+              SizedBox(
+                width: 40,
+                height: 40,
+                child: CircularProgressIndicator(
+                  value: timerProgress,
+                  strokeWidth: 2.0,
+                  backgroundColor: AppTheme.colors.surface,
+                  color: AppTheme.colors.accent,
                 ),
-              ],
+              ),
+            // Timer Text
+            Text(
+              isThisTimerActive
+                  ? '${timerState.secondsRemaining}s'
+                  : '${presetDuration}s',
+              style: AppTheme.typography.body.copyWith(
+                fontSize: 14,
+                color: isThisTimerActive
+                    ? AppTheme.colors.accent
+                    : AppTheme.colors.textMuted,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),

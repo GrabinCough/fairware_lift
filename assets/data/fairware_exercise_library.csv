@@ -1,0 +1,168 @@
+name,equipment,movement_pattern,primary_muscles,secondary_muscles,how_to
+Banded Pallof Press,Band,Anti-Rotation,Obliques,Transverse Abdominis,Press band away from body and resist rotation; keep hips/pelvis square.
+Banded Triceps Pushdown,Band,Elbow Extension,Triceps,Forearms,Elbows pinned; extend band to full lockout; slow return.
+Banded Curl,Band,Elbow Flexion,Biceps,Forearms,Stand on band; curl with elbows fixed; squeeze at top.
+Band Face Pull,Band,External Rotation,"Rear Delts, Lower Traps",Rotator Cuff,Band anchored high; pull toward nose while rotating thumbs back.
+Banded Good Morning,Band,Hinge,"Hamstrings, Glutes",Spinal Erectors,"Band under feet and behind neck; hinge back, then stand tall."
+Monster Walk / Lateral Walk,Band,Hip Abduction,Glute Med/Min,Glute Max,Loop band above ankles/knees; small steps out/forward maintaining tension.
+Banded Row,Band,Horizontal Pull,Mid-Back,"Lats, Rear Delts",Seated or standing; pull handles toward torso; control return.
+Banded Push-Up,Band,Horizontal Push,"Chest, Triceps",Front Delts,Band across upper back and hands; perform push-ups with extra resistance.
+Band Pull-Apart,Band,Scapular Retraction,"Rear Delts, Mid-Back",Rotator Cuff,Arms straight at chest height; pull band apart by squeezing shoulder blades together.
+Banded Squat,Band,Squat,"Quads, Glutes",Hamstrings,Band for accommodating resistance; squat keeping knees tracking out.
+Assisted Pull-Up (Band),Band,Vertical Pull,Lats,Biceps,Loop band over bar and foot/knee; pull chest to bar; use minimal assistance.
+Glute Bridge (Barbell),Barbell,Bridge/Thrust,Glutes,"Hamstrings, Core","Shoulders on floor; bar at hips; drive hips up; keep ribs down, eyes forward."
+Hip Thrust,Barbell,Bridge/Thrust,Glutes,"Hamstrings, Quads","Upper back on bench, bar over hips; drive hips to full extension with posterior pelvic tilt; pause and lower."
+JM Press,Barbell,Elbow Extension,Triceps,"Chest, Shoulders",Lower bar toward upper chest with elbow bend; press by extending elbows—hybrid of CGBP and skullcrusher.
+Skullcrusher (Lying Triceps Extension),Barbell,Elbow Extension,Triceps,Forearms,Elbows tucked; lower bar behind forehead; extend by hinging at elbows only.
+Barbell Curl,Barbell,Elbow Flexion,Biceps,"Forearms, Brachialis",Elbows fixed at sides; curl bar under control; avoid torso sway.
+Reverse Curl,Barbell,Elbow Flexion,Brachioradialis,"Biceps, Forearms",Overhand grip; curl to shoulder height; control the descent.
+Conventional Deadlift,Barbell,Hinge,"Hamstrings, Glutes","Spinal Erectors, Lats, Traps",Feet under hips; grip just outside legs; brace; push floor away then extend hips; bar travels close to shins.
+Good Morning,Barbell,Hinge,"Hamstrings, Glutes","Spinal Erectors, Core",Soft knees; hinge hips back with neutral spine until hamstrings loaded; extend hips to stand.
+Good Morning (Safety Bar),Barbell,Hinge,"Hamstrings, Glutes",Spinal Erectors,"With SSB, hinge back keeping shins vertical; extend hips to stand."
+Rack Pull (Below Knee),Barbell,Hinge,"Spinal Erectors, Glutes","Hamstrings, Traps",Bar on pins below knee; hinge and pull to lockout; focus on back strength and lockout mechanics.
+Romanian Deadlift (RDL),Barbell,Hinge,Hamstrings,"Glutes, Spinal Erectors","From standing, hinge back keeping bar close to thighs; stop mid-shin; stand by driving hips forward."
+Snatch-Grip Deadlift,Barbell,Hinge,"Hamstrings, Glutes","Upper Back, Traps",Wide snatch grip; keep lats tight; pull with bar close to body to emphasize posterior chain.
+Sumo Deadlift,Barbell,Hinge,"Glutes, Adductors","Hamstrings, Spinal Erectors",Wide stance; hands inside knees; keep shins vertical; push knees out and drive hips through.
+Bent-Over Row,Barbell,Horizontal Pull,"Lats, Mid-Back","Rear Delts, Biceps",Hinge to ~45°; pull bar to lower ribs; keep spine neutral and elbows close.
+Pendlay Row,Barbell,Horizontal Pull,Mid-Back,"Lats, Rear Delts, Biceps",From floor each rep; torso parallel; explosive pull to sternum then reset.
+Yates Row (Underhand),Barbell,Horizontal Pull,"Lats, Biceps","Rear Delts, Mid-Back",Slight torso lean; underhand grip; pull to lower abdomen; control eccentric.
+Bench Press (Flat),Barbell,Horizontal Push,Chest,"Triceps, Front Delts",Eyes under bar; shoulder blades retracted; touch mid-chest; press bar back/up in slight arc.
+Bench Press (Incline),Barbell,Horizontal Push,Upper Chest,"Front Delts, Triceps",Bench 30–45°; touch upper chest softly; drive bar up while keeping shoulders packed.
+Close-Grip Bench Press,Barbell,Horizontal Push,Triceps,"Chest, Front Delts",Grip just inside shoulder width; elbows tuck ~45°; touch lower sternum; press to lockout.
+Spoto Press,Barbell,Horizontal Push,Chest,Triceps,Pause 1–2 cm above chest; maintain tension; press without bouncing.
+Front Rack Lunge,Barbell,Lunge,"Quads, Glutes","Hamstrings, Core","Bar in front rack; step forward, descend to ~90° front knee; push back up maintaining torso vertical."
+Reverse Lunge (Barbell),Barbell,Lunge,"Glutes, Quads","Hamstrings, Core",Step back into lunge; load front leg; drive through front heel to return.
+Back Squat (High Bar),Barbell,Squat,"Quads, Glutes","Hamstrings, Core, Spinal Erectors","Bar on upper traps; feet shoulder-width; brace, sit hips down/back, knees track over toes; drive up through mid-foot."
+Back Squat (Low Bar),Barbell,Squat,"Glutes, Hamstrings","Quads, Spinal Erectors, Core","Bar below spine of scapula; lean torso slightly; sit back, keep wrists straight; stand by driving hips through."
+Box Squat,Barbell,Squat,"Glutes, Hamstrings","Quads, Core",Sit back to a box with shins near vertical; pause lightly; drive up without rocking.
+Front Squat,Barbell,Squat,Quads,"Glutes, Core, Upper Back","Clean or cross-arm rack; chest tall, elbows high; descend between hips; keep torso upright; stand through mid-foot."
+Overhead Squat,Barbell,Squat,"Quads, Glutes","Shoulders, Upper Back, Core",Snatch-width grip; lockout overhead; sit hips down while bar stays over mid-foot; keep ribs down.
+Upright Row,Barbell,Vertical Pull,"Side Delts, Traps",Forearms,Grip shoulder width; lead with elbows high; pull to lower chest; avoid shoulder pinch.
+Overhead Press (Strict),Barbell,Vertical Push,Shoulders,"Triceps, Upper Chest, Core","Grip just outside shoulders; brace glutes/abs; press bar straight up, head through at lockout."
+Push Press,Barbell,Vertical Push,"Shoulders, Triceps","Quads, Glutes, Core","Dip/drive with legs, transfer momentum to press; control lockout overhead."
+Z Press,Barbell,Vertical Push,Shoulders,"Triceps, Core",Seated on floor legs straight; strict press; forces torso stability.
+Landmine Press,Barbell (Landmine),Angled Push,"Shoulders, Upper Chest","Triceps, Core",Bar in landmine; press from shoulder up/forward; keep ribs down and glutes tight.
+Landmine Rotation,Barbell (Landmine),Anti-Rotation,Obliques,Core,Arms straight; arc bar side-to-side using trunk rotation control; resist lumbar movement.
+Landmine Row (Meadows Row),Barbell (Landmine),Horizontal Pull,Lats,"Mid-Back, Rear Delts",Perpendicular to bar; hip hinge and row handle to hip; control eccentric.
+Landmine Squat,Barbell (Landmine),Squat,"Quads, Glutes",Core,Hold sleeve at chest; sit between heels; keep elbows in; drive up through mid-foot.
+Dead Bug,Bodyweight,Anti-Extension,Core,Hip Flexors,Ribs down; opposite arm/leg extend while lumbar stays flat on floor.
+Plank,Bodyweight,Anti-Extension,Core,"Glutes, Scapular Stabilizers",Elbows under shoulders; ribs down; glutes tight; body in straight line.
+Side Plank,Bodyweight,Anti-Lateral Flexion,Obliques,Glute Med,Elbow under shoulder; stack feet; keep hips high and body in straight line.
+Bird-Dog,Bodyweight,Anti-Rotation,Spinal Stabilizers,"Glutes, Shoulders",Quadruped; extend opposite arm/leg; resist torso rotation.
+Glute Bridge (BW),Bodyweight,Bridge/Thrust,Glutes,Hamstrings,Shoulders on floor; drive hips up; ribs down.
+Hip Thrust (BW),Bodyweight,Bridge/Thrust,Glutes,"Hamstrings, Core",Upper back on bench; squeeze glutes to full extension; posteriorly tilt pelvis.
+Mountain Climber,Bodyweight,Conditioning/Core,"Hip Flexors, Abs",Shoulders,Plank position; drive knees alternately toward chest; keep hips stable.
+Captain’s Chair Knee Raise,Bodyweight,Hip Flexion,Abs,Hip Flexors,Forearms on pads; curl knees up; slow lower.
+Hanging Knee Raise,Bodyweight,Hip Flexion,Abs,Hip Flexors,Hang from bar; curl knees up toward chest; control down.
+Hanging Leg Raise,Bodyweight,Hip Flexion,Abs,Hip Flexors,Straight legs; raise to 90° or higher; avoid swinging.
+Sit-Up,Bodyweight,Hip Flexion + Abs,"Abs, Hip Flexors",—,Feet anchored or free; sit up smoothly; avoid yanking neck.
+Inverted Row,Bodyweight,Horizontal Pull,Mid-Back,"Rear Delts, Biceps",Heels on floor; pull chest to bar; keep body straight.
+Decline Push-Up,Bodyweight,Horizontal Push,Upper Chest,"Front Delts, Triceps",Feet elevated; lower under control; press through full range.
+Diamond Push-Up,Bodyweight,Horizontal Push,Triceps,Chest,Hands close under sternum; keep elbows tucked; full lockout.
+Incline Push-Up,Bodyweight,Horizontal Push,Chest,"Triceps, Front Delts",Hands on bench; same form as push-up; easier angle for higher reps.
+Push-Up,Bodyweight,Horizontal Push,"Chest, Triceps","Front Delts, Core",Hands under shoulders; body rigid; lower until chest near floor; press back maintaining straight line.
+Nordic Hamstring Curl (Assisted),Bodyweight,Knee Flexion (Eccentric),Hamstrings,"Glutes, Calves","Knees on pad, ankles fixed; lower slowly; assist with hands to return."
+Step-Up,Bodyweight,Knee-Dominant,"Quads, Glutes",Hamstrings,Step onto box; drive through full foot; control down.
+Reverse Lunge,Bodyweight,Lunge,"Glutes, Quads",Hamstrings,Step back; load front leg; return by pushing through front heel.
+Split Squat,Bodyweight,Lunge,"Quads, Glutes",Adductors,Feet split; descend straight down; drive through front foot.
+Walking Lunge,Bodyweight,Lunge,"Quads, Glutes",Hamstrings,Step forward into lunge and continue stepping forward each rep.
+Calf Raise (BW),Bodyweight,Plantarflexion,Gastrocnemius,Soleus,Ball of foot on edge; rise tall; slow stretch at bottom.
+Back Extension (Floor/Mat),Bodyweight,Spinal Extension,Spinal Erectors,Glutes,Prone; lift chest slightly keeping neck neutral; controlled reps.
+Crunch,Bodyweight,Spinal Flexion,Abs,—,Exhale and curl ribs toward pelvis; small controlled range.
+Bodyweight Squat,Bodyweight,Squat,"Quads, Glutes","Hamstrings, Core",Sit between heels; keep chest tall; drive up through mid-foot.
+Burpee,Bodyweight,Total-Body,"Quads, Chest","Shoulders, Core","Squat to hands, jump feet back, push-up, jump forward, and jump up."
+Chin-Up (Underhand),Bodyweight,Vertical Pull,"Biceps, Lats",Mid-Back,Underhand grip; pull chin over bar; avoid swinging.
+Neutral-Grip Pull-Up,Bodyweight,Vertical Pull,Lats,"Biceps, Rear Delts",Neutral handles; pull until chin over handles; slow lower.
+Pull-Up (Overhand),Bodyweight,Vertical Pull,"Lats, Mid-Back","Biceps, Rear Delts",Hang from bar; pull chest toward bar; control down to full hang.
+Dips (Parallel Bars),Bodyweight,Vertical Push,"Triceps, Chest",Front Delts,Shoulders down/back; descend below elbows; press to lockout.
+Cable Lateral Raise,Cable,Abduction,Side Delts,Supraspinatus,Cable behind you; lead with elbow; raise to shoulder height; slow eccentric.
+Pallof Press (Anti-Rotation),Cable,Anti-Rotation,Obliques,Transverse Abdominis,Stand side-on; press handle straight out; resist cable pulling you inward.
+Overhead Cable Triceps Extension,Cable,Elbow Extension,Triceps (long head),Forearms,Face away; elbows high; extend without letting elbows flare.
+Triceps Pushdown (Rope),Cable,Elbow Extension,Triceps,Forearms,Elbows pinned; extend rope and split at bottom; full lockout then controlled return.
+Cable Curl (Straight Bar),Cable,Elbow Flexion,Biceps,"Brachialis, Forearms",Elbows at sides; curl bar up with constant cable tension.
+Incline Cable Curl,Cable,Elbow Flexion,Biceps (long head),Brachialis,Seated on incline; arms hang back; curl without shoulder roll.
+Cable Rear Delt Fly,Cable,Horizontal Abduction,Rear Delts,Mid-Back,Cross-body handles; open arms out and slightly back; avoid shrugging.
+Cable Fly (High-to-Low),Cable,Horizontal Adduction,Lower Chest,Front Delts,Pulleys high; sweep down/in to hip line; squeeze chest; slow return.
+Cable Fly (Low-to-High),Cable,Horizontal Adduction,Upper Chest,Front Delts,Pulleys low; sweep up/in toward upper chest; keep elbows soft.
+Incline Cable Fly (Bench),Cable,Horizontal Adduction,Upper Chest,Front Delts,Bench at 30–45°; arc wide then squeeze together above chest.
+Seated Cable Row (Neutral),Cable,Horizontal Pull,Mid-Back,"Lats, Biceps",Flat torso; pull handle to lower ribs; avoid shrugging; control eccentric.
+Seated Cable Row (Wide Bar),Cable,Horizontal Pull,"Rear Delts, Mid-Back",Lats,Wide grip; pull to upper chest; flare elbows slightly to hit rear delts.
+Standing Cable Row,Cable,Horizontal Pull,"Lats, Mid-Back","Rear Delts, Biceps",Athletic stance; pull to mid-torso; keep ribs down and shoulders packed.
+Cable Chest Press,Cable,Horizontal Push,Chest,"Triceps, Front Delts",Staggered stance; press handles forward; slight inward path; control back.
+Cable Woodchop (High-to-Low),Cable,Rotation,Obliques,Lats,Rotate trunk to pull handle diagonally down across body; control return.
+Cable Woodchop (Low-to-High),Cable,Rotation,Obliques,Shoulders,"From low pulley, rotate and lift handle diagonally up and across body."
+Face Pull (Rope),Cable,Scapular Retraction/External Rotation,"Rear Delts, Lower Traps",Rotator Cuff,Set rope high; pull toward nose/thumbs back; externally rotate so knuckles point behind you.
+Straight-Arm Pulldown,Cable,Shoulder Extension,Lats,"Teres Major, Triceps (long head)",Arms straight; sweep bar from overhead to thighs while keeping ribs down.
+Cable Crunch (Kneeling),Cable,Spinal Flexion,Abs,Hip Flexors,Rope behind head; crunch by bringing ribs toward pelvis; avoid hip hinge.
+Cable Upright Row (EZ Bar),Cable,Vertical Pull,"Side Delts, Traps",Forearms,Pull bar up keeping elbows higher than wrists; stop below clavicle.
+Lat Pulldown (Close Neutral),Cable,Vertical Pull,Lats,"Biceps, Lower Lats","Neutral-grip handle; pull to sternum; squeeze at bottom, slow return."
+Lat Pulldown (Underhand),Cable,Vertical Pull,"Lower Lats, Biceps",Mid-Back,Underhand shoulder-width; pull to upper chest keeping elbows in.
+Lat Pulldown (Wide Overhand),Cable,Vertical Pull,Lats,"Biceps, Mid-Back",Grip wider than shoulders; pull to upper chest; keep chest tall and elbows down.
+Lateral Raise,Dumbbell,Abduction,Side Delts,Upper Traps,Lead with elbows; raise to shoulder height; slight forward torso to bias delts.
+DB Hip Thrust,Dumbbell,Bridge/Thrust,Glutes,Hamstrings,Bell on hips; drive to full extension with posterior pelvic tilt; pause and lower.
+Farmer Carry,Dumbbell,Carry,"Forearms, Traps","Core, Glutes",Walk tall with neutral spine and packed shoulders; even steps and breathing.
+Suitcase Carry (Single-Arm),Dumbbell,Carry (Anti-Lateral Flexion),Obliques,"Forearms, Glutes",Hold one heavy bell; resist leaning; walk steadily.
+Overhead Triceps Extension,Dumbbell,Elbow Extension,Triceps (long head),Forearms,Two-hand or single arm; lower behind head; extend by driving elbows up.
+Triceps Kickback,Dumbbell,Elbow Extension,Triceps,Rear Delts,Torso hinged; upper arm parallel to floor; extend elbow to straight; squeeze.
+Alternating Curl,Dumbbell,Elbow Flexion,Biceps,Forearms,Supinated curl one arm at a time; avoid torso sway.
+Concentration Curl,Dumbbell,Elbow Flexion,Biceps,Forearms,Elbow braced on inner thigh; strict curl to peak contraction.
+Hammer Curl,Dumbbell,Elbow Flexion,"Brachialis, Brachioradialis",Biceps,Neutral grip; curl keeping elbows by sides; control descent.
+Incline Curl,Dumbbell,Elbow Flexion,Biceps (long head),Brachialis,"On incline bench, let arms hang; curl without letting shoulder roll forward."
+Front Raise,Dumbbell,Flexion,Front Delts,Upper Chest,Raise bells to eye level with thumbs slightly up; avoid swinging.
+Romanian Deadlift (DB),Dumbbell,Hinge,Hamstrings,"Glutes, Spinal Erectors",Hinge back with bells along thighs; stop mid-shin; extend hips to stand.
+Single-Leg RDL,Dumbbell,Hinge (Unilateral),"Hamstrings, Glutes","Core, Foot Stabilizers",Hinge on one leg; let back leg extend; keep hips square; return to stand.
+Rear Delt Fly (Bent Over),Dumbbell,Horizontal Abduction,Rear Delts,Mid-Back,Hinge at hips; raise bells out/back; keep thumbs slightly down and scapula neutral.
+DB Fly (Incline),Dumbbell,Horizontal Adduction,Upper Chest,Front Delts,Arc out on incline; stop at big chest stretch; squeeze together above chest.
+Dumbbell Fly,Dumbbell,Horizontal Adduction,Chest,"Front Delts, Biceps (long head)",Soft elbows; arc out until chest stretch; squeeze together above chest.
+One-Arm Dumbbell Row,Dumbbell,Horizontal Pull,Lats,"Mid-Back, Rear Delts, Biceps",Knee/hand on bench; pull bell to hip; keep shoulder from rolling forward.
+Renegade Row,Dumbbell,Horizontal Pull,"Lats, Core","Rear Delts, Biceps",Push-up plank on bells; row one side while resisting hip roll; alternate.
+DB Floor Press,Dumbbell,Horizontal Push,Chest,Triceps,Lie on floor; lower until triceps touch; press without bouncing elbows.
+Dumbbell Bench Press (Flat),Dumbbell,Horizontal Push,Chest,"Triceps, Front Delts",Shoulder blades set; lower bells to mid-chest with slight elbow tuck; press together over sternum.
+Dumbbell Decline Press,Dumbbell,Horizontal Push,Lower Chest,Triceps,Set decline; lower to lower chest; press up keeping wrists stacked.
+Dumbbell Incline Bench Press,Dumbbell,Horizontal Push,Upper Chest,"Front Delts, Triceps",Bench 30–45°; neutral or slight pronation; press up/back toward shoulders.
+Step-Up,Dumbbell,Knee-Dominant,"Quads, Glutes","Hamstrings, Calves",Foot on box; drive through entire foot; control descent.
+Bulgarian Split Squat,Dumbbell,Lunge,"Quads, Glutes","Adductors, Core",Rear foot on bench; descend straight down; front shin vertical; drive through front heel.
+Walking Lunge,Dumbbell,Lunge,"Quads, Glutes","Hamstrings, Calves",Step forward into lunge; push through front leg and step through.
+Shrug,Dumbbell,Scapular Elevation,Upper Traps,Forearms,Stand tall; elevate shoulders straight up; brief pause and lower under control.
+DB Pullover (Bent-Arm),Dumbbell,Shoulder Extension,Lats,"Serratus, Chest",Keep elbows ~30° flexed; pull over using lats and serratus.
+Dumbbell Pullover,Dumbbell,Shoulder Extension,Lats,"Chest, Serratus",Bell over chest; lower behind head with elbows soft; pull back using lats and ribcage control.
+Goblet Squat,Dumbbell,Squat,Quads,"Glutes, Core",Hold bell at chest; sit between heels; keep torso tall; drive up through mid-foot.
+Arnold Press,Dumbbell,Vertical Push,Front/Side Delts,Triceps,Start palms in; rotate outward while pressing overhead; control down with reverse rotation.
+Dumbbell Shoulder Press (Seated),Dumbbell,Vertical Push,Shoulders,Triceps,Back supported; press bells overhead with forearms vertical; avoid flaring ribs.
+KB Farmer Carry,Kettlebell,Carry,"Forearms, Traps","Core, Glutes",Walk tall with packed shoulders; even stride and breathing.
+KB Suitcase Carry,Kettlebell,Carry (Anti-Lateral Flexion),Obliques,Forearms,One bell; resist side bend; steady gait.
+KB RDL,Kettlebell,Hinge,Hamstrings,"Glutes, Spinal Erectors","Hinge back, bell close to shins; stand by squeezing glutes."
+Kettlebell Snatch,Kettlebell,Hinge (Ballistic),"Glutes, Hamstrings","Shoulders, Grip",Explode from hips; guide bell overhead to lockout; punch through to avoid forearm slam.
+Kettlebell Swing (Hardstyle),Kettlebell,Hinge (Ballistic),"Glutes, Hamstrings","Spinal Erectors, Lats, Core",Hike bell; snap hips to float to chest height; hinge back—no shoulder lift; stay tight at lockout.
+Single-Arm KB Swing,Kettlebell,Hinge (Ballistic),"Glutes, Hamstrings","Obliques, Lats",One hand; switch mid-air or on the downswing; keep shoulders square.
+Kettlebell Clean,Kettlebell,Hinge→Rack,"Glutes, Hamstrings","Forearms, Delts, Core",Hike; snap hips; guide bell around forearm to rack softly (no bang).
+KB Clean & Press,Kettlebell,Hinge→Vertical Push,Shoulders,"Glutes, Triceps, Core","Clean to rack, then press overhead with ribs down and glutes tight."
+KB Windmill,Kettlebell,Hip Hinge/Rotation,"Obliques, Glutes","Shoulders, Hamstrings",Bell overhead; hinge toward unloaded leg; keep eyes on bell.
+KB Halo,Kettlebell,Shoulder Mobility,Shoulders,"Upper Back, Triceps",Circle bell around head close to neck; keep ribs down.
+Goblet Squat (KB),Kettlebell,Squat,Quads,"Glutes, Core",Hold horns at chest; sit between heels; keep elbows inside knees.
+KB Front Rack Squat (Double),Kettlebell,Squat,"Quads, Glutes","Core, Upper Back",Two bells in rack; descend with upright torso; drive through mid-foot.
+Turkish Get-Up,Kettlebell,Total-Body,"Shoulders, Core, Hips","Obliques, Glutes","From supine to stand with bell locked overhead, moving through each posture with control."
+Bottoms-Up Press,Kettlebell,Vertical Push,Shoulders,"Forearms, Core",Hold bell upside-down; press while crushing handle; stay strict.
+Lateral Raise (Machine),Machine,Abduction,Side Delts,Upper Traps,Pads on arms; raise to shoulder height; control eccentric.
+Glute Drive (Machine),Machine,Bridge/Thrust,Glutes,Hamstrings,Shoulders on pad; belt over hips; extend hips fully with slight posterior pelvic tilt.
+Hip Abductor,Machine,Hip Abduction,Glute Med/Min,TFL,Knees press out against pads; move through comfortable range with control.
+Hip Adductor,Machine,Hip Adduction,Adductors,—,Knees press inward against pads; control both directions.
+Back Extension (45° Hyper),Machine,Hip Extension,"Glutes, Hamstrings",Spinal Erectors,Hinge at hips over pad; extend to neutral spine; avoid hyperextending.
+Reverse Hyperextension,Machine,Hip Extension,"Glutes, Hamstrings",Spinal Erectors,Hips on pad; swing legs up behind to hip extension; control down.
+Pec Deck (Chest Fly),Machine,Horizontal Adduction,Chest,"Front Delts, Biceps (long head)",Elbows slightly bent; bring pads together squeezing chest; slow return.
+Seated Row (Machine),Machine,Horizontal Pull,Mid-Back,"Lats, Rear Delts",Neutral spine; pull to torso; squeeze shoulder blades together.
+Chest Press (Plate/Selectorized),Machine,Horizontal Push,Chest,"Triceps, Front Delts",Seat height set so handles align with mid-chest; press and control back.
+Leg Extension,Machine,Knee Extension,Quads,—,Pad above ankle; extend to near lockout; control down.
+Leg Curl (Lying),Machine,Knee Flexion,Hamstrings,Calves,Prone; curl heels toward glutes without lifting hips off pad.
+Leg Curl (Seated),Machine,Knee Flexion,Hamstrings,Calves,Pad just above heels; curl under seat; pause and return slowly.
+Leg Press,Machine,Knee-Dominant,Quads,"Glutes, Hamstrings",Feet mid-platform; lower to ~90° knee; drive platform away without locking knees violently.
+Calf Raise (Seated),Machine,Plantarflexion,Soleus,Gastrocnemius,"Ball of foot on platform; drive through big toe; pause at top, slow stretch at bottom."
+Calf Raise (Standing),Machine,Plantarflexion,Gastrocnemius,Soleus,Knees straight; rise onto toes fully; slow controlled lower.
+Hack Squat (Machine),Machine,Squat,Quads,Glutes,Back against pad; descend with heels planted; drive through mid-foot up.
+Assisted Chin-Up (Machine),Machine,Vertical Pull,"Lats, Biceps",Rear Delts,Knees on pad; pull chin over bar; control down.
+Lat Pulldown (Machine),Machine,Vertical Pull,Lats,"Biceps, Mid-Back",Grip bar/handles; pull to upper chest; avoid leaning back excessively.
+Assisted Dip (Machine),Machine,Vertical Push,"Triceps, Chest",Front Delts,Knees on pad; descend until shoulders below elbows; press up to lockout.
+Shoulder Press (Machine),Machine,Vertical Push,Shoulders,Triceps,Seat so handles start near jawline; press overhead; avoid shrugging.
+Smith RDL,Machine (Smith),Hinge,Hamstrings,"Glutes, Spinal Erectors",Hinge with bar close; keep shins mostly vertical; extend hips to stand.
+Smith Bench Press,Machine (Smith),Horizontal Push,Chest,"Triceps, Front Delts",Set safeties; lower to mid-chest; press to lockout under control.
+Smith Squat,Machine (Smith),Squat,"Quads, Glutes",Hamstrings,Feet slightly forward; descend straight down with bar path fixed; drive up evenly.

@@ -1,14 +1,11 @@
+// lib/src/features/workout/presentation/widgets/exercise_list_item.dart
+
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// Core Flutter material design library.
 import 'package:flutter/material.dart';
-
-// The application's design system for consistent styling.
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
-
-// The data model for a logged set.
 import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 
 // -----------------------------------------------------------------------------
@@ -16,28 +13,32 @@ import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 // -----------------------------------------------------------------------------
 
 /// A widget that displays a single exercise within the session's exercise list.
-///
-/// This widget is responsible for showing the exercise name, its target sets
-/// and reps, and visually indicating whether it is the currently active exercise.
 class ExerciseListItem extends StatelessWidget {
   final String exerciseName;
   final String target;
   final bool isCurrent;
-  // --- STATE INTEGRATION ---
-  // It now accepts a list of LoggedSet objects to display.
   final List<LoggedSet> loggedSets;
+
+  /// --- NEW ---
+  /// The "how-to" instructions for the exercise.
+  final String howTo;
+
+  /// --- NEW ---
+  /// A callback function to be executed when the info button is tapped.
+  final VoidCallback onInfoTap;
 
   const ExerciseListItem({
     super.key,
     required this.exerciseName,
     required this.target,
     required this.loggedSets,
+    required this.howTo,
+    required this.onInfoTap,
     this.isCurrent = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    // A Card provides a clear visual container for the exercise information.
     return Card(
       color: isCurrent ? AppTheme.colors.surfaceAlt : AppTheme.colors.surface,
       elevation: 0,
@@ -56,30 +57,40 @@ class ExerciseListItem extends StatelessWidget {
             // --- EXERCISE NAME & TARGET ---
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Text(
                     exerciseName,
                     style: AppTheme.typography.title.copyWith(fontSize: 20),
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                    maxLines: 2, // Allow for slightly longer names
                   ),
                 ),
-                const SizedBox(width: 16),
-                Text(
-                  target,
-                  style: AppTheme.typography.body,
+                const SizedBox(width: 8),
+                // --- NEW ---
+                // The target and info button are now grouped in a Row.
+                Row(
+                  children: [
+                    Text(
+                      target,
+                      style: AppTheme.typography.body,
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      icon: const Icon(Icons.info_outline_rounded),
+                      onPressed: onInfoTap,
+                      color: AppTheme.colors.textMuted,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(), // Removes extra padding
+                    ),
+                  ],
                 ),
               ],
             ),
             const SizedBox(height: 16),
 
-            // --- STATE INTEGRATION ---
-            // The hardcoded list has been replaced with a dynamic list builder.
-            // It uses the `loggedSets` list passed into the widget to build
-            // a _buildSetRow for each set.
-            // The `...` is the "spread" operator, which inserts all the
-            // generated widgets into this Column.
+            // --- LOGGED SETS ---
             ...loggedSets.asMap().entries.map((entry) {
               final index = entry.key;
               final set = entry.value;
