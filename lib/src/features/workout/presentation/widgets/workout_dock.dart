@@ -1,3 +1,5 @@
+// lib/src/features/workout/presentation/widgets/workout_dock.dart
+
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
@@ -22,22 +24,47 @@ import 'package:fairware_lift/src/features/workout/application/timer_state.dart'
 // The SetSheet UI.
 import 'set_sheet.dart';
 
+// --- NEW IMPORT ---
+// Import our new custom duration picker.
+import 'duration_picker_sheet.dart';
+
 // -----------------------------------------------------------------------------
 // --- WORKOUT DOCK WIDGET -----------------------------------------------------
 // -----------------------------------------------------------------------------
 
 /// A persistent bottom navigation bar for the in-workout session screen.
-///
-/// This is a ConsumerWidget, allowing it to interact with Riverpod providers.
 class WorkoutDock extends ConsumerWidget {
   const WorkoutDock({super.key});
 
-  /// A helper to format the seconds into a MM:SS format.
+  /// A helper to format the seconds into a "90s" format.
   String _formatDuration(int totalSeconds) {
-    final duration = Duration(seconds: totalSeconds);
-    final minutes = duration.inMinutes.toString().padLeft(2, '0');
-    final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
+    return '${totalSeconds}s';
+  }
+
+  /// --- UPDATED METHOD ---
+  /// Shows our new custom bottom sheet for picking a duration.
+  void _showTimerPicker(BuildContext context, WidgetRef ref) async {
+    // Get the current duration to pre-fill the picker.
+    final currentDuration = Duration(
+      seconds: ref.read(timerStateProvider).initialDuration,
+    );
+
+    // `showModalBottomSheet` now returns the `Duration` selected by the user.
+    final selectedDuration = await showModalBottomSheet<Duration>(
+      context: context,
+      backgroundColor: AppTheme.colors.surface,
+      builder: (BuildContext builder) {
+        return DurationPickerSheet(initialDuration: currentDuration);
+      },
+    );
+
+    // If the user selected a duration (didn't just dismiss the sheet),
+    // start the timer with that new duration.
+    if (selectedDuration != null) {
+      ref.read(timerStateProvider.notifier).startTimer(
+            duration: selectedDuration.inSeconds,
+          );
+    }
   }
 
   @override
@@ -52,6 +79,12 @@ class WorkoutDock extends ConsumerWidget {
         : null;
 
     final timerState = ref.watch(timerStateProvider);
+    final timerNotifier = ref.read(timerStateProvider.notifier);
+
+    // Calculate the progress for the circular indicator.
+    final double timerProgress = timerState.isRunning && timerState.initialDuration > 0
+        ? timerState.secondsRemaining / timerState.initialDuration
+        : 0.0;
 
     return BottomAppBar(
       color: AppTheme.colors.background,
@@ -61,31 +94,59 @@ class WorkoutDock extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              timerState.isRunning
-                  ? 'Rest: ${_formatDuration(timerState.secondsRemaining)}'
-                  : 'Timer',
-              style: AppTheme.typography.body.copyWith(
-                color: timerState.isRunning
-                    ? AppTheme.colors.accent
-                    : AppTheme.colors.textMuted,
-                fontWeight: FontWeight.bold,
+            // --- TIMER DISPLAY ---
+            GestureDetector(
+              onTap: () => _showTimerPicker(context, ref),
+              child: SizedBox(
+                width: 70,
+                height: 40,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Progress Indicator
+                    if (timerState.isRunning)
+                      SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: CircularProgressIndicator(
+                          value: timerProgress,
+                          strokeWidth: 2.0,
+                          backgroundColor: AppTheme.colors.surface,
+                          color: AppTheme.colors.accent,
+                        ),
+                      ),
+                    // Timer Text
+                    Text(
+                      timerState.isRunning
+                          ? _formatDuration(timerState.secondsRemaining)
+                          : 'Rest',
+                      style: AppTheme.typography.body.copyWith(
+                        fontSize: 14,
+                        color: timerState.isRunning
+                            ? AppTheme.colors.accent
+                            : AppTheme.colors.textMuted,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
+
+            // --- ACTION BUTTONS ---
             Row(
               children: [
                 TextButton(
-                  onPressed: () {
-                    // --- FUNCTIONALITY INTEGRATION ---
-                    // This now calls the method in our timer notifier to add
-                    // 30 seconds to the currently running timer.
-                    ref.read(timerStateProvider.notifier).addTime(seconds: 30);
-                  },
+                  onPressed: timerState.isRunning
+                      ? () => timerNotifier.addTime(seconds: 30)
+                      : null,
                   child: const Text('+30s'),
                 ),
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: () {
+                    // Stop any running timer when moving to the next exercise.
+                    timerNotifier.stopTimer();
                     ref.read(sessionStateProvider.notifier).selectNextExercise();
                   },
                   child: const Text('Next'),
