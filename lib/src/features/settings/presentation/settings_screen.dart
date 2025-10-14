@@ -54,6 +54,17 @@ class SettingsScreen extends StatelessWidget {
 
           // --- DATA SECTION ---
           _buildSectionHeader('Data'),
+          // --- NEW ENTRY ---
+          // "History" is now a list tile within the Settings screen.
+          _buildListTile(
+            icon: Icons.bar_chart_rounded,
+            title: 'Workout History',
+            subtitle: 'Review all your past sessions',
+            onTap: () {
+              // TODO: Navigate to the History screen.
+              print('Workout History tapped');
+            },
+          ),
           _buildListTile(
             icon: Icons.upload_file_rounded,
             title: 'Export Data',
