@@ -4,18 +4,20 @@
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
+import 'dart:convert';
+import 'dart:io';
+import 'package:collection/collection.dart'; // For groupBy
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
-import 'dart:io';
+import 'package:fairware_lift/src/features/dxg/domain/exercise_instance.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:collection/collection.dart'; // For groupBy
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 part 'database.g.dart';
 
 // -----------------------------------------------------------------------------
-// --- NEW DATA CLASS FOR HISTORY ----------------------------------------------
+// --- DATA CLASS FOR HISTORY --------------------------------------------------
 // -----------------------------------------------------------------------------
 
 /// A helper class to hold a complete workout session, including the parent
@@ -28,8 +30,10 @@ class FullWorkoutSession {
 }
 
 // -----------------------------------------------------------------------------
-// --- TABLE DEFINITIONS (from SSOT 6.1) ---------------------------------------
+// --- TABLE DEFINITIONS -------------------------------------------------------
 // -----------------------------------------------------------------------------
+
+// --- EXISTING WORKOUT HISTORY TABLES ---
 
 @DataClassName('Session')
 class Sessions extends Table {
@@ -56,16 +60,51 @@ class SetEntries extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+// --- NEW DXG TABLE ---
+
+/// Persists a canonical exercise the first time it is used.
+/// This table stores the generated slug, display name, and the discriminators
+/// that were used to create it, linking it back to a movement family.
+@DataClassName('ExerciseInstance')
+class ExerciseInstances extends Table {
+  /// The stable, unique slug, e.g., "press.dumbbell.incline.bilateral.supine".
+  TextColumn get slug => text()();
+
+  /// The ID of the parent movement family, e.g., "press".
+  TextColumn get familyId => text().named('family_id')();
+
+  /// The generated human-readable name, e.g., "Incline Dumbbell Press".
+  TextColumn get displayName => text().named('display_name')();
+
+  /// A JSON string representation of the map of discriminators.
+  /// Uses a TypeConverter to handle serialization.
+  TextColumn get discriminators =>
+      text().map(const DiscriminatorsConverter())();
+
+  /// The timestamp of when this exercise was first created/logged.
+  DateTimeColumn get firstSeenAt => dateTime().named('first_seen_at')();
+
+  @override
+  Set<Column> get primaryKey => {slug};
+}
+
 // -----------------------------------------------------------------------------
 // --- DATABASE CLASS ----------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-@DriftDatabase(tables: [Sessions, SetEntries])
+@DriftDatabase(tables: [
+  Sessions,
+  SetEntries,
+  ExerciseInstances, // Add the new table here
+])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  // --- MIGRATION STEP ---
+  // The schema version must be incremented whenever the database structure
+  // changes (e.g., adding a new table or column).
+  int get schemaVersion => 2;
 
   /// Queries the database to retrieve all sessions and their associated sets.
   Future<List<FullWorkoutSession>> getWorkoutHistory() async {
@@ -90,13 +129,13 @@ class AppDatabase extends _$AppDatabase {
     return result;
   }
 
-  /// --- NEW METHOD ---
   /// Deletes a session and all of its associated set entries from the database.
   /// This is done in a transaction to ensure data integrity.
   Future<void> deleteWorkoutSession(String sessionId) async {
     await transaction(() async {
       // Delete the sets associated with the session first.
-      await (delete(setEntries)..where((tbl) => tbl.sessionId.equals(sessionId))).go();
+      await (delete(setEntries)..where((tbl) => tbl.sessionId.equals(sessionId)))
+          .go();
       // Then, delete the parent session record.
       await (delete(sessions)..where((tbl) => tbl.id.equals(sessionId))).go();
     });

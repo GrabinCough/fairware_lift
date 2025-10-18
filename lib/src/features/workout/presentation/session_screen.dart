@@ -7,13 +7,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
-import '../application/session_state.dart';
-import 'widgets/workout_dock.dart';
-import 'widgets/exercise_list_item.dart';
-import 'workout_summary_screen.dart';
-
-import 'package:fairware_lift/src/features/exercises/data/presentation/exercise_picker_screen.dart';
-import 'package:fairware_lift/src/features/exercises/domain/exercise.dart';
+import 'package:fairware_lift/src/features/dxg/application/dxg_state.dart';
+import 'package:fairware_lift/src/features/dxg/presentation/dxg_exercise_picker_screen.dart';
+import 'package:fairware_lift/src/features/workout/application/session_state.dart';
+import 'package:fairware_lift/src/features/workout/presentation/widgets/exercise_list_item.dart';
+import 'package:fairware_lift/src/features/workout/presentation/widgets/workout_dock.dart';
+import 'package:fairware_lift/src/features/workout/presentation/workout_summary_screen.dart';
 
 // -----------------------------------------------------------------------------
 // --- SESSION SCREEN WIDGET ---------------------------------------------------
@@ -24,14 +23,16 @@ class SessionScreen extends ConsumerWidget {
   const SessionScreen({super.key});
 
   /// Shows an AlertDialog with the exercise's "how-to" instructions.
-  void _showExerciseInfo(BuildContext context, {required String name, required String howTo}) {
+  void _showExerciseInfo(
+      BuildContext context, {required String name, required String howTo}) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppTheme.colors.surface,
           title: Text(name),
-          content: Text(howTo),
+          content: Text(
+              howTo.isNotEmpty ? howTo : 'Instructions are not yet available for this exercise.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -82,19 +83,13 @@ class SessionScreen extends ConsumerWidget {
             _buildEmptyState()
           else
             ...sessionExercises.map((exercise) {
-              // --- UI FIX ---
-              // The ExerciseListItem is now wrapped in a GestureDetector.
               return GestureDetector(
                 onTap: () {
-                  // When tapped, this calls the new method to set this
-                  // exercise as the current one.
-                  ref.read(sessionStateProvider.notifier).setCurrentExercise(exercise.id);
+                  ref
+                      .read(sessionStateProvider.notifier)
+                      .setCurrentExercise(exercise.id);
                 },
-                // Use a transparent color to ensure the tap is detected
-                // across the entire widget area.
                 child: AbsorbPointer(
-                  // AbsorbPointer prevents the IconButton from interfering
-                  // with the GestureDetector, but the button is still tappable.
                   child: ExerciseListItem(
                     exerciseName: exercise.name,
                     target: exercise.target,
@@ -112,16 +107,20 @@ class SessionScreen extends ConsumerWidget {
             }),
           const SizedBox(height: 16),
           TextButton.icon(
+            // --- UPDATED ONPRESSED ACTION ---
             onPressed: () async {
-              final selectedExercise = await Navigator.of(context).push<Exercise>(
+              // Navigate to the new DXG picker and wait for a result.
+              final result =
+                  await Navigator.of(context).push<GeneratedExerciseResult>(
                 MaterialPageRoute(
                   fullscreenDialog: true,
-                  builder: (context) => const ExercisePickerScreen(),
+                  builder: (context) => const DXGExercisePickerScreen(),
                 ),
               );
 
-              if (selectedExercise != null) {
-                ref.read(sessionStateProvider.notifier).addExercise(selectedExercise);
+              // If the user selected an exercise, add it to the session.
+              if (result != null) {
+                ref.read(sessionStateProvider.notifier).addDxgExercise(result);
               }
             },
             icon: const Icon(Icons.add_circle_outline_rounded),

@@ -749,16 +749,355 @@ class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
   }
 }
 
+class $ExerciseInstancesTable extends ExerciseInstances
+    with TableInfo<$ExerciseInstancesTable, ExerciseInstance> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ExerciseInstancesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _slugMeta = const VerificationMeta('slug');
+  @override
+  late final GeneratedColumn<String> slug = GeneratedColumn<String>(
+      'slug', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _familyIdMeta =
+      const VerificationMeta('familyId');
+  @override
+  late final GeneratedColumn<String> familyId = GeneratedColumn<String>(
+      'family_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _displayNameMeta =
+      const VerificationMeta('displayName');
+  @override
+  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
+      'display_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  late final GeneratedColumnWithTypeConverter<Map<String, String>, String>
+      discriminators = GeneratedColumn<String>(
+              'discriminators', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<Map<String, String>>(
+              $ExerciseInstancesTable.$converterdiscriminators);
+  static const VerificationMeta _firstSeenAtMeta =
+      const VerificationMeta('firstSeenAt');
+  @override
+  late final GeneratedColumn<DateTime> firstSeenAt = GeneratedColumn<DateTime>(
+      'first_seen_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [slug, familyId, displayName, discriminators, firstSeenAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'exercise_instances';
+  @override
+  VerificationContext validateIntegrity(Insertable<ExerciseInstance> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('slug')) {
+      context.handle(
+          _slugMeta, slug.isAcceptableOrUnknown(data['slug']!, _slugMeta));
+    } else if (isInserting) {
+      context.missing(_slugMeta);
+    }
+    if (data.containsKey('family_id')) {
+      context.handle(_familyIdMeta,
+          familyId.isAcceptableOrUnknown(data['family_id']!, _familyIdMeta));
+    } else if (isInserting) {
+      context.missing(_familyIdMeta);
+    }
+    if (data.containsKey('display_name')) {
+      context.handle(
+          _displayNameMeta,
+          displayName.isAcceptableOrUnknown(
+              data['display_name']!, _displayNameMeta));
+    } else if (isInserting) {
+      context.missing(_displayNameMeta);
+    }
+    if (data.containsKey('first_seen_at')) {
+      context.handle(
+          _firstSeenAtMeta,
+          firstSeenAt.isAcceptableOrUnknown(
+              data['first_seen_at']!, _firstSeenAtMeta));
+    } else if (isInserting) {
+      context.missing(_firstSeenAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {slug};
+  @override
+  ExerciseInstance map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ExerciseInstance(
+      slug: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}slug'])!,
+      familyId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}family_id'])!,
+      displayName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}display_name'])!,
+      discriminators: $ExerciseInstancesTable.$converterdiscriminators.fromSql(
+          attachedDatabase.typeMapping.read(
+              DriftSqlType.string, data['${effectivePrefix}discriminators'])!),
+      firstSeenAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}first_seen_at'])!,
+    );
+  }
+
+  @override
+  $ExerciseInstancesTable createAlias(String alias) {
+    return $ExerciseInstancesTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<Map<String, String>, String> $converterdiscriminators =
+      const DiscriminatorsConverter();
+}
+
+class ExerciseInstance extends DataClass
+    implements Insertable<ExerciseInstance> {
+  /// The stable, unique slug, e.g., "press.dumbbell.incline.bilateral.supine".
+  final String slug;
+
+  /// The ID of the parent movement family, e.g., "press".
+  final String familyId;
+
+  /// The generated human-readable name, e.g., "Incline Dumbbell Press".
+  final String displayName;
+
+  /// A JSON string representation of the map of discriminators.
+  /// Uses a TypeConverter to handle serialization.
+  final Map<String, String> discriminators;
+
+  /// The timestamp of when this exercise was first created/logged.
+  final DateTime firstSeenAt;
+  const ExerciseInstance(
+      {required this.slug,
+      required this.familyId,
+      required this.displayName,
+      required this.discriminators,
+      required this.firstSeenAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['slug'] = Variable<String>(slug);
+    map['family_id'] = Variable<String>(familyId);
+    map['display_name'] = Variable<String>(displayName);
+    {
+      map['discriminators'] = Variable<String>($ExerciseInstancesTable
+          .$converterdiscriminators
+          .toSql(discriminators));
+    }
+    map['first_seen_at'] = Variable<DateTime>(firstSeenAt);
+    return map;
+  }
+
+  ExerciseInstancesCompanion toCompanion(bool nullToAbsent) {
+    return ExerciseInstancesCompanion(
+      slug: Value(slug),
+      familyId: Value(familyId),
+      displayName: Value(displayName),
+      discriminators: Value(discriminators),
+      firstSeenAt: Value(firstSeenAt),
+    );
+  }
+
+  factory ExerciseInstance.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ExerciseInstance(
+      slug: serializer.fromJson<String>(json['slug']),
+      familyId: serializer.fromJson<String>(json['familyId']),
+      displayName: serializer.fromJson<String>(json['displayName']),
+      discriminators:
+          serializer.fromJson<Map<String, String>>(json['discriminators']),
+      firstSeenAt: serializer.fromJson<DateTime>(json['firstSeenAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'slug': serializer.toJson<String>(slug),
+      'familyId': serializer.toJson<String>(familyId),
+      'displayName': serializer.toJson<String>(displayName),
+      'discriminators': serializer.toJson<Map<String, String>>(discriminators),
+      'firstSeenAt': serializer.toJson<DateTime>(firstSeenAt),
+    };
+  }
+
+  ExerciseInstance copyWith(
+          {String? slug,
+          String? familyId,
+          String? displayName,
+          Map<String, String>? discriminators,
+          DateTime? firstSeenAt}) =>
+      ExerciseInstance(
+        slug: slug ?? this.slug,
+        familyId: familyId ?? this.familyId,
+        displayName: displayName ?? this.displayName,
+        discriminators: discriminators ?? this.discriminators,
+        firstSeenAt: firstSeenAt ?? this.firstSeenAt,
+      );
+  ExerciseInstance copyWithCompanion(ExerciseInstancesCompanion data) {
+    return ExerciseInstance(
+      slug: data.slug.present ? data.slug.value : this.slug,
+      familyId: data.familyId.present ? data.familyId.value : this.familyId,
+      displayName:
+          data.displayName.present ? data.displayName.value : this.displayName,
+      discriminators: data.discriminators.present
+          ? data.discriminators.value
+          : this.discriminators,
+      firstSeenAt:
+          data.firstSeenAt.present ? data.firstSeenAt.value : this.firstSeenAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExerciseInstance(')
+          ..write('slug: $slug, ')
+          ..write('familyId: $familyId, ')
+          ..write('displayName: $displayName, ')
+          ..write('discriminators: $discriminators, ')
+          ..write('firstSeenAt: $firstSeenAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(slug, familyId, displayName, discriminators, firstSeenAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ExerciseInstance &&
+          other.slug == this.slug &&
+          other.familyId == this.familyId &&
+          other.displayName == this.displayName &&
+          other.discriminators == this.discriminators &&
+          other.firstSeenAt == this.firstSeenAt);
+}
+
+class ExerciseInstancesCompanion extends UpdateCompanion<ExerciseInstance> {
+  final Value<String> slug;
+  final Value<String> familyId;
+  final Value<String> displayName;
+  final Value<Map<String, String>> discriminators;
+  final Value<DateTime> firstSeenAt;
+  final Value<int> rowid;
+  const ExerciseInstancesCompanion({
+    this.slug = const Value.absent(),
+    this.familyId = const Value.absent(),
+    this.displayName = const Value.absent(),
+    this.discriminators = const Value.absent(),
+    this.firstSeenAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ExerciseInstancesCompanion.insert({
+    required String slug,
+    required String familyId,
+    required String displayName,
+    required Map<String, String> discriminators,
+    required DateTime firstSeenAt,
+    this.rowid = const Value.absent(),
+  })  : slug = Value(slug),
+        familyId = Value(familyId),
+        displayName = Value(displayName),
+        discriminators = Value(discriminators),
+        firstSeenAt = Value(firstSeenAt);
+  static Insertable<ExerciseInstance> custom({
+    Expression<String>? slug,
+    Expression<String>? familyId,
+    Expression<String>? displayName,
+    Expression<String>? discriminators,
+    Expression<DateTime>? firstSeenAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (slug != null) 'slug': slug,
+      if (familyId != null) 'family_id': familyId,
+      if (displayName != null) 'display_name': displayName,
+      if (discriminators != null) 'discriminators': discriminators,
+      if (firstSeenAt != null) 'first_seen_at': firstSeenAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ExerciseInstancesCompanion copyWith(
+      {Value<String>? slug,
+      Value<String>? familyId,
+      Value<String>? displayName,
+      Value<Map<String, String>>? discriminators,
+      Value<DateTime>? firstSeenAt,
+      Value<int>? rowid}) {
+    return ExerciseInstancesCompanion(
+      slug: slug ?? this.slug,
+      familyId: familyId ?? this.familyId,
+      displayName: displayName ?? this.displayName,
+      discriminators: discriminators ?? this.discriminators,
+      firstSeenAt: firstSeenAt ?? this.firstSeenAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (slug.present) {
+      map['slug'] = Variable<String>(slug.value);
+    }
+    if (familyId.present) {
+      map['family_id'] = Variable<String>(familyId.value);
+    }
+    if (displayName.present) {
+      map['display_name'] = Variable<String>(displayName.value);
+    }
+    if (discriminators.present) {
+      map['discriminators'] = Variable<String>($ExerciseInstancesTable
+          .$converterdiscriminators
+          .toSql(discriminators.value));
+    }
+    if (firstSeenAt.present) {
+      map['first_seen_at'] = Variable<DateTime>(firstSeenAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExerciseInstancesCompanion(')
+          ..write('slug: $slug, ')
+          ..write('familyId: $familyId, ')
+          ..write('displayName: $displayName, ')
+          ..write('discriminators: $discriminators, ')
+          ..write('firstSeenAt: $firstSeenAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $SessionsTable sessions = $SessionsTable(this);
   late final $SetEntriesTable setEntries = $SetEntriesTable(this);
+  late final $ExerciseInstancesTable exerciseInstances =
+      $ExerciseInstancesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [sessions, setEntries];
+  List<DatabaseSchemaEntity> get allSchemaEntities =>
+      [sessions, setEntries, exerciseInstances];
 }
 
 typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
@@ -1333,6 +1672,186 @@ typedef $$SetEntriesTableProcessedTableManager = ProcessedTableManager<
     (SetEntry, $$SetEntriesTableReferences),
     SetEntry,
     PrefetchHooks Function({bool sessionId})>;
+typedef $$ExerciseInstancesTableCreateCompanionBuilder
+    = ExerciseInstancesCompanion Function({
+  required String slug,
+  required String familyId,
+  required String displayName,
+  required Map<String, String> discriminators,
+  required DateTime firstSeenAt,
+  Value<int> rowid,
+});
+typedef $$ExerciseInstancesTableUpdateCompanionBuilder
+    = ExerciseInstancesCompanion Function({
+  Value<String> slug,
+  Value<String> familyId,
+  Value<String> displayName,
+  Value<Map<String, String>> discriminators,
+  Value<DateTime> firstSeenAt,
+  Value<int> rowid,
+});
+
+class $$ExerciseInstancesTableFilterComposer
+    extends Composer<_$AppDatabase, $ExerciseInstancesTable> {
+  $$ExerciseInstancesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get slug => $composableBuilder(
+      column: $table.slug, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get familyId => $composableBuilder(
+      column: $table.familyId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get displayName => $composableBuilder(
+      column: $table.displayName, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<Map<String, String>, Map<String, String>,
+          String>
+      get discriminators => $composableBuilder(
+          column: $table.discriminators,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<DateTime> get firstSeenAt => $composableBuilder(
+      column: $table.firstSeenAt, builder: (column) => ColumnFilters(column));
+}
+
+class $$ExerciseInstancesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ExerciseInstancesTable> {
+  $$ExerciseInstancesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get slug => $composableBuilder(
+      column: $table.slug, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get familyId => $composableBuilder(
+      column: $table.familyId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get displayName => $composableBuilder(
+      column: $table.displayName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get discriminators => $composableBuilder(
+      column: $table.discriminators,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get firstSeenAt => $composableBuilder(
+      column: $table.firstSeenAt, builder: (column) => ColumnOrderings(column));
+}
+
+class $$ExerciseInstancesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ExerciseInstancesTable> {
+  $$ExerciseInstancesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get slug =>
+      $composableBuilder(column: $table.slug, builder: (column) => column);
+
+  GeneratedColumn<String> get familyId =>
+      $composableBuilder(column: $table.familyId, builder: (column) => column);
+
+  GeneratedColumn<String> get displayName => $composableBuilder(
+      column: $table.displayName, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Map<String, String>, String>
+      get discriminators => $composableBuilder(
+          column: $table.discriminators, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get firstSeenAt => $composableBuilder(
+      column: $table.firstSeenAt, builder: (column) => column);
+}
+
+class $$ExerciseInstancesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ExerciseInstancesTable,
+    ExerciseInstance,
+    $$ExerciseInstancesTableFilterComposer,
+    $$ExerciseInstancesTableOrderingComposer,
+    $$ExerciseInstancesTableAnnotationComposer,
+    $$ExerciseInstancesTableCreateCompanionBuilder,
+    $$ExerciseInstancesTableUpdateCompanionBuilder,
+    (
+      ExerciseInstance,
+      BaseReferences<_$AppDatabase, $ExerciseInstancesTable, ExerciseInstance>
+    ),
+    ExerciseInstance,
+    PrefetchHooks Function()> {
+  $$ExerciseInstancesTableTableManager(
+      _$AppDatabase db, $ExerciseInstancesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ExerciseInstancesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ExerciseInstancesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ExerciseInstancesTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> slug = const Value.absent(),
+            Value<String> familyId = const Value.absent(),
+            Value<String> displayName = const Value.absent(),
+            Value<Map<String, String>> discriminators = const Value.absent(),
+            Value<DateTime> firstSeenAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ExerciseInstancesCompanion(
+            slug: slug,
+            familyId: familyId,
+            displayName: displayName,
+            discriminators: discriminators,
+            firstSeenAt: firstSeenAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String slug,
+            required String familyId,
+            required String displayName,
+            required Map<String, String> discriminators,
+            required DateTime firstSeenAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ExerciseInstancesCompanion.insert(
+            slug: slug,
+            familyId: familyId,
+            displayName: displayName,
+            discriminators: discriminators,
+            firstSeenAt: firstSeenAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$ExerciseInstancesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ExerciseInstancesTable,
+    ExerciseInstance,
+    $$ExerciseInstancesTableFilterComposer,
+    $$ExerciseInstancesTableOrderingComposer,
+    $$ExerciseInstancesTableAnnotationComposer,
+    $$ExerciseInstancesTableCreateCompanionBuilder,
+    $$ExerciseInstancesTableUpdateCompanionBuilder,
+    (
+      ExerciseInstance,
+      BaseReferences<_$AppDatabase, $ExerciseInstancesTable, ExerciseInstance>
+    ),
+    ExerciseInstance,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1341,4 +1860,6 @@ class $AppDatabaseManager {
       $$SessionsTableTableManager(_db, _db.sessions);
   $$SetEntriesTableTableManager get setEntries =>
       $$SetEntriesTableTableManager(_db, _db.setEntries);
+  $$ExerciseInstancesTableTableManager get exerciseInstances =>
+      $$ExerciseInstancesTableTableManager(_db, _db.exerciseInstances);
 }

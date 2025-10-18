@@ -1,0 +1,256 @@
+{
+  "movement_families": [
+    {
+      "id": "press",
+      "name": "Press",
+      "pattern": "push",
+      "primary_muscles": ["chest"],
+      "secondary_muscles": ["triceps", "shoulders"],
+      "allowed": {
+        "equipment": ["barbell", "dumbbell", "machine", "cable", "smith", "band"],
+        "angle": ["flat", "incline", "decline", "overhead"],
+        "unilateral": ["bilateral", "unilateral"],
+        "orientation": ["supine", "seated", "standing"],
+        "attachment": ["none", "straight_bar", "ez_bar", "rope", "v_bar", "d_handle"],
+        "grip": ["neutral", "pronated"]
+      },
+      "denies": [
+        { "equipment": "barbell", "attachment": ["rope", "v_bar", "d_handle"] }
+      ],
+      "display_name_template": "{{angle?}} {{equipment?}} Press",
+      "naming_rules": [
+        { "if": { "angle": "overhead" }, "name": "Overhead {{equipment?}} Press" }
+      ],
+      "aliases": ["Bench Press family"],
+      "notes": "Use angle=overhead for OHP variants."
+    },
+    {
+      "id": "fly",
+      "name": "Fly",
+      "pattern": "push",
+      "primary_muscles": ["chest"],
+      "secondary_muscles": ["shoulders"],
+      "allowed": {
+        "equipment": ["dumbbell", "cable", "machine"],
+        "angle": ["flat", "incline"],
+        "unilateral": ["bilateral", "unilateral"],
+        "orientation": ["supine", "seated", "standing"],
+        "attachment": ["none", "d_handle"],
+        "grip": ["neutral"]
+      },
+      "denies": [
+        { "equipment": "barbell" }
+      ],
+      "display_name_template": "{{angle?}} {{equipment?}} Fly",
+      "aliases": [],
+      "notes": "No barbell for fly."
+    },
+    {
+      "id": "row",
+      "name": "Row",
+      "pattern": "pull",
+      "primary_muscles": ["back"],
+      "secondary_muscles": ["biceps", "rear_delts"],
+      "allowed": {
+        "equipment": ["barbell", "dumbbell", "cable", "machine", "trx", "kettlebell", "landmine", "smith"],
+        "angle": ["horizontal", "chest_supported", "seated_cable"],
+        "unilateral": ["bilateral", "unilateral"],
+        "orientation": ["standing", "seated", "chest_supported", "prone"],
+        "attachment": ["v_bar", "straight_bar", "d_handle", "rope", "lat_bar", "single_d_handle"],
+        "grip": ["neutral", "supinated", "pronated"]
+      },
+      "display_name_template": "{{angle?}} {{equipment?}} Row",
+      "naming_rules": [
+        { "if": { "angle": "seated_cable" }, "name": "Seated Cable Row{{attachment_paren?}}" }
+      ],
+      "aliases": [],
+      "notes": "If attachment is conventional (v_bar, etc.), append in parentheses."
+    },
+    {
+      "id": "pulldown",
+      "name": "Pulldown",
+      "pattern": "pull",
+      "primary_muscles": ["lats"],
+      "secondary_muscles": ["biceps"],
+      "allowed": {
+        "equipment": ["cable", "machine", "smith"],
+        "angle": ["vertical"],
+        "unilateral": ["bilateral", "unilateral"],
+        "orientation": ["seated", "kneeling"],
+        "attachment": ["lat_bar", "straight_bar", "rope", "d_handle", "single_d_handle", "v_bar"],
+        "grip": ["pronated", "supinated", "neutral"]
+      },
+      "display_name_template": "{{attachment?}} {{equipment?}} Pulldown",
+      "aliases": ["Lat Pulldown"],
+      "notes": "Treat smith-based pulldown machines as equipment=smith."
+    },
+    {
+      "id": "pullup",
+      "name": "Pull-Up/Chin-Up",
+      "pattern": "pull",
+      "primary_muscles": ["lats"],
+      "secondary_muscles": ["biceps", "upper_back"],
+      "allowed": {
+        "equipment": ["bodyweight", "band", "machine"],
+        "angle": ["vertical"],
+        "unilateral": ["bilateral"],
+        "orientation": ["hanging"],
+        "attachment": ["none"],
+        "grip": ["pronated", "supinated", "neutral"]
+      },
+      "display_name_template": "{{grip?}} Pull-Up",
+      "naming_rules": [
+        { "if": { "grip": "supinated" }, "name": "Chin-Up" }
+      ],
+      "aliases": ["Chin Up", "Pull Up"],
+      "notes": "Use 'Chin-Up' for supinated."
+    },
+    {
+      "id": "curl",
+      "name": "Curl",
+      "pattern": "isolation",
+      "primary_muscles": ["biceps"],
+      "secondary_muscles": [],
+      "allowed": {
+        "equipment": ["dumbbell", "barbell", "ez_bar", "cable", "machine", "band"],
+        "angle": ["standing", "seated", "incline_bench"],
+        "unilateral": ["bilateral", "unilateral"],
+        "orientation": ["standing", "seated", "supine"],
+        "attachment": ["straight_bar", "ez_bar", "rope", "d_handle", "single_d_handle", "none"],
+        "grip": ["supinated", "neutral", "pronated"]
+      },
+      "display_name_template": "{{angle?}} {{equipment?}} Curl",
+      "naming_rules": [
+        { "if": { "equipment": "dumbbell", "unilateral": "unilateral", "angle": "standing" }, "name": "Alternating Dumbbell Curl" }
+      ],
+      "aliases": ["Biceps Curl"],
+      "notes": "Incline bench implies supine orientation for dumbbell curls."
+    },
+    {
+      "id": "extension_triceps",
+      "name": "Extension (Triceps)",
+      "pattern": "isolation",
+      "primary_muscles": ["triceps"],
+      "secondary_muscles": [],
+      "allowed": {
+        "equipment": ["dumbbell", "cable", "barbell", "ez_bar", "machine", "band"],
+        "angle": ["overhead", "horizontal"],
+        "unilateral": ["bilateral", "unilateral"],
+        "orientation": ["standing", "seated", "supine"],
+        "attachment": ["rope", "straight_bar", "ez_bar", "d_handle", "single_d_handle", "none"],
+        "grip": ["neutral", "pronated"]
+      },
+      "display_name_template": "{{angle?}} {{equipment?}} Triceps Extension",
+      "aliases": ["Skullcrusher (horizontal barbell/ez_bar)"],
+      "notes": "Horizontal barbell/ez_bar in supine → Skullcrusher alias."
+    },
+    {
+      "id": "squat",
+      "name": "Squat",
+      "pattern": "squat",
+      "primary_muscles": ["quads"],
+      "secondary_muscles": ["glutes", "adductors", "core"],
+      "allowed": {
+        "equipment": ["barbell", "dumbbell", "machine", "smith", "kettlebell", "trapbar", "bodyweight"],
+        "angle": ["back", "front", "goblet", "hack", "zercher"],
+        "unilateral": ["bilateral"],
+        "orientation": ["standing"],
+        "attachment": ["none"],
+        "grip": ["pronated"]
+      },
+      "display_name_template": "{{angle?}} {{equipment?}} Squat",
+      "aliases": ["Back Squat", "Front Squat", "Goblet Squat", "Hack Squat"],
+      "notes": "Angle here is a variant slot (back/front/etc.)."
+    },
+    {
+      "id": "hinge",
+      "name": "Deadlift / Hip Hinge",
+      "pattern": "hinge",
+      "primary_muscles": ["posterior_chain"],
+      "secondary_muscles": ["glutes", "hamstrings", "back"],
+      "allowed": {
+        "equipment": ["barbell", "trapbar", "dumbbell", "kettlebell", "smith", "machine"],
+        "angle": ["conventional", "sumo", "romanian", "stiff_leg", "rack_pull"],
+        "unilateral": ["bilateral", "unilateral"],
+        "orientation": ["standing"],
+        "attachment": ["none"],
+        "grip": ["mixed", "hook", "pronated"]
+      },
+      "display_name_template": "{{angle?}} {{equipment?}} Deadlift",
+      "aliases": ["RDL (romanian barbell)"],
+      "notes": "Use 'RDL' as a friendly alias for barbell romanian."
+    },
+    {
+      "id": "lunge",
+      "name": "Lunge / Split Squat",
+      "pattern": "lunge",
+      "primary_muscles": ["quads", "glutes"],
+      "secondary_muscles": ["adductors", "hamstrings", "calves"],
+      "allowed": {
+        "equipment": ["dumbbell", "barbell", "kettlebell", "smith", "machine", "bodyweight"],
+        "angle": ["forward", "reverse", "walking", "split_squat", "bulgarian_split"],
+        "unilateral": ["unilateral"],
+        "orientation": ["standing"],
+        "attachment": ["none"],
+        "grip": ["pronated", "neutral"]
+      },
+      "display_name_template": "{{angle?}} {{equipment?}} {{familyName}}",
+      "aliases": ["Bulgarian Split Squat"],
+      "notes": "Unilateral by definition."
+    },
+    {
+      "id": "carry",
+      "name": "Carry",
+      "pattern": "carry",
+      "primary_muscles": ["core", "grip", "traps"],
+      "secondary_muscles": [],
+      "allowed": {
+        "equipment": ["dumbbell", "kettlebell", "trapbar", "farmer_handles", "sandbag"],
+        "angle": ["farmer", "suitcase", "front_rack", "overhead"],
+        "unilateral": ["unilateral", "bilateral"],
+        "orientation": ["walking", "standing"],
+        "attachment": ["none"],
+        "grip": ["neutral"]
+      },
+      "display_name_template": "{{angle?}} {{equipment?}} Carry",
+      "aliases": ["Farmer's Walk"],
+      "notes": "Suitcase = unilateral; farmer may be uni or bi."
+    },
+    {
+      "id": "rotation",
+      "name": "Rotation",
+      "pattern": "rotate",
+      "primary_muscles": ["obliques", "core"],
+      "secondary_muscles": [],
+      "allowed": {
+        "equipment": ["cable", "band", "medicine_ball", "landmine"],
+        "angle": ["anti_rotation", "rotation", "chop", "lift"],
+        "unilateral": ["bilateral", "unilateral"],
+        "orientation": ["standing", "half_kneel", "tall_kneel", "seated"],
+        "attachment": ["rope", "d_handle", "single_d_handle", "none"],
+        "grip": ["neutral"]
+      },
+      "display_name_template": "{{angle?}} {{equipment?}} Rotation",
+      "aliases": ["Pallof Press (anti_rotation band/cable)"],
+      "notes": "Pallof Press as alias for anti_rotation band/cable."
+    },
+    {
+      "id": "calf",
+      "name": "Calf Raise",
+      "pattern": "isolation",
+      "primary_muscles": ["calves"],
+      "secondary_muscles": [],
+      "allowed": {
+        "equipment": ["machine", "smith", "barbell", "dumbbell", "bodyweight"],
+        "angle": ["standing", "seated", "donkey"],
+        "unilateral": ["bilateral", "unilateral"],
+        "orientation": ["standing", "seated"],
+        "attachment": ["none"],
+        "grip": ["neutral"]
+      },
+      "display_name_template": "{{angle?}} {{equipment?}} Calf Raise",
+      "aliases": [],
+      "notes": "Donkey raise usually machine/lever."
+    }
+  ]
+}

@@ -36,7 +36,7 @@ dependencies:
   image_picker: ^1.1.2           # Proactive fix for known v1 embedding build errors.
   file_picker: ^8.3.5            # Upgrade to current stable to avoid build issues.
   open_filex: ^4.7.0             # Upgrade to latest with modern Gradle compatibility.
-  
+
   # Pure Dart / Already Compatible
   uuid: ^4.4.0                   # NEW: For generating unique IDs for database records.
   pdf: ^3.10.4
@@ -67,3 +67,6 @@ flutter:
   assets:
     - assets/audio/
     - assets/data/
+    # --- NEW DXG ASSETS ---
+    - assets/dxg/movement_families.seed.json
+    - assets/dxg/synonyms.map.json

@@ -5,11 +5,12 @@
 // -----------------------------------------------------------------------------
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../domain/session_exercise.dart';
-import '../domain/logged_set.dart';
-import 'timer_state.dart';
-import '../../exercises/domain/exercise.dart';
 import 'package:uuid/uuid.dart';
+import 'package:fairware_lift/src/features/dxg/application/dxg_state.dart';
+import 'package:fairware_lift/src/features/exercises/domain/exercise.dart';
+import 'package:fairware_lift/src/features/workout/application/timer_state.dart';
+import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
+import 'package:fairware_lift/src/features/workout/domain/session_exercise.dart';
 
 // -----------------------------------------------------------------------------
 // --- SESSION STATE NOTIFIER --------------------------------------------------
@@ -23,26 +24,45 @@ class SessionStateNotifier extends Notifier<List<SessionExercise>> {
     return [];
   }
 
-  /// Adds a new exercise to the current session.
+  /// --- DEPRECATED ---
+  /// Adds a new exercise from the old CSV-based picker.
   void addExercise(Exercise exercise) {
     final newExercise = SessionExercise(
       id: _uuid.v4(),
       name: exercise.name,
       target: '3 sets x 10 reps',
       howTo: exercise.howTo,
-      // If this is the first exercise, make it current. Otherwise, don't.
       isCurrent: state.isEmpty,
     );
 
-    // Set all other exercises to not be current before adding the new one.
     final updatedState = [
       for (final ex in state) ex.copyWith(isCurrent: false),
-      newExercise.copyWith(isCurrent: true) // Make the new one current
+      newExercise.copyWith(isCurrent: true)
     ];
     state = updatedState;
   }
 
   /// --- NEW METHOD ---
+  /// Adds a new exercise to the current session from the DXG picker.
+  void addDxgExercise(GeneratedExerciseResult result) {
+    final newExercise = SessionExercise(
+      id: _uuid.v4(),
+      name: result.displayName,
+      target: '3 sets x 10 reps', // Default target for now
+      // NOTE: The DXG system does not yet provide "how-to" instructions.
+      // This will be an empty string until that feature is added.
+      howTo: '',
+      isCurrent: true,
+    );
+
+    // Set all other exercises to not be current before adding the new one.
+    final updatedState = [
+      for (final ex in state) ex.copyWith(isCurrent: false),
+      newExercise,
+    ];
+    state = updatedState;
+  }
+
   /// Sets the specified exercise as the current one for logging sets.
   void setCurrentExercise(String exerciseId) {
     // Stop any running timer when switching exercises.
@@ -81,8 +101,6 @@ class SessionStateNotifier extends Notifier<List<SessionExercise>> {
     // Auto-start the rest timer.
     ref.read(timerStateProvider.notifier).startTimer();
   }
-
-  // The old `selectNextExercise` method has been removed.
 }
 
 // -----------------------------------------------------------------------------
