@@ -8,8 +8,6 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-// --- FIX ---
-// Import the collection package to get access to the 'firstWhereOrNull' extension method.
 import 'package:collection/collection.dart';
 import 'package:fairware_lift/src/features/dxg/domain/movement_family.dart';
 import 'package:fairware_lift/src/features/dxg/application/guardrail_service.dart';
@@ -63,7 +61,7 @@ class DXGState with _$DXGState {
 // --- STATE NOTIFIER ----------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-class DXGStateNotifier extends AsyncNotifier<DXGState> {
+class DXGStateNotifier extends AutoDisposeAsyncNotifier<DXGState> {
   @override
   Future<DXGState> build() async {
     // This method is called once to provide the initial state.
@@ -183,5 +181,11 @@ class DXGStateNotifier extends AsyncNotifier<DXGState> {
 // --- PROVIDER ----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
+// --- BUG FIX: State Not Resetting ---
+// The provider is now an `AutoDisposeAsyncNotifierProvider`. This ensures that
+// when the exercise picker screen is closed (and no longer being listened to),
+// the state is automatically destroyed. The next time the user opens the
+// picker, a fresh instance of the notifier will be created.
 final dxgStateProvider =
-    AsyncNotifierProvider<DXGStateNotifier, DXGState>(DXGStateNotifier.new);
+    AutoDisposeAsyncNotifierProvider<DXGStateNotifier, DXGState>(
+        DXGStateNotifier.new);

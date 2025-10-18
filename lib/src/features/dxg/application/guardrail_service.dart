@@ -34,15 +34,6 @@ typedef CandidateOptions = Map<String, Set<String>>;
 
 class GuardrailService {
   /// Computes the available, valid options for all discriminator fields.
-  ///
-  /// This is the core of the Guardrail Engine. It takes a movement family and
-  /// the user's current selections, and for each discriminator type (equipment,
-  /// angle, etc.), it returns the set of choices that are still valid.
-  ///
-  /// Evaluation Order (from DXG spec 4):
-  /// 1. Start with the full `allowed` list for a given field.
-  /// 2. Subtract any values that are explicitly forbidden by a `denies` rule
-  ///    that matches the *other* current selections.
   CandidateOptions getCandidateOptions({
     required MovementFamily family,
     required SelectionsMap selections,
@@ -50,7 +41,7 @@ class GuardrailService {
     final allowed = family.allowed;
     final denials = family.denies;
 
-    // Helper function to compute candidates for a single field.
+    // Helper to compute candidates for a single field, considering denials.
     Set<String> _getOptionsForField(
       List<String> allowedValues,
       String currentField,
@@ -58,36 +49,37 @@ class GuardrailService {
       final options = Set<String>.from(allowedValues);
       final denialsToRemove = <String>{};
 
-      // Check each deny rule to see if it applies.
       for (final rule in denials) {
-        // A rule applies if its conditions match the user's current selections.
         bool ruleMatches = true;
         if (rule.equipment != null &&
             selections['equipment'] != rule.equipment) {
           ruleMatches = false;
         }
-        // Add checks for other fields (e.g., angle) if deny rules become more complex.
 
         if (ruleMatches) {
-          // If the rule matches, find any denials for the field we are currently calculating.
           if (currentField == 'attachment' && rule.attachment != null) {
             denialsToRemove.addAll(rule.attachment!);
           }
-          // Add other fields here as needed.
         }
       }
-
       options.removeAll(denialsToRemove);
       return options;
     }
 
-    // Calculate the valid options for each discriminator field.
+    // --- BUG FIX: Irrelevant "Attachment" Section ---
+    // Attachments are only relevant for cable exercises. This logic now
+    // checks the selected equipment. If it's not 'cable', the attachment
+    // options will be an empty set, preventing the UI from showing the section.
+    final attachmentOptions = (selections['equipment'] == 'cable')
+        ? _getOptionsForField(allowed.attachment, 'attachment')
+        : <String>{};
+
     return {
-      'equipment': Set<String>.from(allowed.equipment), // Denials don't currently restrict equipment
+      'equipment': Set<String>.from(allowed.equipment),
       'angle': Set<String>.from(allowed.angle),
       'unilateral': Set<String>.from(allowed.unilateral),
       'orientation': Set<String>.from(allowed.orientation),
-      'attachment': _getOptionsForField(allowed.attachment, 'attachment'),
+      'attachment': attachmentOptions,
       'grip': Set<String>.from(allowed.grip),
     };
   }
@@ -99,14 +91,12 @@ class GuardrailService {
   }) {
     final candidates = getCandidateOptions(family: family, selections: selections);
 
-    // Check each of the user's selections.
     for (final entry in selections.entries) {
       final field = entry.key;
       final selectedValue = entry.value;
       final validOptions = candidates[field];
 
       if (validOptions == null || !validOptions.contains(selectedValue)) {
-        // This selection is invalid.
         return (
           isValid: false,
           reason:
@@ -114,8 +104,6 @@ class GuardrailService {
         );
       }
     }
-
-    // If all selections are valid, the overall selection is valid.
     return (isValid: true, reason: null);
   }
 }
