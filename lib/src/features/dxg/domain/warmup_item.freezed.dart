@@ -27,7 +27,9 @@ mixin _$WarmupItem {
   String get modality =>
       throw _privateConstructorUsedError; // ignore: invalid_annotation_target
   @JsonKey(name: 'display_name')
-  String get displayName => throw _privateConstructorUsedError;
+  String get displayName => throw _privateConstructorUsedError; // --- NEW ---
+// A list of parameters that can be configured for this warm-up.
+  List<WarmupParameter> get parameters => throw _privateConstructorUsedError;
 
   /// Serializes this WarmupItem to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -51,7 +53,8 @@ abstract class $WarmupItemCopyWith<$Res> {
       String region,
       String pattern,
       String modality,
-      @JsonKey(name: 'display_name') String displayName});
+      @JsonKey(name: 'display_name') String displayName,
+      List<WarmupParameter> parameters});
 }
 
 /// @nodoc
@@ -75,6 +78,7 @@ class _$WarmupItemCopyWithImpl<$Res, $Val extends WarmupItem>
     Object? pattern = null,
     Object? modality = null,
     Object? displayName = null,
+    Object? parameters = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -101,6 +105,10 @@ class _$WarmupItemCopyWithImpl<$Res, $Val extends WarmupItem>
           ? _value.displayName
           : displayName // ignore: cast_nullable_to_non_nullable
               as String,
+      parameters: null == parameters
+          ? _value.parameters
+          : parameters // ignore: cast_nullable_to_non_nullable
+              as List<WarmupParameter>,
     ) as $Val);
   }
 }
@@ -119,7 +127,8 @@ abstract class _$$WarmupItemImplCopyWith<$Res>
       String region,
       String pattern,
       String modality,
-      @JsonKey(name: 'display_name') String displayName});
+      @JsonKey(name: 'display_name') String displayName,
+      List<WarmupParameter> parameters});
 }
 
 /// @nodoc
@@ -141,6 +150,7 @@ class __$$WarmupItemImplCopyWithImpl<$Res>
     Object? pattern = null,
     Object? modality = null,
     Object? displayName = null,
+    Object? parameters = null,
   }) {
     return _then(_$WarmupItemImpl(
       id: null == id
@@ -167,6 +177,10 @@ class __$$WarmupItemImplCopyWithImpl<$Res>
           ? _value.displayName
           : displayName // ignore: cast_nullable_to_non_nullable
               as String,
+      parameters: null == parameters
+          ? _value._parameters
+          : parameters // ignore: cast_nullable_to_non_nullable
+              as List<WarmupParameter>,
     ));
   }
 }
@@ -180,7 +194,9 @@ class _$WarmupItemImpl implements _WarmupItem {
       required this.region,
       required this.pattern,
       required this.modality,
-      @JsonKey(name: 'display_name') required this.displayName});
+      @JsonKey(name: 'display_name') required this.displayName,
+      final List<WarmupParameter> parameters = const []})
+      : _parameters = parameters;
 
   factory _$WarmupItemImpl.fromJson(Map<String, dynamic> json) =>
       _$$WarmupItemImplFromJson(json);
@@ -199,10 +215,22 @@ class _$WarmupItemImpl implements _WarmupItem {
   @override
   @JsonKey(name: 'display_name')
   final String displayName;
+// --- NEW ---
+// A list of parameters that can be configured for this warm-up.
+  final List<WarmupParameter> _parameters;
+// --- NEW ---
+// A list of parameters that can be configured for this warm-up.
+  @override
+  @JsonKey()
+  List<WarmupParameter> get parameters {
+    if (_parameters is EqualUnmodifiableListView) return _parameters;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_parameters);
+  }
 
   @override
   String toString() {
-    return 'WarmupItem(id: $id, type: $type, region: $region, pattern: $pattern, modality: $modality, displayName: $displayName)';
+    return 'WarmupItem(id: $id, type: $type, region: $region, pattern: $pattern, modality: $modality, displayName: $displayName, parameters: $parameters)';
   }
 
   @override
@@ -217,13 +245,15 @@ class _$WarmupItemImpl implements _WarmupItem {
             (identical(other.modality, modality) ||
                 other.modality == modality) &&
             (identical(other.displayName, displayName) ||
-                other.displayName == displayName));
+                other.displayName == displayName) &&
+            const DeepCollectionEquality()
+                .equals(other._parameters, _parameters));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, type, region, pattern, modality, displayName);
+  int get hashCode => Object.hash(runtimeType, id, type, region, pattern,
+      modality, displayName, const DeepCollectionEquality().hash(_parameters));
 
   /// Create a copy of WarmupItem
   /// with the given fields replaced by the non-null parameter values.
@@ -243,13 +273,13 @@ class _$WarmupItemImpl implements _WarmupItem {
 
 abstract class _WarmupItem implements WarmupItem {
   const factory _WarmupItem(
-          {required final String id,
-          required final String type,
-          required final String region,
-          required final String pattern,
-          required final String modality,
-          @JsonKey(name: 'display_name') required final String displayName}) =
-      _$WarmupItemImpl;
+      {required final String id,
+      required final String type,
+      required final String region,
+      required final String pattern,
+      required final String modality,
+      @JsonKey(name: 'display_name') required final String displayName,
+      final List<WarmupParameter> parameters}) = _$WarmupItemImpl;
 
   factory _WarmupItem.fromJson(Map<String, dynamic> json) =
       _$WarmupItemImpl.fromJson;
@@ -266,12 +296,191 @@ abstract class _WarmupItem implements WarmupItem {
   String get modality; // ignore: invalid_annotation_target
   @override
   @JsonKey(name: 'display_name')
-  String get displayName;
+  String get displayName; // --- NEW ---
+// A list of parameters that can be configured for this warm-up.
+  @override
+  List<WarmupParameter> get parameters;
 
   /// Create a copy of WarmupItem
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$WarmupItemImplCopyWith<_$WarmupItemImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+WarmupParameter _$WarmupParameterFromJson(Map<String, dynamic> json) {
+  return _WarmupParameter.fromJson(json);
+}
+
+/// @nodoc
+mixin _$WarmupParameter {
+  String get name => throw _privateConstructorUsedError;
+  List<String> get options => throw _privateConstructorUsedError;
+
+  /// Serializes this WarmupParameter to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of WarmupParameter
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $WarmupParameterCopyWith<WarmupParameter> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $WarmupParameterCopyWith<$Res> {
+  factory $WarmupParameterCopyWith(
+          WarmupParameter value, $Res Function(WarmupParameter) then) =
+      _$WarmupParameterCopyWithImpl<$Res, WarmupParameter>;
+  @useResult
+  $Res call({String name, List<String> options});
+}
+
+/// @nodoc
+class _$WarmupParameterCopyWithImpl<$Res, $Val extends WarmupParameter>
+    implements $WarmupParameterCopyWith<$Res> {
+  _$WarmupParameterCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of WarmupParameter
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? options = null,
+  }) {
+    return _then(_value.copyWith(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      options: null == options
+          ? _value.options
+          : options // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$WarmupParameterImplCopyWith<$Res>
+    implements $WarmupParameterCopyWith<$Res> {
+  factory _$$WarmupParameterImplCopyWith(_$WarmupParameterImpl value,
+          $Res Function(_$WarmupParameterImpl) then) =
+      __$$WarmupParameterImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String name, List<String> options});
+}
+
+/// @nodoc
+class __$$WarmupParameterImplCopyWithImpl<$Res>
+    extends _$WarmupParameterCopyWithImpl<$Res, _$WarmupParameterImpl>
+    implements _$$WarmupParameterImplCopyWith<$Res> {
+  __$$WarmupParameterImplCopyWithImpl(
+      _$WarmupParameterImpl _value, $Res Function(_$WarmupParameterImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of WarmupParameter
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? name = null,
+    Object? options = null,
+  }) {
+    return _then(_$WarmupParameterImpl(
+      name: null == name
+          ? _value.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      options: null == options
+          ? _value._options
+          : options // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$WarmupParameterImpl implements _WarmupParameter {
+  const _$WarmupParameterImpl(
+      {required this.name, required final List<String> options})
+      : _options = options;
+
+  factory _$WarmupParameterImpl.fromJson(Map<String, dynamic> json) =>
+      _$$WarmupParameterImplFromJson(json);
+
+  @override
+  final String name;
+  final List<String> _options;
+  @override
+  List<String> get options {
+    if (_options is EqualUnmodifiableListView) return _options;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_options);
+  }
+
+  @override
+  String toString() {
+    return 'WarmupParameter(name: $name, options: $options)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$WarmupParameterImpl &&
+            (identical(other.name, name) || other.name == name) &&
+            const DeepCollectionEquality().equals(other._options, _options));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, name, const DeepCollectionEquality().hash(_options));
+
+  /// Create a copy of WarmupParameter
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$WarmupParameterImplCopyWith<_$WarmupParameterImpl> get copyWith =>
+      __$$WarmupParameterImplCopyWithImpl<_$WarmupParameterImpl>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$WarmupParameterImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _WarmupParameter implements WarmupParameter {
+  const factory _WarmupParameter(
+      {required final String name,
+      required final List<String> options}) = _$WarmupParameterImpl;
+
+  factory _WarmupParameter.fromJson(Map<String, dynamic> json) =
+      _$WarmupParameterImpl.fromJson;
+
+  @override
+  String get name;
+  @override
+  List<String> get options;
+
+  /// Create a copy of WarmupParameter
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$WarmupParameterImplCopyWith<_$WarmupParameterImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

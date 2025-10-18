@@ -28,7 +28,9 @@ mixin _$SessionItem {
             List<LoggedSet> loggedSets,
             bool isCurrent)
         exercise,
-    required TResult Function(String id, WarmupItem item) warmup,
+    required TResult Function(
+            String id, WarmupItem item, Map<String, String> selectedParameters)
+        warmup,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -42,7 +44,9 @@ mixin _$SessionItem {
             List<LoggedSet> loggedSets,
             bool isCurrent)?
         exercise,
-    TResult? Function(String id, WarmupItem item)? warmup,
+    TResult? Function(
+            String id, WarmupItem item, Map<String, String> selectedParameters)?
+        warmup,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -56,7 +60,9 @@ mixin _$SessionItem {
             List<LoggedSet> loggedSets,
             bool isCurrent)?
         exercise,
-    TResult Function(String id, WarmupItem item)? warmup,
+    TResult Function(
+            String id, WarmupItem item, Map<String, String> selectedParameters)?
+        warmup,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -292,7 +298,9 @@ class _$SessionExerciseImpl implements SessionExercise {
             List<LoggedSet> loggedSets,
             bool isCurrent)
         exercise,
-    required TResult Function(String id, WarmupItem item) warmup,
+    required TResult Function(
+            String id, WarmupItem item, Map<String, String> selectedParameters)
+        warmup,
   }) {
     return exercise(
         id, slug, displayName, discriminators, target, loggedSets, isCurrent);
@@ -310,7 +318,9 @@ class _$SessionExerciseImpl implements SessionExercise {
             List<LoggedSet> loggedSets,
             bool isCurrent)?
         exercise,
-    TResult? Function(String id, WarmupItem item)? warmup,
+    TResult? Function(
+            String id, WarmupItem item, Map<String, String> selectedParameters)?
+        warmup,
   }) {
     return exercise?.call(
         id, slug, displayName, discriminators, target, loggedSets, isCurrent);
@@ -328,7 +338,9 @@ class _$SessionExerciseImpl implements SessionExercise {
             List<LoggedSet> loggedSets,
             bool isCurrent)?
         exercise,
-    TResult Function(String id, WarmupItem item)? warmup,
+    TResult Function(
+            String id, WarmupItem item, Map<String, String> selectedParameters)?
+        warmup,
     required TResult orElse(),
   }) {
     if (exercise != null) {
@@ -405,7 +417,8 @@ abstract class _$$SessionWarmupItemImplCopyWith<$Res>
       __$$SessionWarmupItemImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String id, WarmupItem item});
+  $Res call(
+      {String id, WarmupItem item, Map<String, String> selectedParameters});
 
   $WarmupItemCopyWith<$Res> get item;
 }
@@ -425,6 +438,7 @@ class __$$SessionWarmupItemImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? item = null,
+    Object? selectedParameters = null,
   }) {
     return _then(_$SessionWarmupItemImpl(
       id: null == id
@@ -435,6 +449,10 @@ class __$$SessionWarmupItemImplCopyWithImpl<$Res>
           ? _value.item
           : item // ignore: cast_nullable_to_non_nullable
               as WarmupItem,
+      selectedParameters: null == selectedParameters
+          ? _value._selectedParameters
+          : selectedParameters // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
     ));
   }
 
@@ -452,16 +470,32 @@ class __$$SessionWarmupItemImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$SessionWarmupItemImpl implements SessionWarmupItem {
-  const _$SessionWarmupItemImpl({required this.id, required this.item});
+  const _$SessionWarmupItemImpl(
+      {required this.id,
+      required this.item,
+      required final Map<String, String> selectedParameters})
+      : _selectedParameters = selectedParameters;
 
   @override
   final String id;
   @override
   final WarmupItem item;
+// --- NEW ---
+// Stores the user's selections, e.g., {'Grip': 'Wide'}
+  final Map<String, String> _selectedParameters;
+// --- NEW ---
+// Stores the user's selections, e.g., {'Grip': 'Wide'}
+  @override
+  Map<String, String> get selectedParameters {
+    if (_selectedParameters is EqualUnmodifiableMapView)
+      return _selectedParameters;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_selectedParameters);
+  }
 
   @override
   String toString() {
-    return 'SessionItem.warmup(id: $id, item: $item)';
+    return 'SessionItem.warmup(id: $id, item: $item, selectedParameters: $selectedParameters)';
   }
 
   @override
@@ -470,11 +504,14 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
         (other.runtimeType == runtimeType &&
             other is _$SessionWarmupItemImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.item, item) || other.item == item));
+            (identical(other.item, item) || other.item == item) &&
+            const DeepCollectionEquality()
+                .equals(other._selectedParameters, _selectedParameters));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, item);
+  int get hashCode => Object.hash(runtimeType, id, item,
+      const DeepCollectionEquality().hash(_selectedParameters));
 
   /// Create a copy of SessionItem
   /// with the given fields replaced by the non-null parameter values.
@@ -497,9 +534,11 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
             List<LoggedSet> loggedSets,
             bool isCurrent)
         exercise,
-    required TResult Function(String id, WarmupItem item) warmup,
+    required TResult Function(
+            String id, WarmupItem item, Map<String, String> selectedParameters)
+        warmup,
   }) {
-    return warmup(id, item);
+    return warmup(id, item, selectedParameters);
   }
 
   @override
@@ -514,9 +553,11 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
             List<LoggedSet> loggedSets,
             bool isCurrent)?
         exercise,
-    TResult? Function(String id, WarmupItem item)? warmup,
+    TResult? Function(
+            String id, WarmupItem item, Map<String, String> selectedParameters)?
+        warmup,
   }) {
-    return warmup?.call(id, item);
+    return warmup?.call(id, item, selectedParameters);
   }
 
   @override
@@ -531,11 +572,13 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
             List<LoggedSet> loggedSets,
             bool isCurrent)?
         exercise,
-    TResult Function(String id, WarmupItem item)? warmup,
+    TResult Function(
+            String id, WarmupItem item, Map<String, String> selectedParameters)?
+        warmup,
     required TResult orElse(),
   }) {
     if (warmup != null) {
-      return warmup(id, item);
+      return warmup(id, item, selectedParameters);
     }
     return orElse();
   }
@@ -574,12 +617,16 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
 
 abstract class SessionWarmupItem implements SessionItem {
   const factory SessionWarmupItem(
-      {required final String id,
-      required final WarmupItem item}) = _$SessionWarmupItemImpl;
+          {required final String id,
+          required final WarmupItem item,
+          required final Map<String, String> selectedParameters}) =
+      _$SessionWarmupItemImpl;
 
   @override
   String get id;
-  WarmupItem get item;
+  WarmupItem get item; // --- NEW ---
+// Stores the user's selections, e.g., {'Grip': 'Wide'}
+  Map<String, String> get selectedParameters;
 
   /// Create a copy of SessionItem
   /// with the given fields replaced by the non-null parameter values.

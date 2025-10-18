@@ -94,7 +94,6 @@ class DXGExercisePickerScreen extends ConsumerWidget {
     );
   }
 
-  /// Builds the view for selecting warm-up/prep items from a simple list.
   Widget _buildPrepView(BuildContext context, WidgetRef ref) {
     final warmupItemsAsync = ref.watch(warmupItemsProvider);
     return warmupItemsAsync.when(
@@ -108,10 +107,69 @@ class DXGExercisePickerScreen extends ConsumerWidget {
             return ListTile(
               title: Text(item.displayName),
               subtitle: Text('${item.region} - ${item.modality}'),
-              onTap: () {
-                // Return the selected WarmupItem to the session screen.
-                Navigator.of(context).pop(item);
+              onTap: () async {
+                if (item.parameters.isNotEmpty) {
+                  final selectedParameters = await _showParameterDialog(context, item);
+                  if (selectedParameters != null) {
+                    Navigator.of(context).pop({'item': item, 'params': selectedParameters});
+                  }
+                } else {
+                  Navigator.of(context).pop({'item': item, 'params': <String, String>{}});
+                }
               },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<Map<String, String>?> _showParameterDialog(
+      BuildContext context, WarmupItem item) {
+    return showDialog<Map<String, String>>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            final selections = {
+              for (var p in item.parameters) p.name: p.options.first
+            };
+
+            return AlertDialog(
+              backgroundColor: AppTheme.colors.surface,
+              title: Text(item.displayName),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: item.parameters.map((param) {
+                  return DropdownButtonFormField<String>(
+                    value: selections[param.name],
+                    items: param.options.map((option) {
+                      return DropdownMenuItem(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => selections[param.name] = value);
+                      }
+                    },
+                    decoration: InputDecoration(labelText: param.name),
+                  );
+                }).toList(),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(selections);
+                  },
+                  child: const Text('Add'),
+                ),
+              ],
             );
           },
         );
@@ -201,7 +259,6 @@ class DXGExercisePickerScreen extends ConsumerWidget {
           ),
           child: InkWell(
             onTap: () {
-              // Return the selected GeneratedExerciseResult to the session screen.
               Navigator.of(context).pop(result);
             },
             borderRadius: BorderRadius.circular(AppTheme.sizing.cardRadius),

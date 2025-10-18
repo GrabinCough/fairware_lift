@@ -13,10 +13,6 @@ part 'session_item.freezed.dart';
 // -----------------------------------------------------------------------------
 // --- SESSION ITEM DATA MODEL (REFACTOR) --------------------------------------
 // -----------------------------------------------------------------------------
-// This file introduces a sealed class `SessionItem` to represent anything that
-// can be part of a workout session. This allows our state to hold both strength
-// exercises and warm-up items in a single, type-safe list.
-// -----------------------------------------------------------------------------
 
 @freezed
 sealed class SessionItem with _$SessionItem {
@@ -31,9 +27,12 @@ sealed class SessionItem with _$SessionItem {
     @Default(false) bool isCurrent,
   }) = SessionExercise;
 
-  /// Represents a simple warm-up or prep item.
+  /// Represents a warm-up or prep item with its selected parameters.
   const factory SessionItem.warmup({
     required String id,
     required WarmupItem item,
+    // --- NEW ---
+    // Stores the user's selections, e.g., {'Grip': 'Wide'}
+    required Map<String, String> selectedParameters,
   }) = SessionWarmupItem;
 }

@@ -6,23 +6,30 @@
 
 import 'package:flutter/material.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
-import 'package:fairware_lift/src/features/dxg/domain/warmup_item.dart';
+import 'package:fairware_lift/src/features/workout/domain/session_item.dart';
 
 // -----------------------------------------------------------------------------
 // --- WARMUP LIST ITEM WIDGET -------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// A simple, stateless widget to display a warm-up item in the session list.
 class WarmupListItem extends StatelessWidget {
-  final WarmupItem warmupItem;
+  // --- REFACTOR ---
+  // Now accepts the full SessionWarmupItem to access selected parameters.
+  final SessionWarmupItem warmup;
 
   const WarmupListItem({
     super.key,
-    required this.warmupItem,
+    required this.warmup,
   });
 
   @override
   Widget build(BuildContext context) {
+    // --- NEW: Displaying Parameters ---
+    // Create a subtitle string from the selected parameters.
+    final subtitle = warmup.selectedParameters.entries
+        .map((e) => '${e.key}: ${e.value}')
+        .join(', ');
+
     return Card(
       color: AppTheme.colors.surface,
       elevation: 0,
@@ -40,10 +47,22 @@ class WarmupListItem extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: Text(
-                warmupItem.displayName,
-                style: AppTheme.typography.body
-                    .copyWith(color: AppTheme.colors.textSecondary),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    warmup.item.displayName,
+                    style: AppTheme.typography.body
+                        .copyWith(color: AppTheme.colors.textSecondary),
+                  ),
+                  if (subtitle.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: AppTheme.typography.caption,
+                    ),
+                  ],
+                ],
               ),
             ),
           ],

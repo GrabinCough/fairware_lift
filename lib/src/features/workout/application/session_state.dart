@@ -16,8 +16,6 @@ import 'package:fairware_lift/src/features/workout/domain/session_item.dart';
 // --- SESSION STATE NOTIFIER --------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// --- REFACTOR ---
-// The notifier now manages a list of the generic `SessionItem` type.
 class SessionStateNotifier extends Notifier<List<SessionItem>> {
   final _uuid = const Uuid();
 
@@ -44,14 +42,13 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     state = updatedState;
   }
 
-  /// --- NEW METHOD ---
-  /// Adds a new warm-up item to the current session.
-  void addWarmupItem(WarmupItem item) {
+  /// Adds a new warm-up item to the current session with its selected parameters.
+  void addWarmupItem(WarmupItem item, Map<String, String> selectedParameters) {
     final newWarmup = SessionItem.warmup(
       id: _uuid.v4(),
       item: item,
+      selectedParameters: selectedParameters,
     );
-    // When adding a warm-up, we don't change the `isCurrent` status of exercises.
     state = [...state, newWarmup];
   }
 

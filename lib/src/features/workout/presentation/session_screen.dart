@@ -24,19 +24,54 @@ import 'package:fairware_lift/src/features/workout/presentation/workout_summary_
 class SessionScreen extends ConsumerWidget {
   const SessionScreen({super.key});
 
-  /// Shows a dialog displaying the exercise's defining discriminators.
   void _showExerciseInfo(
     BuildContext context, {
     required String displayName,
     required Map<String, String> discriminators,
   }) {
-    // ... (implementation is unchanged)
+    String _formatTitle(String key) =>
+        '${key[0].toUpperCase()}${key.substring(1)}';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.colors.surface,
+          title: Text(displayName),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: discriminators.entries.map((entry) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: RichText(
+                  text: TextSpan(
+                    style: AppTheme.typography.body,
+                    children: [
+                      TextSpan(
+                        text: '${_formatTitle(entry.key)}: ',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(text: entry.value),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // --- REFACTOR ---
-    // The state now contains a list of the generic `SessionItem` type.
     final sessionItems = ref.watch(sessionStateProvider);
 
     return Scaffold(
@@ -47,7 +82,6 @@ class SessionScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () {
-              // This needs to be updated to pass the new list type
               final completedWorkout = ref.read(sessionStateProvider);
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -89,9 +123,6 @@ class SessionScreen extends ConsumerWidget {
                     alignment: Alignment.centerRight,
                     child: const Icon(Icons.delete_forever_rounded),
                   ),
-                  // --- REFACTOR ---
-                  // Use a switch statement on the `SessionItem` to determine
-                  // which type of list item to render.
                   child: switch (item) {
                     SessionExercise e => ExerciseListItem(
                         displayName: e.displayName,
@@ -111,7 +142,7 @@ class SessionScreen extends ConsumerWidget {
                         ),
                       ),
                     SessionWarmupItem w => WarmupListItem(
-                        warmupItem: w.item,
+                        warmup: w,
                       ),
                   },
                 );
@@ -120,20 +151,19 @@ class SessionScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           TextButton.icon(
             onPressed: () async {
-              // --- REFACTOR ---
-              // The result can now be a `GeneratedExerciseResult` or a `WarmupItem`.
-              final result = await Navigator.of(context).push<Object>(
+              final result = await Navigator.of(context).push<dynamic>(
                 MaterialPageRoute(
                   fullscreenDialog: true,
                   builder: (context) => const DXGExercisePickerScreen(),
                 ),
               );
 
-              // Check the type of the result and call the appropriate notifier method.
               if (result is GeneratedExerciseResult) {
                 ref.read(sessionStateProvider.notifier).addDxgExercise(result);
-              } else if (result is WarmupItem) {
-                ref.read(sessionStateProvider.notifier).addWarmupItem(result);
+              } else if (result is Map) {
+                final item = result['item'] as WarmupItem;
+                final params = result['params'] as Map<String, String>;
+                ref.read(sessionStateProvider.notifier).addWarmupItem(item, params);
               }
             },
             icon: const Icon(Icons.add_circle_outline_rounded),
@@ -145,7 +175,29 @@ class SessionScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState() {
-    // ... (implementation is unchanged)
-    return Center(/* ... */);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 64.0),
+        child: Column(
+          children: [
+            Icon(
+              Icons.fitness_center_rounded,
+              size: 64,
+              color: AppTheme.colors.textMuted,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Your session is empty.',
+              style: AppTheme.typography.title,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Tap "Add Exercise" to get started.',
+              style: AppTheme.typography.body,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
