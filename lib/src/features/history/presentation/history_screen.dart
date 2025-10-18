@@ -65,7 +65,6 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
-  /// Builds the red background that appears behind the card during a swipe.
   Widget _buildDismissBackground() {
     return Container(
       color: AppTheme.colors.danger,
@@ -79,7 +78,6 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
-  /// Shows an AlertDialog to confirm the deletion.
   Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
     return showDialog<bool>(
       context: context,
@@ -106,10 +104,10 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
-  /// Builds the card for a single workout session.
   Widget _buildWorkoutCard(BuildContext context, FullWorkoutSession workout) {
     final setsByExercise =
         groupBy(workout.sets, (setWithExercise) => setWithExercise.exercise);
+    final totalItems = setsByExercise.keys.length + workout.warmups.length;
 
     return Card(
       color: AppTheme.colors.surface,
@@ -123,20 +121,48 @@ class HistoryScreen extends ConsumerWidget {
           style: AppTheme.typography.title.copyWith(fontSize: 18),
         ),
         subtitle: Text(
-          '${setsByExercise.keys.length} exercises, ${workout.sets.length} total sets',
+          '$totalItems items, ${workout.sets.length} total sets',
           style: AppTheme.typography.caption,
         ),
         childrenPadding: const EdgeInsets.all(16.0),
-        children: setsByExercise.entries.map((entry) {
-          final exercise = entry.key;
-          final sets = entry.value;
-          return _buildExerciseSummary(context, exercise, sets);
-        }).toList(),
+        children: [
+          ...workout.warmups.map((warmup) => _buildWarmupSummary(warmup)),
+          ...setsByExercise.entries.map((entry) {
+            final exercise = entry.key;
+            final sets = entry.value;
+            return _buildExerciseSummary(context, exercise, sets);
+          }),
+        ],
       ),
     );
   }
 
-  /// Builds the summary for a single exercise within a workout card.
+  Widget _buildWarmupSummary(SavedWarmup warmup) {
+    final subtitle =
+        warmup.parameters.entries.map((e) => e.value).join(' • ');
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            warmup.displayName,
+            style: AppTheme.typography.body
+                .copyWith(color: AppTheme.colors.textSecondary),
+          ),
+          if (subtitle.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: AppTheme.typography.caption,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildExerciseSummary(BuildContext context, ExerciseInstance exercise,
       List<SetEntryWithExercise> sets) {
     return Padding(
@@ -144,8 +170,6 @@ class HistoryScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // --- BUG FIX: Data Verification ---
-          // The exercise name is now in a Row with an info button.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -180,8 +204,6 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
-  /// --- NEW METHOD for Data Verification ---
-  /// Shows the discriminator dialog for a historical exercise.
   void _showExerciseInfoDialog(
       BuildContext context, ExerciseInstance exercise) {
     String _formatTitle(String key) =>
@@ -225,9 +247,29 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
-  /// Builds the "Empty State" UI when no workouts are found.
   Widget _buildEmptyState() {
-    // ... (this method is unchanged)
-    return Center(/* ... */);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.bar_chart_rounded,
+              size: 80,
+              color: AppTheme.colors.textMuted,
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'No workouts logged yet.',
+              style: AppTheme.typography.title.copyWith(
+                color: AppTheme.colors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

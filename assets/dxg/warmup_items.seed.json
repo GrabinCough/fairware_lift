@@ -25,7 +25,12 @@
       "pattern": "dynamic_stretch",
       "modality": "bodyweight",
       "display_name": "Leg Swings",
-      "parameters": []
+      "parameters": [
+        {
+          "name": "Reps per Leg",
+          "options": ["10", "15", "20"]
+        }
+      ]
     },
     {
       "id": "arm_swings",
@@ -34,7 +39,12 @@
       "pattern": "dynamic_stretch",
       "modality": "bodyweight",
       "display_name": "Arm Swings",
-      "parameters": []
+      "parameters": [
+        {
+          "name": "Reps per Arm",
+          "options": ["10", "15", "20"]
+        }
+      ]
     },
     {
       "id": "arm_spins",
@@ -75,7 +85,12 @@
       "pattern": "scapular_retraction",
       "modality": "band",
       "display_name": "Band Pull-Aparts",
-      "parameters": []
+      "parameters": [
+        {
+          "name": "Resistance",
+          "options": ["Light", "Medium", "Heavy"]
+        }
+      ]
     }
   ]
 }

@@ -1078,6 +1078,362 @@ class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
   }
 }
 
+class $SavedWarmupsTable extends SavedWarmups
+    with TableInfo<$SavedWarmupsTable, SavedWarmup> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SavedWarmupsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _sessionIdMeta =
+      const VerificationMeta('sessionId');
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+      'session_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES sessions (id)'));
+  static const VerificationMeta _warmupIdMeta =
+      const VerificationMeta('warmupId');
+  @override
+  late final GeneratedColumn<String> warmupId = GeneratedColumn<String>(
+      'warmup_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _displayNameMeta =
+      const VerificationMeta('displayName');
+  @override
+  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
+      'display_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  late final GeneratedColumnWithTypeConverter<Map<String, String>, String>
+      parameters = GeneratedColumn<String>('parameters', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<Map<String, String>>(
+              $SavedWarmupsTable.$converterparameters);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, sessionId, warmupId, displayName, parameters, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'saved_warmups';
+  @override
+  VerificationContext validateIntegrity(Insertable<SavedWarmup> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(_sessionIdMeta,
+          sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta));
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('warmup_id')) {
+      context.handle(_warmupIdMeta,
+          warmupId.isAcceptableOrUnknown(data['warmup_id']!, _warmupIdMeta));
+    } else if (isInserting) {
+      context.missing(_warmupIdMeta);
+    }
+    if (data.containsKey('display_name')) {
+      context.handle(
+          _displayNameMeta,
+          displayName.isAcceptableOrUnknown(
+              data['display_name']!, _displayNameMeta));
+    } else if (isInserting) {
+      context.missing(_displayNameMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SavedWarmup map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SavedWarmup(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      sessionId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}session_id'])!,
+      warmupId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}warmup_id'])!,
+      displayName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}display_name'])!,
+      parameters: $SavedWarmupsTable.$converterparameters.fromSql(
+          attachedDatabase.typeMapping.read(
+              DriftSqlType.string, data['${effectivePrefix}parameters'])!),
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+    );
+  }
+
+  @override
+  $SavedWarmupsTable createAlias(String alias) {
+    return $SavedWarmupsTable(attachedDatabase, alias);
+  }
+
+  static TypeConverter<Map<String, String>, String> $converterparameters =
+      const DiscriminatorsConverter();
+}
+
+class SavedWarmup extends DataClass implements Insertable<SavedWarmup> {
+  final String id;
+  final String sessionId;
+  final String warmupId;
+  final String displayName;
+  final Map<String, String> parameters;
+  final DateTime createdAt;
+  const SavedWarmup(
+      {required this.id,
+      required this.sessionId,
+      required this.warmupId,
+      required this.displayName,
+      required this.parameters,
+      required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['session_id'] = Variable<String>(sessionId);
+    map['warmup_id'] = Variable<String>(warmupId);
+    map['display_name'] = Variable<String>(displayName);
+    {
+      map['parameters'] = Variable<String>(
+          $SavedWarmupsTable.$converterparameters.toSql(parameters));
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  SavedWarmupsCompanion toCompanion(bool nullToAbsent) {
+    return SavedWarmupsCompanion(
+      id: Value(id),
+      sessionId: Value(sessionId),
+      warmupId: Value(warmupId),
+      displayName: Value(displayName),
+      parameters: Value(parameters),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory SavedWarmup.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SavedWarmup(
+      id: serializer.fromJson<String>(json['id']),
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      warmupId: serializer.fromJson<String>(json['warmupId']),
+      displayName: serializer.fromJson<String>(json['displayName']),
+      parameters: serializer.fromJson<Map<String, String>>(json['parameters']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'sessionId': serializer.toJson<String>(sessionId),
+      'warmupId': serializer.toJson<String>(warmupId),
+      'displayName': serializer.toJson<String>(displayName),
+      'parameters': serializer.toJson<Map<String, String>>(parameters),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  SavedWarmup copyWith(
+          {String? id,
+          String? sessionId,
+          String? warmupId,
+          String? displayName,
+          Map<String, String>? parameters,
+          DateTime? createdAt}) =>
+      SavedWarmup(
+        id: id ?? this.id,
+        sessionId: sessionId ?? this.sessionId,
+        warmupId: warmupId ?? this.warmupId,
+        displayName: displayName ?? this.displayName,
+        parameters: parameters ?? this.parameters,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  SavedWarmup copyWithCompanion(SavedWarmupsCompanion data) {
+    return SavedWarmup(
+      id: data.id.present ? data.id.value : this.id,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      warmupId: data.warmupId.present ? data.warmupId.value : this.warmupId,
+      displayName:
+          data.displayName.present ? data.displayName.value : this.displayName,
+      parameters:
+          data.parameters.present ? data.parameters.value : this.parameters,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SavedWarmup(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('warmupId: $warmupId, ')
+          ..write('displayName: $displayName, ')
+          ..write('parameters: $parameters, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, sessionId, warmupId, displayName, parameters, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SavedWarmup &&
+          other.id == this.id &&
+          other.sessionId == this.sessionId &&
+          other.warmupId == this.warmupId &&
+          other.displayName == this.displayName &&
+          other.parameters == this.parameters &&
+          other.createdAt == this.createdAt);
+}
+
+class SavedWarmupsCompanion extends UpdateCompanion<SavedWarmup> {
+  final Value<String> id;
+  final Value<String> sessionId;
+  final Value<String> warmupId;
+  final Value<String> displayName;
+  final Value<Map<String, String>> parameters;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const SavedWarmupsCompanion({
+    this.id = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.warmupId = const Value.absent(),
+    this.displayName = const Value.absent(),
+    this.parameters = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SavedWarmupsCompanion.insert({
+    required String id,
+    required String sessionId,
+    required String warmupId,
+    required String displayName,
+    required Map<String, String> parameters,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        sessionId = Value(sessionId),
+        warmupId = Value(warmupId),
+        displayName = Value(displayName),
+        parameters = Value(parameters),
+        createdAt = Value(createdAt);
+  static Insertable<SavedWarmup> custom({
+    Expression<String>? id,
+    Expression<String>? sessionId,
+    Expression<String>? warmupId,
+    Expression<String>? displayName,
+    Expression<String>? parameters,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sessionId != null) 'session_id': sessionId,
+      if (warmupId != null) 'warmup_id': warmupId,
+      if (displayName != null) 'display_name': displayName,
+      if (parameters != null) 'parameters': parameters,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SavedWarmupsCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? sessionId,
+      Value<String>? warmupId,
+      Value<String>? displayName,
+      Value<Map<String, String>>? parameters,
+      Value<DateTime>? createdAt,
+      Value<int>? rowid}) {
+    return SavedWarmupsCompanion(
+      id: id ?? this.id,
+      sessionId: sessionId ?? this.sessionId,
+      warmupId: warmupId ?? this.warmupId,
+      displayName: displayName ?? this.displayName,
+      parameters: parameters ?? this.parameters,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (warmupId.present) {
+      map['warmup_id'] = Variable<String>(warmupId.value);
+    }
+    if (displayName.present) {
+      map['display_name'] = Variable<String>(displayName.value);
+    }
+    if (parameters.present) {
+      map['parameters'] = Variable<String>(
+          $SavedWarmupsTable.$converterparameters.toSql(parameters.value));
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SavedWarmupsCompanion(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('warmupId: $warmupId, ')
+          ..write('displayName: $displayName, ')
+          ..write('parameters: $parameters, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1085,12 +1441,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ExerciseInstancesTable exerciseInstances =
       $ExerciseInstancesTable(this);
   late final $SetEntriesTable setEntries = $SetEntriesTable(this);
+  late final $SavedWarmupsTable savedWarmups = $SavedWarmupsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [sessions, exerciseInstances, setEntries];
+      [sessions, exerciseInstances, setEntries, savedWarmups];
 }
 
 typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
@@ -1125,6 +1482,21 @@ final class $$SessionsTableReferences
         .filter((f) => f.sessionId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_setEntriesRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$SavedWarmupsTable, List<SavedWarmup>>
+      _savedWarmupsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+          db.savedWarmups,
+          aliasName:
+              $_aliasNameGenerator(db.sessions.id, db.savedWarmups.sessionId));
+
+  $$SavedWarmupsTableProcessedTableManager get savedWarmupsRefs {
+    final manager = $$SavedWarmupsTableTableManager($_db, $_db.savedWarmups)
+        .filter((f) => f.sessionId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_savedWarmupsRefsTable($_db));
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: cache));
   }
@@ -1168,6 +1540,27 @@ class $$SessionsTableFilterComposer
             $$SetEntriesTableFilterComposer(
               $db: $db,
               $table: $db.setEntries,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> savedWarmupsRefs(
+      Expression<bool> Function($$SavedWarmupsTableFilterComposer f) f) {
+    final $$SavedWarmupsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.savedWarmups,
+        getReferencedColumn: (t) => t.sessionId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SavedWarmupsTableFilterComposer(
+              $db: $db,
+              $table: $db.savedWarmups,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -1247,6 +1640,27 @@ class $$SessionsTableAnnotationComposer
             ));
     return f(composer);
   }
+
+  Expression<T> savedWarmupsRefs<T extends Object>(
+      Expression<T> Function($$SavedWarmupsTableAnnotationComposer a) f) {
+    final $$SavedWarmupsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.savedWarmups,
+        getReferencedColumn: (t) => t.sessionId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SavedWarmupsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.savedWarmups,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$SessionsTableTableManager extends RootTableManager<
@@ -1260,7 +1674,7 @@ class $$SessionsTableTableManager extends RootTableManager<
     $$SessionsTableUpdateCompanionBuilder,
     (Session, $$SessionsTableReferences),
     Session,
-    PrefetchHooks Function({bool setEntriesRefs})> {
+    PrefetchHooks Function({bool setEntriesRefs, bool savedWarmupsRefs})> {
   $$SessionsTableTableManager(_$AppDatabase db, $SessionsTable table)
       : super(TableManagerState(
           db: db,
@@ -1307,10 +1721,14 @@ class $$SessionsTableTableManager extends RootTableManager<
               .map((e) =>
                   (e.readTable(table), $$SessionsTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({setEntriesRefs = false}) {
+          prefetchHooksCallback: (
+              {setEntriesRefs = false, savedWarmupsRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (setEntriesRefs) db.setEntries],
+              explicitlyWatchedTables: [
+                if (setEntriesRefs) db.setEntries,
+                if (savedWarmupsRefs) db.savedWarmups
+              ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
@@ -1323,6 +1741,19 @@ class $$SessionsTableTableManager extends RootTableManager<
                         managerFromTypedResult: (p0) =>
                             $$SessionsTableReferences(db, table, p0)
                                 .setEntriesRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.sessionId == item.id),
+                        typedResults: items),
+                  if (savedWarmupsRefs)
+                    await $_getPrefetchedData<Session, $SessionsTable,
+                            SavedWarmup>(
+                        currentTable: table,
+                        referencedTable: $$SessionsTableReferences
+                            ._savedWarmupsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$SessionsTableReferences(db, table, p0)
+                                .savedWarmupsRefs,
                         referencedItemsForCurrentItem:
                             (item, referencedItems) => referencedItems
                                 .where((e) => e.sessionId == item.id),
@@ -1345,7 +1776,7 @@ typedef $$SessionsTableProcessedTableManager = ProcessedTableManager<
     $$SessionsTableUpdateCompanionBuilder,
     (Session, $$SessionsTableReferences),
     Session,
-    PrefetchHooks Function({bool setEntriesRefs})>;
+    PrefetchHooks Function({bool setEntriesRefs, bool savedWarmupsRefs})>;
 typedef $$ExerciseInstancesTableCreateCompanionBuilder
     = ExerciseInstancesCompanion Function({
   required String slug,
@@ -2005,6 +2436,300 @@ typedef $$SetEntriesTableProcessedTableManager = ProcessedTableManager<
     (SetEntry, $$SetEntriesTableReferences),
     SetEntry,
     PrefetchHooks Function({bool sessionId, bool exerciseSlug})>;
+typedef $$SavedWarmupsTableCreateCompanionBuilder = SavedWarmupsCompanion
+    Function({
+  required String id,
+  required String sessionId,
+  required String warmupId,
+  required String displayName,
+  required Map<String, String> parameters,
+  required DateTime createdAt,
+  Value<int> rowid,
+});
+typedef $$SavedWarmupsTableUpdateCompanionBuilder = SavedWarmupsCompanion
+    Function({
+  Value<String> id,
+  Value<String> sessionId,
+  Value<String> warmupId,
+  Value<String> displayName,
+  Value<Map<String, String>> parameters,
+  Value<DateTime> createdAt,
+  Value<int> rowid,
+});
+
+final class $$SavedWarmupsTableReferences
+    extends BaseReferences<_$AppDatabase, $SavedWarmupsTable, SavedWarmup> {
+  $$SavedWarmupsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $SessionsTable _sessionIdTable(_$AppDatabase db) =>
+      db.sessions.createAlias(
+          $_aliasNameGenerator(db.savedWarmups.sessionId, db.sessions.id));
+
+  $$SessionsTableProcessedTableManager get sessionId {
+    final $_column = $_itemColumn<String>('session_id')!;
+
+    final manager = $$SessionsTableTableManager($_db, $_db.sessions)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_sessionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$SavedWarmupsTableFilterComposer
+    extends Composer<_$AppDatabase, $SavedWarmupsTable> {
+  $$SavedWarmupsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get warmupId => $composableBuilder(
+      column: $table.warmupId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get displayName => $composableBuilder(
+      column: $table.displayName, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<Map<String, String>, Map<String, String>,
+          String>
+      get parameters => $composableBuilder(
+          column: $table.parameters,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  $$SessionsTableFilterComposer get sessionId {
+    final $$SessionsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.sessionId,
+        referencedTable: $db.sessions,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SessionsTableFilterComposer(
+              $db: $db,
+              $table: $db.sessions,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$SavedWarmupsTableOrderingComposer
+    extends Composer<_$AppDatabase, $SavedWarmupsTable> {
+  $$SavedWarmupsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get warmupId => $composableBuilder(
+      column: $table.warmupId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get displayName => $composableBuilder(
+      column: $table.displayName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get parameters => $composableBuilder(
+      column: $table.parameters, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  $$SessionsTableOrderingComposer get sessionId {
+    final $$SessionsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.sessionId,
+        referencedTable: $db.sessions,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SessionsTableOrderingComposer(
+              $db: $db,
+              $table: $db.sessions,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$SavedWarmupsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SavedWarmupsTable> {
+  $$SavedWarmupsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get warmupId =>
+      $composableBuilder(column: $table.warmupId, builder: (column) => column);
+
+  GeneratedColumn<String> get displayName => $composableBuilder(
+      column: $table.displayName, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Map<String, String>, String>
+      get parameters => $composableBuilder(
+          column: $table.parameters, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$SessionsTableAnnotationComposer get sessionId {
+    final $$SessionsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.sessionId,
+        referencedTable: $db.sessions,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SessionsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.sessions,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$SavedWarmupsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SavedWarmupsTable,
+    SavedWarmup,
+    $$SavedWarmupsTableFilterComposer,
+    $$SavedWarmupsTableOrderingComposer,
+    $$SavedWarmupsTableAnnotationComposer,
+    $$SavedWarmupsTableCreateCompanionBuilder,
+    $$SavedWarmupsTableUpdateCompanionBuilder,
+    (SavedWarmup, $$SavedWarmupsTableReferences),
+    SavedWarmup,
+    PrefetchHooks Function({bool sessionId})> {
+  $$SavedWarmupsTableTableManager(_$AppDatabase db, $SavedWarmupsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SavedWarmupsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SavedWarmupsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SavedWarmupsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> sessionId = const Value.absent(),
+            Value<String> warmupId = const Value.absent(),
+            Value<String> displayName = const Value.absent(),
+            Value<Map<String, String>> parameters = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SavedWarmupsCompanion(
+            id: id,
+            sessionId: sessionId,
+            warmupId: warmupId,
+            displayName: displayName,
+            parameters: parameters,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String sessionId,
+            required String warmupId,
+            required String displayName,
+            required Map<String, String> parameters,
+            required DateTime createdAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SavedWarmupsCompanion.insert(
+            id: id,
+            sessionId: sessionId,
+            warmupId: warmupId,
+            displayName: displayName,
+            parameters: parameters,
+            createdAt: createdAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$SavedWarmupsTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({sessionId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (sessionId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.sessionId,
+                    referencedTable:
+                        $$SavedWarmupsTableReferences._sessionIdTable(db),
+                    referencedColumn:
+                        $$SavedWarmupsTableReferences._sessionIdTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$SavedWarmupsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $SavedWarmupsTable,
+    SavedWarmup,
+    $$SavedWarmupsTableFilterComposer,
+    $$SavedWarmupsTableOrderingComposer,
+    $$SavedWarmupsTableAnnotationComposer,
+    $$SavedWarmupsTableCreateCompanionBuilder,
+    $$SavedWarmupsTableUpdateCompanionBuilder,
+    (SavedWarmup, $$SavedWarmupsTableReferences),
+    SavedWarmup,
+    PrefetchHooks Function({bool sessionId})>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2015,4 +2740,6 @@ class $AppDatabaseManager {
       $$ExerciseInstancesTableTableManager(_db, _db.exerciseInstances);
   $$SetEntriesTableTableManager get setEntries =>
       $$SetEntriesTableTableManager(_db, _db.setEntries);
+  $$SavedWarmupsTableTableManager get savedWarmups =>
+      $$SavedWarmupsTableTableManager(_db, _db.savedWarmups);
 }

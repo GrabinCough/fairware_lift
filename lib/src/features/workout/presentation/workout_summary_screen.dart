@@ -18,8 +18,6 @@ import 'package:fairware_lift/src/features/workout/domain/session_item.dart';
 // -----------------------------------------------------------------------------
 
 class WorkoutSummaryScreen extends ConsumerWidget {
-  // --- REFACTOR ---
-  // The screen now accepts a list of the generic `SessionItem` type.
   final List<SessionItem> completedItems;
 
   const WorkoutSummaryScreen({
@@ -42,41 +40,51 @@ class WorkoutSummaryScreen extends ConsumerWidget {
 
     final setEntriesCompanion = <SetEntriesCompanion>[];
     final exerciseInstancesToSave = <ExerciseInstancesCompanion>[];
+    final savedWarmupsCompanion = <SavedWarmupsCompanion>[];
 
-    // --- REFACTOR ---
-    // Iterate over the generic list and only process items that are exercises.
-    // Warm-up items are not persisted in this version.
     for (final item in completedItems) {
-      if (item is SessionExercise && item.loggedSets.isNotEmpty) {
-        exerciseInstancesToSave.add(
-          ExerciseInstancesCompanion(
-            slug: drift.Value(item.slug),
-            familyId: drift.Value(item.discriminators['family_id'] ?? ''),
-            displayName: drift.Value(item.displayName),
-            discriminators: drift.Value(item.discriminators),
-            firstSeenAt: drift.Value(now),
-          ),
-        );
-
-        for (int i = 0; i < item.loggedSets.length; i++) {
-          final set = item.loggedSets[i];
-          setEntriesCompanion.add(
-            SetEntriesCompanion(
-              id: drift.Value(uuid.v4()),
-              sessionId: drift.Value(sessionId),
-              exerciseSlug: drift.Value(item.slug),
-              setOrder: drift.Value(i + 1),
-              weight: drift.Value(set.weight),
-              reps: drift.Value(set.reps),
-              createdAt: drift.Value(now),
-              updatedAt: drift.Value(now),
+      switch (item) {
+        case SessionExercise e when e.loggedSets.isNotEmpty:
+          exerciseInstancesToSave.add(
+            ExerciseInstancesCompanion(
+              slug: drift.Value(e.slug),
+              familyId: drift.Value(e.discriminators['family_id'] ?? ''),
+              displayName: drift.Value(e.displayName),
+              discriminators: drift.Value(e.discriminators),
+              firstSeenAt: drift.Value(now),
             ),
           );
-        }
+          for (int i = 0; i < e.loggedSets.length; i++) {
+            final set = e.loggedSets[i];
+            setEntriesCompanion.add(
+              SetEntriesCompanion(
+                id: drift.Value(uuid.v4()),
+                sessionId: drift.Value(sessionId),
+                exerciseSlug: drift.Value(e.slug),
+                setOrder: drift.Value(i + 1),
+                weight: drift.Value(set.weight),
+                reps: drift.Value(set.reps),
+                createdAt: drift.Value(now),
+                updatedAt: drift.Value(now),
+              ),
+            );
+          }
+        case SessionWarmupItem w:
+          savedWarmupsCompanion.add(
+            SavedWarmupsCompanion(
+              id: drift.Value(uuid.v4()),
+              sessionId: drift.Value(sessionId),
+              warmupId: drift.Value(w.item.id),
+              displayName: drift.Value(w.item.displayName),
+              parameters: drift.Value(w.selectedParameters),
+              createdAt: drift.Value(now),
+            ),
+          );
+        case _:
       }
     }
 
-    if (setEntriesCompanion.isEmpty) {
+    if (setEntriesCompanion.isEmpty && savedWarmupsCompanion.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Empty workout discarded.')),
       );
@@ -89,9 +97,16 @@ class WorkoutSummaryScreen extends ConsumerWidget {
       for (final instance in exerciseInstancesToSave) {
         await db.into(db.exerciseInstances).insertOnConflictUpdate(instance);
       }
-      await db.batch((batch) {
-        batch.insertAll(db.setEntries, setEntriesCompanion);
-      });
+      if (setEntriesCompanion.isNotEmpty) {
+        await db.batch((batch) {
+          batch.insertAll(db.setEntries, setEntriesCompanion);
+        });
+      }
+      if (savedWarmupsCompanion.isNotEmpty) {
+        await db.batch((batch) {
+          batch.insertAll(db.savedWarmups, savedWarmupsCompanion);
+        });
+      }
     });
 
     if (context.mounted) {
@@ -122,12 +137,12 @@ class WorkoutSummaryScreen extends ConsumerWidget {
         itemCount: completedItems.length,
         itemBuilder: (context, index) {
           final item = completedItems[index];
-          // Only show exercises in the summary for now.
-          if (item is SessionExercise && item.loggedSets.isNotEmpty) {
-            return _buildExerciseSummary(item);
-          }
-          // Return an empty container for warm-up items.
-          return const SizedBox.shrink();
+          return switch (item) {
+            SessionExercise e when e.loggedSets.isNotEmpty =>
+              _buildExerciseSummary(e),
+            SessionWarmupItem w => _buildWarmupSummary(w),
+            _ => const SizedBox.shrink(),
+          };
         },
       ),
     );
@@ -161,6 +176,40 @@ class WorkoutSummaryScreen extends ConsumerWidget {
                 ),
               );
             }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWarmupSummary(SessionWarmupItem warmup) {
+    final subtitle = warmup.selectedParameters.entries
+        .map((e) => e.value)
+        .join(' • ');
+
+    return Card(
+      color: AppTheme.colors.surface,
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.sizing.cardRadius),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              warmup.item.displayName,
+              style: AppTheme.typography.body
+                  .copyWith(color: AppTheme.colors.textPrimary),
+            ),
+            if (subtitle.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: AppTheme.typography.caption,
+              ),
+            ],
           ],
         ),
       ),

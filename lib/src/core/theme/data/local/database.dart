@@ -20,20 +20,20 @@ part 'database.g.dart';
 // --- DATA CLASS FOR HISTORY --------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// A helper class to hold a complete workout session.
 class FullWorkoutSession {
   final Session session;
   final List<SetEntryWithExercise> sets;
+  final List<SavedWarmup> warmups;
 
-  FullWorkoutSession({required this.session, required this.sets});
+  FullWorkoutSession({
+    required this.session,
+    required this.sets,
+    required this.warmups,
+  });
 }
 
-/// A helper class to hold a set entry joined with its full exercise instance.
 class SetEntryWithExercise {
   final SetEntry set;
-  // --- BUG FIX: Data Verification ---
-  // We now include the full ExerciseInstance object, not just the display name.
-  // This gives the History screen access to the discriminators for the info button.
   final ExerciseInstance exercise;
 
   SetEntryWithExercise({required this.set, required this.exercise});
@@ -81,6 +81,18 @@ class ExerciseInstances extends Table {
   Set<Column> get primaryKey => {slug};
 }
 
+@DataClassName('SavedWarmup')
+class SavedWarmups extends Table {
+  TextColumn get id => text()();
+  TextColumn get sessionId => text().references(Sessions, #id)();
+  TextColumn get warmupId => text().named('warmup_id')();
+  TextColumn get displayName => text().named('display_name')();
+  TextColumn get parameters => text().map(const DiscriminatorsConverter())();
+  DateTimeColumn get createdAt => dateTime()();
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 // -----------------------------------------------------------------------------
 // --- DATABASE CLASS ----------------------------------------------------------
 // -----------------------------------------------------------------------------
@@ -89,12 +101,13 @@ class ExerciseInstances extends Table {
   Sessions,
   SetEntries,
   ExerciseInstances,
+  SavedWarmups,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -103,47 +116,60 @@ class AppDatabase extends _$AppDatabase {
         await migrator.deleteTable('sessions');
         await migrator.deleteTable('set_entries');
         await migrator.deleteTable('exercise_instances');
+        await migrator.deleteTable('saved_warmups');
         await migrator.createAll();
       },
     );
   }
 
-  /// Queries the database to retrieve all sessions and their associated sets.
   Future<List<FullWorkoutSession>> getWorkoutHistory() async {
-    final query = select(sessions).join([
-      innerJoin(setEntries, setEntries.sessionId.equalsExp(sessions.id)),
+    final sessionsResult = await (select(sessions)
+          ..orderBy([(t) => OrderingTerm.desc(t.sessionDateTime)]))
+        .get();
+
+    final sessionIds = sessionsResult.map((s) => s.id).toList();
+    if (sessionIds.isEmpty) return [];
+
+    final setsQuery = select(setEntries).join([
       innerJoin(exerciseInstances,
           exerciseInstances.slug.equalsExp(setEntries.exerciseSlug)),
-    ]);
-    query.orderBy([OrderingTerm.desc(sessions.sessionDateTime)]);
+    ])
+      ..where(setEntries.sessionId.isIn(sessionIds));
 
-    final rows = await query.get();
+    final warmupsQuery =
+        select(savedWarmups)..where((tbl) => tbl.sessionId.isIn(sessionIds));
 
-    final groupedData = groupBy(
-      rows,
-      (row) => row.readTable(sessions),
-    );
+    final setsResult = await setsQuery.get();
+    final warmupsResult = await warmupsQuery.get();
 
-    final result = groupedData.entries.map((entry) {
-      final session = entry.key;
-      // --- BUG FIX: Data Verification ---
-      // The mapping now creates a SetEntryWithExercise containing the full
-      // ExerciseInstance object from the database query.
-      final setsWithExercise = entry.value.map((row) {
+    final setsBySession =
+        groupBy(setsResult, (row) => row.readTable(setEntries).sessionId);
+    final warmupsBySession =
+        groupBy(warmupsResult, (warmup) => warmup.sessionId);
+
+    return sessionsResult.map((session) {
+      final setsForSession = setsBySession[session.id] ?? [];
+      final setsWithExercise = setsForSession.map((row) {
         return SetEntryWithExercise(
           set: row.readTable(setEntries),
           exercise: row.readTable(exerciseInstances),
         );
       }).toList();
-      return FullWorkoutSession(session: session, sets: setsWithExercise);
-    }).toList();
 
-    return result;
+      final warmupsForSession = warmupsBySession[session.id] ?? [];
+
+      return FullWorkoutSession(
+        session: session,
+        sets: setsWithExercise,
+        warmups: warmupsForSession,
+      );
+    }).toList();
   }
 
-  /// Deletes a session and all of its associated set entries from the database.
   Future<void> deleteWorkoutSession(String sessionId) async {
     await transaction(() async {
+      await (delete(savedWarmups)..where((tbl) => tbl.sessionId.equals(sessionId)))
+          .go();
       await (delete(setEntries)..where((tbl) => tbl.sessionId.equals(sessionId)))
           .go();
       await (delete(sessions)..where((tbl) => tbl.id.equals(sessionId))).go();
@@ -151,7 +177,6 @@ class AppDatabase extends _$AppDatabase {
   }
 }
 
-/// A private helper function to create the database connection.
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
