@@ -25,8 +25,6 @@ class SessionStateNotifier extends Notifier<List<SessionExercise>> {
 
   /// Adds a new exercise to the current session from the DXG picker.
   void addDxgExercise(GeneratedExerciseResult result) {
-    // --- DATA MODEL UPGRADE ---
-    // The SessionExercise is now created with the full data from the DXG result.
     final newExercise = SessionExercise(
       id: _uuid.v4(),
       slug: result.slug,
@@ -35,8 +33,6 @@ class SessionStateNotifier extends Notifier<List<SessionExercise>> {
       target: '3 sets x 10 reps', // Default target for now
       isCurrent: true,
     );
-
-    // Set all other exercises to not be current before adding the new one.
     final updatedState = [
       for (final ex in state) ex.copyWith(isCurrent: false),
       newExercise,
@@ -74,6 +70,30 @@ class SessionStateNotifier extends Notifier<List<SessionExercise>> {
     state = newState;
 
     ref.read(timerStateProvider.notifier).startTimer();
+  }
+
+  // --- NEW METHODS FOR EDITING ---
+
+  /// Deletes an exercise from the current session.
+  void deleteExercise(String exerciseId) {
+    final updatedState =
+        state.where((exercise) => exercise.id != exerciseId).toList();
+    state = updatedState;
+  }
+
+  /// Reorders the exercises in the current session.
+  void reorderExercise(int oldIndex, int newIndex) {
+    // The list is mutated, so we create a mutable copy first.
+    final items = List<SessionExercise>.from(state);
+    // Adjust the index if moving an item down the list.
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+    // Remove the item from its old position and insert it at the new one.
+    final SessionExercise item = items.removeAt(oldIndex);
+    items.insert(newIndex, item);
+    // Update the state with the new, reordered list.
+    state = items;
   }
 }
 
