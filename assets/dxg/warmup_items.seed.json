@@ -7,7 +7,20 @@
       "pattern": "cardio",
       "modality": "machine",
       "display_name": "Treadmill",
-      "parameters": []
+      "parameters": [
+        {
+          "name": "Time (minutes)",
+          "options": ["5", "10", "15", "20"]
+        },
+        {
+          "name": "Incline",
+          "options": ["0.0", "1.0", "2.0", "3.0", "4.0", "5.0"]
+        },
+        {
+          "name": "Speed (mph)",
+          "options": ["2.5", "3.0", "3.5", "4.0", "5.0"]
+        }
+      ]
     },
     {
       "id": "elliptical",
@@ -16,7 +29,16 @@
       "pattern": "cardio",
       "modality": "machine",
       "display_name": "Elliptical",
-      "parameters": []
+      "parameters": [
+        {
+          "name": "Time (minutes)",
+          "options": ["5", "10", "15", "20"]
+        },
+        {
+          "name": "Resistance",
+          "options": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        }
+      ]
     },
     {
       "id": "leg_swings",
