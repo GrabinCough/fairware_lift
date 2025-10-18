@@ -99,10 +99,7 @@ class ExerciseListItem extends StatelessWidget {
     );
   }
 
-  /// A private helper to build a row for a logged set.
   Widget _buildSetRow({required int setNumber, required String details}) {
-    // --- FIX ---
-    // The method body has been restored.
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(

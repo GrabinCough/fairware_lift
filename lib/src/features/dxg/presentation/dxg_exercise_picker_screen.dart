@@ -8,16 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
 import 'package:fairware_lift/src/features/dxg/application/dxg_state.dart';
+import 'package:fairware_lift/src/features/dxg/application/warmup_service.dart';
 import 'package:fairware_lift/src/features/dxg/domain/warmup_item.dart';
 
 // -----------------------------------------------------------------------------
 // --- LOCAL STATE PROVIDER ----------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// An enum to manage the toggle state between Strength and Prep.
 enum PickerMode { strength, prep }
 
-/// A simple provider to hold the current mode of the picker UI.
 final _pickerModeProvider = StateProvider.autoDispose<PickerMode>((ref) {
   return PickerMode.strength;
 });
@@ -63,13 +62,12 @@ class DXGExercisePickerScreen extends ConsumerWidget {
       ),
       body: SafeArea(
         child:
-            pickerMode == PickerMode.strength ? _buildStrengthView(ref) : _buildPrepView(ref),
+            pickerMode == PickerMode.strength ? _buildStrengthView(context, ref) : _buildPrepView(context, ref),
       ),
     );
   }
 
-  /// Builds the main view for selecting strength exercises using the DXG engine.
-  Widget _buildStrengthView(WidgetRef ref) {
+  Widget _buildStrengthView(BuildContext context, WidgetRef ref) {
     final asyncDxgState = ref.watch(dxgStateProvider);
 
     return asyncDxgState.when(
@@ -89,7 +87,7 @@ class DXGExercisePickerScreen extends ConsumerWidget {
             _buildDiscriminatorChips(ref, 'Attachment', 'attachment', dxgState),
             _buildDiscriminatorChips(ref, 'Grip', 'grip', dxgState),
             if (dxgState.canonicalExercise != null)
-              _buildResultCard(dxgState.canonicalExercise!),
+              _buildResultCard(context, dxgState.canonicalExercise!),
           ],
         );
       },
@@ -97,16 +95,30 @@ class DXGExercisePickerScreen extends ConsumerWidget {
   }
 
   /// Builds the view for selecting warm-up/prep items from a simple list.
-  Widget _buildPrepView(WidgetRef ref) {
-    return const Center(
-      child: Text(
-        'Warm-up / Prep View (Coming Soon)',
-        style: TextStyle(color: Colors.white),
-      ),
+  Widget _buildPrepView(BuildContext context, WidgetRef ref) {
+    final warmupItemsAsync = ref.watch(warmupItemsProvider);
+    return warmupItemsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => Center(child: Text('Error: $err')),
+      data: (items) {
+        return ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return ListTile(
+              title: Text(item.displayName),
+              subtitle: Text('${item.region} - ${item.modality}'),
+              onTap: () {
+                // Return the selected WarmupItem to the session screen.
+                Navigator.of(context).pop(item);
+              },
+            );
+          },
+        );
+      },
     );
   }
 
-  /// Builds the header text for a chip section.
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -117,7 +129,6 @@ class DXGExercisePickerScreen extends ConsumerWidget {
     );
   }
 
-  /// Builds the horizontal list of chips for selecting a Movement Family.
   Widget _buildFamilyChips(WidgetRef ref, DXGState dxgState) {
     return Wrap(
       spacing: 8.0,
@@ -134,7 +145,6 @@ class DXGExercisePickerScreen extends ConsumerWidget {
     );
   }
 
-  /// A generic builder for a row of discriminator chips (Equipment, Angle, etc.).
   Widget _buildDiscriminatorChips(
     WidgetRef ref,
     String title,
@@ -150,9 +160,7 @@ class DXGExercisePickerScreen extends ConsumerWidget {
         hasOnlyNoneOption) {
       return const SizedBox.shrink();
     }
-
     final selectedValue = dxgState.selections[field];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -178,8 +186,8 @@ class DXGExercisePickerScreen extends ConsumerWidget {
     );
   }
 
-  /// Builds the card that displays the final generated exercise.
-  Widget _buildResultCard(GeneratedExerciseResult result) {
+  Widget _buildResultCard(
+      BuildContext context, GeneratedExerciseResult result) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -193,7 +201,8 @@ class DXGExercisePickerScreen extends ConsumerWidget {
           ),
           child: InkWell(
             onTap: () {
-              // This needs to be updated to handle returning a WarmupItem as well
+              // Return the selected GeneratedExerciseResult to the session screen.
+              Navigator.of(context).pop(result);
             },
             borderRadius: BorderRadius.circular(AppTheme.sizing.cardRadius),
             child: Padding(

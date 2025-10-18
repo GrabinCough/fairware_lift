@@ -8,12 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
 import 'package:fairware_lift/src/features/workout/application/session_state.dart';
-import 'package:fairware_lift/src/features/workout/domain/session_exercise.dart';
-import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 import 'package:fairware_lift/src/features/workout/application/timer_state.dart';
 import 'package:fairware_lift/src/features/settings/application/settings_provider.dart';
-import 'set_sheet.dart';
-import 'keypad_duration_picker.dart';
+import 'package:fairware_lift/src/features/workout/presentation/widgets/set_sheet.dart';
+import 'package:fairware_lift/src/features/workout/presentation/widgets/keypad_duration_picker.dart';
 
 // -----------------------------------------------------------------------------
 // --- WORKOUT DOCK WIDGET -----------------------------------------------------
@@ -45,8 +43,6 @@ class WorkoutDock extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Note: We no longer need to watch the session state here, as we don't
-    // need the `lastSet` information anymore.
     final timerState = ref.watch(timerStateProvider);
     final settings = ref.watch(settingsProvider);
 
@@ -82,8 +78,6 @@ class WorkoutDock extends ConsumerWidget {
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: AppTheme.colors.surface,
-                  // --- FIX ---
-                  // The SetSheet is now called without any initial values.
                   builder: (context) => const SetSheet(),
                 );
 
@@ -114,7 +108,6 @@ class WorkoutDock extends ConsumerWidget {
     required int presetDuration,
     required TimerState timerState,
   }) {
-    // Determine if this specific timer is the one currently running.
     final bool isThisTimerActive =
         timerState.isRunning && timerState.initialDuration == presetDuration;
 
@@ -123,9 +116,7 @@ class WorkoutDock extends ConsumerWidget {
         : 0.0;
 
     return GestureDetector(
-      // A simple tap starts the timer with its preset duration.
       onTap: () => ref.read(timerStateProvider.notifier).startTimer(duration: presetDuration),
-      // A long press opens the keypad to set a new duration for this preset.
       onLongPress: () => _showKeypadPicker(context, ref, timerIndex),
       child: Container(
         width: 50,
@@ -134,7 +125,6 @@ class WorkoutDock extends ConsumerWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Progress Indicator
             if (isThisTimerActive)
               SizedBox(
                 width: 40,
@@ -146,7 +136,6 @@ class WorkoutDock extends ConsumerWidget {
                   color: AppTheme.colors.accent,
                 ),
               ),
-            // Timer Text
             Text(
               isThisTimerActive
                   ? '${timerState.secondsRemaining}s'

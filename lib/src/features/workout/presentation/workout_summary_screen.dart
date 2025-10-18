@@ -11,21 +11,22 @@ import 'package:uuid/uuid.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
 import 'package:fairware_lift/src/core/theme/data/local/database.dart';
 import 'package:fairware_lift/src/features/workout/application/session_state.dart';
-import 'package:fairware_lift/src/features/workout/domain/session_exercise.dart';
+import 'package:fairware_lift/src/features/workout/domain/session_item.dart';
 
 // -----------------------------------------------------------------------------
 // --- WORKOUT SUMMARY SCREEN WIDGET -------------------------------------------
 // -----------------------------------------------------------------------------
 
 class WorkoutSummaryScreen extends ConsumerWidget {
-  final List<SessionExercise> completedExercises;
+  // --- REFACTOR ---
+  // The screen now accepts a list of the generic `SessionItem` type.
+  final List<SessionItem> completedItems;
 
   const WorkoutSummaryScreen({
     super.key,
-    required this.completedExercises,
+    required this.completedItems,
   });
 
-  /// --- SAVE WORKOUT LOGIC (UPGRADED) ---
   Future<void> _saveWorkout(BuildContext context, WidgetRef ref) async {
     final db = ref.read(databaseProvider);
     const uuid = Uuid();
@@ -42,26 +43,28 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     final setEntriesCompanion = <SetEntriesCompanion>[];
     final exerciseInstancesToSave = <ExerciseInstancesCompanion>[];
 
-    for (final exercise in completedExercises) {
-      if (exercise.loggedSets.isNotEmpty) {
-        // --- PERSIST ON FIRST USE ---
+    // --- REFACTOR ---
+    // Iterate over the generic list and only process items that are exercises.
+    // Warm-up items are not persisted in this version.
+    for (final item in completedItems) {
+      if (item is SessionExercise && item.loggedSets.isNotEmpty) {
         exerciseInstancesToSave.add(
           ExerciseInstancesCompanion(
-            slug: drift.Value(exercise.slug),
-            familyId: drift.Value(exercise.discriminators['family_id'] ?? ''),
-            displayName: drift.Value(exercise.displayName),
-            discriminators: drift.Value(exercise.discriminators),
+            slug: drift.Value(item.slug),
+            familyId: drift.Value(item.discriminators['family_id'] ?? ''),
+            displayName: drift.Value(item.displayName),
+            discriminators: drift.Value(item.discriminators),
             firstSeenAt: drift.Value(now),
           ),
         );
 
-        for (int i = 0; i < exercise.loggedSets.length; i++) {
-          final set = exercise.loggedSets[i];
+        for (int i = 0; i < item.loggedSets.length; i++) {
+          final set = item.loggedSets[i];
           setEntriesCompanion.add(
             SetEntriesCompanion(
               id: drift.Value(uuid.v4()),
               sessionId: drift.Value(sessionId),
-              exerciseSlug: drift.Value(exercise.slug),
+              exerciseSlug: drift.Value(item.slug),
               setOrder: drift.Value(i + 1),
               weight: drift.Value(set.weight),
               reps: drift.Value(set.reps),
@@ -92,9 +95,6 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     });
 
     if (context.mounted) {
-      // --- BUG FIX: No "Save" Feedback ---
-      // We now `await` the result of showing the SnackBar. This ensures it is
-      // visible for its full duration before we navigate away.
       await ScaffoldMessenger.of(context)
           .showSnackBar(
             const SnackBar(content: Text('Workout Saved!')),
@@ -119,20 +119,51 @@ class WorkoutSummaryScreen extends ConsumerWidget {
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(8.0),
-        itemCount: completedExercises.length,
+        itemCount: completedItems.length,
         itemBuilder: (context, index) {
-          final exercise = completedExercises[index];
-          if (exercise.loggedSets.isEmpty) {
-            return const SizedBox.shrink();
+          final item = completedItems[index];
+          // Only show exercises in the summary for now.
+          if (item is SessionExercise && item.loggedSets.isNotEmpty) {
+            return _buildExerciseSummary(item);
           }
-          return _buildExerciseSummary(exercise);
+          // Return an empty container for warm-up items.
+          return const SizedBox.shrink();
         },
       ),
     );
   }
 
   Widget _buildExerciseSummary(SessionExercise exercise) {
-    // ... (this method is unchanged)
-    return Card(/* ... */);
+    return Card(
+      color: AppTheme.colors.surface,
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.sizing.cardRadius),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              exercise.displayName,
+              style: AppTheme.typography.title.copyWith(fontSize: 20),
+            ),
+            const SizedBox(height: 12),
+            ...exercise.loggedSets.asMap().entries.map((entry) {
+              final setIndex = entry.key + 1;
+              final set = entry.value;
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2.0),
+                child: Text(
+                  'Set $setIndex: ${set.weight} lb x ${set.reps} reps',
+                  style: AppTheme.typography.body,
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
   }
 }
