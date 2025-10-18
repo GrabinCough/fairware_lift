@@ -1,0 +1,60 @@
+{
+  "warmup_items": [
+    {
+      "id": "treadmill",
+      "type": "warmup",
+      "region": "full",
+      "pattern": "cardio",
+      "modality": "machine",
+      "display_name": "Treadmill"
+    },
+    {
+      "id": "elliptical",
+      "type": "warmup",
+      "region": "full",
+      "pattern": "cardio",
+      "modality": "machine",
+      "display_name": "Elliptical"
+    },
+    {
+      "id": "leg_swings",
+      "type": "warmup",
+      "region": "lower",
+      "pattern": "dynamic_stretch",
+      "modality": "bodyweight",
+      "display_name": "Leg Swings"
+    },
+    {
+      "id": "arm_swings",
+      "type": "warmup",
+      "region": "upper",
+      "pattern": "dynamic_stretch",
+      "modality": "bodyweight",
+      "display_name": "Arm Swings"
+    },
+    {
+      "id": "arm_spins",
+      "type": "warmup",
+      "region": "upper",
+      "pattern": "dynamic_stretch",
+      "modality": "bodyweight",
+      "display_name": "Arm Spins"
+    },
+    {
+      "id": "pushups",
+      "type": "warmup",
+      "region": "upper",
+      "pattern": "activation",
+      "modality": "bodyweight",
+      "display_name": "Push-ups (Warm-up)"
+    },
+    {
+      "id": "band_pull_aparts",
+      "type": "warmup",
+      "region": "upper",
+      "pattern": "scapular_retraction",
+      "modality": "band",
+      "display_name": "Band Pull-Aparts"
+    }
+  ]
+}

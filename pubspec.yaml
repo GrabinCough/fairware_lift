@@ -38,13 +38,14 @@ dependencies:
   open_filex: ^4.7.0             # Upgrade to latest with modern Gradle compatibility.
 
   # Pure Dart / Already Compatible
-  uuid: ^4.4.0                   # NEW: For generating unique IDs for database records.
+  uuid: ^4.4.0
   pdf: ^3.10.4
   printing: ^5.11.0
   csv: ^6.0.0
   fl_chart: ^0.68.0
   permission_handler: ^11.0.1
   shared_preferences: ^2.1.0
+  collection: ^1.18.0
 
   # Code Gen - Unchanged
   freezed_annotation: ^2.4.1
@@ -70,3 +71,4 @@ flutter:
     # --- NEW DXG ASSETS ---
     - assets/dxg/movement_families.seed.json
     - assets/dxg/synonyms.map.json
+    - assets/dxg/warmup_items.seed.json

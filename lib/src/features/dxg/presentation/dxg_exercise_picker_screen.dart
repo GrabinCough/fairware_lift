@@ -8,13 +8,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
 import 'package:fairware_lift/src/features/dxg/application/dxg_state.dart';
+import 'package:fairware_lift/src/features/dxg/domain/warmup_item.dart';
+
+// -----------------------------------------------------------------------------
+// --- LOCAL STATE PROVIDER ----------------------------------------------------
+// -----------------------------------------------------------------------------
+
+/// An enum to manage the toggle state between Strength and Prep.
+enum PickerMode { strength, prep }
+
+/// A simple provider to hold the current mode of the picker UI.
+final _pickerModeProvider = StateProvider.autoDispose<PickerMode>((ref) {
+  return PickerMode.strength;
+});
 
 // -----------------------------------------------------------------------------
 // --- DXG EXERCISE PICKER SCREEN WIDGET ---------------------------------------
-// -----------------------------------------------------------------------------
-// This screen implements the chip-based UI for the Deterministic Exercise Graph.
-// It allows users to progressively build a canonical exercise by selecting
-// a family and then applying valid discriminator filters.
 // -----------------------------------------------------------------------------
 
 class DXGExercisePickerScreen extends ConsumerWidget {
@@ -22,51 +31,77 @@ class DXGExercisePickerScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Watch the state provider. The UI will rebuild whenever the state changes.
-    final asyncDxgState = ref.watch(dxgStateProvider);
+    final pickerMode = ref.watch(_pickerModeProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Exercise (New)'),
+        title: const Text('Add to Session'),
         backgroundColor: AppTheme.colors.surface,
-      ),
-      // --- UI FIX ---
-      // The entire body is now wrapped in a SafeArea widget. This automatically
-      // handles insets for system UI like the navigation bar, ensuring that
-      // the ListView and its content are never obscured.
-      body: SafeArea(
-        child: asyncDxgState.when(
-          // --- LOADING STATE ---
-          loading: () => const Center(child: CircularProgressIndicator()),
-          // --- ERROR STATE ---
-          error: (err, stack) => Center(child: Text('Error: $err')),
-          // --- DATA LOADED STATE ---
-          data: (dxgState) {
-            return ListView(
-              // The manual bottom padding is no longer needed, as SafeArea handles it.
-              // We keep the other padding for aesthetic spacing.
-              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
-              children: [
-                // --- 1. FAMILY SELECTION ---
-                _buildSectionHeader('Family'),
-                _buildFamilyChips(ref, dxgState),
-                const SizedBox(height: 24),
-
-                // --- 2. DISCRIMINATOR SELECTIONS (Progressive) ---
-                _buildDiscriminatorChips(ref, 'Equipment', 'equipment', dxgState),
-                _buildDiscriminatorChips(ref, 'Angle / Line', 'angle', dxgState),
-                _buildDiscriminatorChips(ref, 'Unilateral', 'unilateral', dxgState),
-                _buildDiscriminatorChips(ref, 'Orientation', 'orientation', dxgState),
-                _buildDiscriminatorChips(ref, 'Attachment', 'attachment', dxgState),
-                _buildDiscriminatorChips(ref, 'Grip', 'grip', dxgState),
-
-                // --- 3. RESULT CARD ---
-                if (dxgState.canonicalExercise != null)
-                  _buildResultCard(context, dxgState.canonicalExercise!),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SegmentedButton<PickerMode>(
+              segments: const [
+                ButtonSegment(
+                    value: PickerMode.strength,
+                    label: Text('Strength'),
+                    icon: Icon(Icons.fitness_center)),
+                ButtonSegment(
+                    value: PickerMode.prep,
+                    label: Text('Prep'),
+                    icon: Icon(Icons.self_improvement)),
               ],
-            );
-          },
+              selected: {pickerMode},
+              onSelectionChanged: (newSelection) {
+                ref.read(_pickerModeProvider.notifier).state =
+                    newSelection.first;
+              },
+            ),
+          ),
         ),
+      ),
+      body: SafeArea(
+        child:
+            pickerMode == PickerMode.strength ? _buildStrengthView(ref) : _buildPrepView(ref),
+      ),
+    );
+  }
+
+  /// Builds the main view for selecting strength exercises using the DXG engine.
+  Widget _buildStrengthView(WidgetRef ref) {
+    final asyncDxgState = ref.watch(dxgStateProvider);
+
+    return asyncDxgState.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) => Center(child: Text('Error: $err')),
+      data: (dxgState) {
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+          children: [
+            _buildSectionHeader('Family'),
+            _buildFamilyChips(ref, dxgState),
+            const SizedBox(height: 24),
+            _buildDiscriminatorChips(ref, 'Equipment', 'equipment', dxgState),
+            _buildDiscriminatorChips(ref, 'Angle / Line', 'angle', dxgState),
+            _buildDiscriminatorChips(ref, 'Unilateral', 'unilateral', dxgState),
+            _buildDiscriminatorChips(ref, 'Orientation', 'orientation', dxgState),
+            _buildDiscriminatorChips(ref, 'Attachment', 'attachment', dxgState),
+            _buildDiscriminatorChips(ref, 'Grip', 'grip', dxgState),
+            if (dxgState.canonicalExercise != null)
+              _buildResultCard(dxgState.canonicalExercise!),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Builds the view for selecting warm-up/prep items from a simple list.
+  Widget _buildPrepView(WidgetRef ref) {
+    return const Center(
+      child: Text(
+        'Warm-up / Prep View (Coming Soon)',
+        style: TextStyle(color: Colors.white),
       ),
     );
   }
@@ -109,7 +144,10 @@ class DXGExercisePickerScreen extends ConsumerWidget {
     final options = dxgState.availableOptions[field];
     final bool hasOnlyNoneOption = (options?.length == 1 && options?.first == 'none');
 
-    if (dxgState.selectedFamily == null || options == null || options.isEmpty || hasOnlyNoneOption) {
+    if (dxgState.selectedFamily == null ||
+        options == null ||
+        options.isEmpty ||
+        hasOnlyNoneOption) {
       return const SizedBox.shrink();
     }
 
@@ -128,7 +166,9 @@ class DXGExercisePickerScreen extends ConsumerWidget {
               selected: selectedValue == option,
               onSelected: (isSelected) {
                 final newValue = isSelected ? option : null;
-                ref.read(dxgStateProvider.notifier).updateSelection(field, newValue);
+                ref
+                    .read(dxgStateProvider.notifier)
+                    .updateSelection(field, newValue);
               },
             );
           }).toList(),
@@ -139,7 +179,7 @@ class DXGExercisePickerScreen extends ConsumerWidget {
   }
 
   /// Builds the card that displays the final generated exercise.
-  Widget _buildResultCard(BuildContext context, GeneratedExerciseResult result) {
+  Widget _buildResultCard(GeneratedExerciseResult result) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -153,7 +193,7 @@ class DXGExercisePickerScreen extends ConsumerWidget {
           ),
           child: InkWell(
             onTap: () {
-              Navigator.of(context).pop(result);
+              // This needs to be updated to handle returning a WarmupItem as well
             },
             borderRadius: BorderRadius.circular(AppTheme.sizing.cardRadius),
             child: Padding(
