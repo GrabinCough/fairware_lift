@@ -1,0 +1,3 @@
+on the workout page i would like to be able to delete a workout if i want. by swiping it.
+
+i would like to be able to reorganize the workouts on that screen. 

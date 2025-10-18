@@ -7,7 +7,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fairware_lift/src/features/dxg/application/dxg_state.dart';
-import 'package:fairware_lift/src/features/exercises/domain/exercise.dart';
 import 'package:fairware_lift/src/features/workout/application/timer_state.dart';
 import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 import 'package:fairware_lift/src/features/workout/domain/session_exercise.dart';
@@ -24,34 +23,16 @@ class SessionStateNotifier extends Notifier<List<SessionExercise>> {
     return [];
   }
 
-  /// --- DEPRECATED ---
-  /// Adds a new exercise from the old CSV-based picker.
-  void addExercise(Exercise exercise) {
-    final newExercise = SessionExercise(
-      id: _uuid.v4(),
-      name: exercise.name,
-      target: '3 sets x 10 reps',
-      howTo: exercise.howTo,
-      isCurrent: state.isEmpty,
-    );
-
-    final updatedState = [
-      for (final ex in state) ex.copyWith(isCurrent: false),
-      newExercise.copyWith(isCurrent: true)
-    ];
-    state = updatedState;
-  }
-
-  /// --- NEW METHOD ---
   /// Adds a new exercise to the current session from the DXG picker.
   void addDxgExercise(GeneratedExerciseResult result) {
+    // --- DATA MODEL UPGRADE ---
+    // The SessionExercise is now created with the full data from the DXG result.
     final newExercise = SessionExercise(
       id: _uuid.v4(),
-      name: result.displayName,
+      slug: result.slug,
+      displayName: result.displayName,
+      discriminators: result.discriminators,
       target: '3 sets x 10 reps', // Default target for now
-      // NOTE: The DXG system does not yet provide "how-to" instructions.
-      // This will be an empty string until that feature is added.
-      howTo: '',
       isCurrent: true,
     );
 
@@ -65,9 +46,7 @@ class SessionStateNotifier extends Notifier<List<SessionExercise>> {
 
   /// Sets the specified exercise as the current one for logging sets.
   void setCurrentExercise(String exerciseId) {
-    // Stop any running timer when switching exercises.
     ref.read(timerStateProvider.notifier).stopTimer();
-
     final newState = [
       for (final exercise in state)
         exercise.copyWith(isCurrent: exercise.id == exerciseId)
@@ -79,26 +58,21 @@ class SessionStateNotifier extends Notifier<List<SessionExercise>> {
   void logSet({required double weight, required int reps}) {
     final currentState = state;
     final currentIndex = currentState.indexWhere((ex) => ex.isCurrent);
-    if (currentIndex == -1) return; // No active exercise.
+    if (currentIndex == -1) return;
 
     final currentExercise = currentState[currentIndex];
-
     final newSet = LoggedSet(
       weight: weight,
       reps: reps,
       id: _uuid.v4(),
     );
-
     final updatedExercise = currentExercise.copyWith(
       loggedSets: [...currentExercise.loggedSets, newSet],
     );
-
     final newState = List<SessionExercise>.from(currentState);
     newState[currentIndex] = updatedExercise;
-
     state = newState;
 
-    // Auto-start the rest timer.
     ref.read(timerStateProvider.notifier).startTimer();
   }
 }

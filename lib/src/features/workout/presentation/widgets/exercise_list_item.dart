@@ -14,25 +14,20 @@ import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 
 /// A widget that displays a single exercise within the session's exercise list.
 class ExerciseListItem extends StatelessWidget {
-  final String exerciseName;
+  // --- DATA MODEL UPGRADE ---
+  final String displayName;
+  final Map<String, String> discriminators;
   final String target;
   final bool isCurrent;
   final List<LoggedSet> loggedSets;
-
-  /// --- NEW ---
-  /// The "how-to" instructions for the exercise.
-  final String howTo;
-
-  /// --- NEW ---
-  /// A callback function to be executed when the info button is tapped.
   final VoidCallback onInfoTap;
 
   const ExerciseListItem({
     super.key,
-    required this.exerciseName,
+    required this.displayName,
+    required this.discriminators,
     required this.target,
     required this.loggedSets,
-    required this.howTo,
     required this.onInfoTap,
     this.isCurrent = false,
   });
@@ -61,15 +56,13 @@ class ExerciseListItem extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    exerciseName,
+                    displayName, // Use displayName
                     style: AppTheme.typography.title.copyWith(fontSize: 20),
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 2, // Allow for slightly longer names
+                    maxLines: 2,
                   ),
                 ),
                 const SizedBox(width: 8),
-                // --- NEW ---
-                // The target and info button are now grouped in a Row.
                 Row(
                   children: [
                     Text(
@@ -82,7 +75,7 @@ class ExerciseListItem extends StatelessWidget {
                       onPressed: onInfoTap,
                       color: AppTheme.colors.textMuted,
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(), // Removes extra padding
+                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),
@@ -111,7 +104,6 @@ class ExerciseListItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          // Set Number Badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
@@ -127,7 +119,6 @@ class ExerciseListItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
-          // Set Details (Weight x Reps)
           Text(
             details,
             style: AppTheme.typography.body,

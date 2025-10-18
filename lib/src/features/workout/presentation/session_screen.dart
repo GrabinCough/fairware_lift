@@ -18,21 +18,46 @@ import 'package:fairware_lift/src/features/workout/presentation/workout_summary_
 // --- SESSION SCREEN WIDGET ---------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// The full-screen UI for an active workout session.
 class SessionScreen extends ConsumerWidget {
   const SessionScreen({super.key});
 
-  /// Shows an AlertDialog with the exercise's "how-to" instructions.
+  /// Shows a dialog displaying the exercise's defining discriminators.
   void _showExerciseInfo(
-      BuildContext context, {required String name, required String howTo}) {
+    BuildContext context, {
+    required String displayName,
+    required Map<String, String> discriminators,
+  }) {
+    // Helper to format the discriminator key for display.
+    String _formatTitle(String key) =>
+        '${key[0].toUpperCase()}${key.substring(1)}';
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppTheme.colors.surface,
-          title: Text(name),
-          content: Text(
-              howTo.isNotEmpty ? howTo : 'Instructions are not yet available for this exercise.'),
+          title: Text(displayName),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: discriminators.entries.map((entry) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: RichText(
+                  text: TextSpan(
+                    style: AppTheme.typography.body,
+                    children: [
+                      TextSpan(
+                        text: '${_formatTitle(entry.key)}: ',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(text: entry.value),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -53,6 +78,8 @@ class SessionScreen extends ConsumerWidget {
         backgroundColor: AppTheme.colors.background,
         elevation: 0,
         title: const Text('Quick Workout'),
+        // --- UI FIX ---
+        // The `actions` property with the "Finish" button has been restored.
         actions: [
           TextButton(
             onPressed: () {
@@ -91,15 +118,15 @@ class SessionScreen extends ConsumerWidget {
                 },
                 child: AbsorbPointer(
                   child: ExerciseListItem(
-                    exerciseName: exercise.name,
+                    displayName: exercise.displayName,
+                    discriminators: exercise.discriminators,
                     target: exercise.target,
                     loggedSets: exercise.loggedSets,
                     isCurrent: exercise.isCurrent,
-                    howTo: exercise.howTo,
                     onInfoTap: () => _showExerciseInfo(
                       context,
-                      name: exercise.name,
-                      howTo: exercise.howTo,
+                      displayName: exercise.displayName,
+                      discriminators: exercise.discriminators,
                     ),
                   ),
                 ),
@@ -107,9 +134,7 @@ class SessionScreen extends ConsumerWidget {
             }),
           const SizedBox(height: 16),
           TextButton.icon(
-            // --- UPDATED ONPRESSED ACTION ---
             onPressed: () async {
-              // Navigate to the new DXG picker and wait for a result.
               final result =
                   await Navigator.of(context).push<GeneratedExerciseResult>(
                 MaterialPageRoute(
@@ -117,8 +142,6 @@ class SessionScreen extends ConsumerWidget {
                   builder: (context) => const DXGExercisePickerScreen(),
                 ),
               );
-
-              // If the user selected an exercise, add it to the session.
               if (result != null) {
                 ref.read(sessionStateProvider.notifier).addDxgExercise(result);
               }

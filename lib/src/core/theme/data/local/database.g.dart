@@ -315,440 +315,6 @@ class SessionsCompanion extends UpdateCompanion<Session> {
   }
 }
 
-class $SetEntriesTable extends SetEntries
-    with TableInfo<$SetEntriesTable, SetEntry> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $SetEntriesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _sessionIdMeta =
-      const VerificationMeta('sessionId');
-  @override
-  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
-      'session_id', aliasedName, false,
-      type: DriftSqlType.string,
-      requiredDuringInsert: true,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('REFERENCES sessions (id)'));
-  static const VerificationMeta _exerciseNameMeta =
-      const VerificationMeta('exerciseName');
-  @override
-  late final GeneratedColumn<String> exerciseName = GeneratedColumn<String>(
-      'exercise_name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _setOrderMeta =
-      const VerificationMeta('setOrder');
-  @override
-  late final GeneratedColumn<int> setOrder = GeneratedColumn<int>(
-      'set_order', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _weightMeta = const VerificationMeta('weight');
-  @override
-  late final GeneratedColumn<double> weight = GeneratedColumn<double>(
-      'weight', aliasedName, false,
-      type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _repsMeta = const VerificationMeta('reps');
-  @override
-  late final GeneratedColumn<int> reps = GeneratedColumn<int>(
-      'reps', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
-  @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
-  @override
-  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  @override
-  List<GeneratedColumn> get $columns => [
-        id,
-        sessionId,
-        exerciseName,
-        setOrder,
-        weight,
-        reps,
-        createdAt,
-        updatedAt
-      ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'set_entries';
-  @override
-  VerificationContext validateIntegrity(Insertable<SetEntry> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
-    if (data.containsKey('session_id')) {
-      context.handle(_sessionIdMeta,
-          sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta));
-    } else if (isInserting) {
-      context.missing(_sessionIdMeta);
-    }
-    if (data.containsKey('exercise_name')) {
-      context.handle(
-          _exerciseNameMeta,
-          exerciseName.isAcceptableOrUnknown(
-              data['exercise_name']!, _exerciseNameMeta));
-    } else if (isInserting) {
-      context.missing(_exerciseNameMeta);
-    }
-    if (data.containsKey('set_order')) {
-      context.handle(_setOrderMeta,
-          setOrder.isAcceptableOrUnknown(data['set_order']!, _setOrderMeta));
-    } else if (isInserting) {
-      context.missing(_setOrderMeta);
-    }
-    if (data.containsKey('weight')) {
-      context.handle(_weightMeta,
-          weight.isAcceptableOrUnknown(data['weight']!, _weightMeta));
-    } else if (isInserting) {
-      context.missing(_weightMeta);
-    }
-    if (data.containsKey('reps')) {
-      context.handle(
-          _repsMeta, reps.isAcceptableOrUnknown(data['reps']!, _repsMeta));
-    } else if (isInserting) {
-      context.missing(_repsMeta);
-    }
-    if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
-    } else if (isInserting) {
-      context.missing(_createdAtMeta);
-    }
-    if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
-    } else if (isInserting) {
-      context.missing(_updatedAtMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  SetEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return SetEntry(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      sessionId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}session_id'])!,
-      exerciseName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}exercise_name'])!,
-      setOrder: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}set_order'])!,
-      weight: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}weight'])!,
-      reps: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}reps'])!,
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
-    );
-  }
-
-  @override
-  $SetEntriesTable createAlias(String alias) {
-    return $SetEntriesTable(attachedDatabase, alias);
-  }
-}
-
-class SetEntry extends DataClass implements Insertable<SetEntry> {
-  final String id;
-  final String sessionId;
-  final String exerciseName;
-  final int setOrder;
-  final double weight;
-  final int reps;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  const SetEntry(
-      {required this.id,
-      required this.sessionId,
-      required this.exerciseName,
-      required this.setOrder,
-      required this.weight,
-      required this.reps,
-      required this.createdAt,
-      required this.updatedAt});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
-    map['session_id'] = Variable<String>(sessionId);
-    map['exercise_name'] = Variable<String>(exerciseName);
-    map['set_order'] = Variable<int>(setOrder);
-    map['weight'] = Variable<double>(weight);
-    map['reps'] = Variable<int>(reps);
-    map['created_at'] = Variable<DateTime>(createdAt);
-    map['updated_at'] = Variable<DateTime>(updatedAt);
-    return map;
-  }
-
-  SetEntriesCompanion toCompanion(bool nullToAbsent) {
-    return SetEntriesCompanion(
-      id: Value(id),
-      sessionId: Value(sessionId),
-      exerciseName: Value(exerciseName),
-      setOrder: Value(setOrder),
-      weight: Value(weight),
-      reps: Value(reps),
-      createdAt: Value(createdAt),
-      updatedAt: Value(updatedAt),
-    );
-  }
-
-  factory SetEntry.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return SetEntry(
-      id: serializer.fromJson<String>(json['id']),
-      sessionId: serializer.fromJson<String>(json['sessionId']),
-      exerciseName: serializer.fromJson<String>(json['exerciseName']),
-      setOrder: serializer.fromJson<int>(json['setOrder']),
-      weight: serializer.fromJson<double>(json['weight']),
-      reps: serializer.fromJson<int>(json['reps']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'sessionId': serializer.toJson<String>(sessionId),
-      'exerciseName': serializer.toJson<String>(exerciseName),
-      'setOrder': serializer.toJson<int>(setOrder),
-      'weight': serializer.toJson<double>(weight),
-      'reps': serializer.toJson<int>(reps),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-      'updatedAt': serializer.toJson<DateTime>(updatedAt),
-    };
-  }
-
-  SetEntry copyWith(
-          {String? id,
-          String? sessionId,
-          String? exerciseName,
-          int? setOrder,
-          double? weight,
-          int? reps,
-          DateTime? createdAt,
-          DateTime? updatedAt}) =>
-      SetEntry(
-        id: id ?? this.id,
-        sessionId: sessionId ?? this.sessionId,
-        exerciseName: exerciseName ?? this.exerciseName,
-        setOrder: setOrder ?? this.setOrder,
-        weight: weight ?? this.weight,
-        reps: reps ?? this.reps,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-      );
-  SetEntry copyWithCompanion(SetEntriesCompanion data) {
-    return SetEntry(
-      id: data.id.present ? data.id.value : this.id,
-      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
-      exerciseName: data.exerciseName.present
-          ? data.exerciseName.value
-          : this.exerciseName,
-      setOrder: data.setOrder.present ? data.setOrder.value : this.setOrder,
-      weight: data.weight.present ? data.weight.value : this.weight,
-      reps: data.reps.present ? data.reps.value : this.reps,
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('SetEntry(')
-          ..write('id: $id, ')
-          ..write('sessionId: $sessionId, ')
-          ..write('exerciseName: $exerciseName, ')
-          ..write('setOrder: $setOrder, ')
-          ..write('weight: $weight, ')
-          ..write('reps: $reps, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, sessionId, exerciseName, setOrder, weight,
-      reps, createdAt, updatedAt);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is SetEntry &&
-          other.id == this.id &&
-          other.sessionId == this.sessionId &&
-          other.exerciseName == this.exerciseName &&
-          other.setOrder == this.setOrder &&
-          other.weight == this.weight &&
-          other.reps == this.reps &&
-          other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
-}
-
-class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
-  final Value<String> id;
-  final Value<String> sessionId;
-  final Value<String> exerciseName;
-  final Value<int> setOrder;
-  final Value<double> weight;
-  final Value<int> reps;
-  final Value<DateTime> createdAt;
-  final Value<DateTime> updatedAt;
-  final Value<int> rowid;
-  const SetEntriesCompanion({
-    this.id = const Value.absent(),
-    this.sessionId = const Value.absent(),
-    this.exerciseName = const Value.absent(),
-    this.setOrder = const Value.absent(),
-    this.weight = const Value.absent(),
-    this.reps = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  SetEntriesCompanion.insert({
-    required String id,
-    required String sessionId,
-    required String exerciseName,
-    required int setOrder,
-    required double weight,
-    required int reps,
-    required DateTime createdAt,
-    required DateTime updatedAt,
-    this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        sessionId = Value(sessionId),
-        exerciseName = Value(exerciseName),
-        setOrder = Value(setOrder),
-        weight = Value(weight),
-        reps = Value(reps),
-        createdAt = Value(createdAt),
-        updatedAt = Value(updatedAt);
-  static Insertable<SetEntry> custom({
-    Expression<String>? id,
-    Expression<String>? sessionId,
-    Expression<String>? exerciseName,
-    Expression<int>? setOrder,
-    Expression<double>? weight,
-    Expression<int>? reps,
-    Expression<DateTime>? createdAt,
-    Expression<DateTime>? updatedAt,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (sessionId != null) 'session_id': sessionId,
-      if (exerciseName != null) 'exercise_name': exerciseName,
-      if (setOrder != null) 'set_order': setOrder,
-      if (weight != null) 'weight': weight,
-      if (reps != null) 'reps': reps,
-      if (createdAt != null) 'created_at': createdAt,
-      if (updatedAt != null) 'updated_at': updatedAt,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  SetEntriesCompanion copyWith(
-      {Value<String>? id,
-      Value<String>? sessionId,
-      Value<String>? exerciseName,
-      Value<int>? setOrder,
-      Value<double>? weight,
-      Value<int>? reps,
-      Value<DateTime>? createdAt,
-      Value<DateTime>? updatedAt,
-      Value<int>? rowid}) {
-    return SetEntriesCompanion(
-      id: id ?? this.id,
-      sessionId: sessionId ?? this.sessionId,
-      exerciseName: exerciseName ?? this.exerciseName,
-      setOrder: setOrder ?? this.setOrder,
-      weight: weight ?? this.weight,
-      reps: reps ?? this.reps,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<String>(id.value);
-    }
-    if (sessionId.present) {
-      map['session_id'] = Variable<String>(sessionId.value);
-    }
-    if (exerciseName.present) {
-      map['exercise_name'] = Variable<String>(exerciseName.value);
-    }
-    if (setOrder.present) {
-      map['set_order'] = Variable<int>(setOrder.value);
-    }
-    if (weight.present) {
-      map['weight'] = Variable<double>(weight.value);
-    }
-    if (reps.present) {
-      map['reps'] = Variable<int>(reps.value);
-    }
-    if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
-    }
-    if (updatedAt.present) {
-      map['updated_at'] = Variable<DateTime>(updatedAt.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('SetEntriesCompanion(')
-          ..write('id: $id, ')
-          ..write('sessionId: $sessionId, ')
-          ..write('exerciseName: $exerciseName, ')
-          ..write('setOrder: $setOrder, ')
-          ..write('weight: $weight, ')
-          ..write('reps: $reps, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $ExerciseInstancesTable extends ExerciseInstances
     with TableInfo<$ExerciseInstancesTable, ExerciseInstance> {
   @override
@@ -860,20 +426,10 @@ class $ExerciseInstancesTable extends ExerciseInstances
 
 class ExerciseInstance extends DataClass
     implements Insertable<ExerciseInstance> {
-  /// The stable, unique slug, e.g., "press.dumbbell.incline.bilateral.supine".
   final String slug;
-
-  /// The ID of the parent movement family, e.g., "press".
   final String familyId;
-
-  /// The generated human-readable name, e.g., "Incline Dumbbell Press".
   final String displayName;
-
-  /// A JSON string representation of the map of discriminators.
-  /// Uses a TypeConverter to handle serialization.
   final Map<String, String> discriminators;
-
-  /// The timestamp of when this exercise was first created/logged.
   final DateTime firstSeenAt;
   const ExerciseInstance(
       {required this.slug,
@@ -1085,19 +641,456 @@ class ExerciseInstancesCompanion extends UpdateCompanion<ExerciseInstance> {
   }
 }
 
+class $SetEntriesTable extends SetEntries
+    with TableInfo<$SetEntriesTable, SetEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SetEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _sessionIdMeta =
+      const VerificationMeta('sessionId');
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+      'session_id', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES sessions (id)'));
+  static const VerificationMeta _exerciseSlugMeta =
+      const VerificationMeta('exerciseSlug');
+  @override
+  late final GeneratedColumn<String> exerciseSlug = GeneratedColumn<String>(
+      'exercise_slug', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES exercise_instances (slug)'));
+  static const VerificationMeta _setOrderMeta =
+      const VerificationMeta('setOrder');
+  @override
+  late final GeneratedColumn<int> setOrder = GeneratedColumn<int>(
+      'set_order', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _weightMeta = const VerificationMeta('weight');
+  @override
+  late final GeneratedColumn<double> weight = GeneratedColumn<double>(
+      'weight', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _repsMeta = const VerificationMeta('reps');
+  @override
+  late final GeneratedColumn<int> reps = GeneratedColumn<int>(
+      'reps', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _createdAtMeta =
+      const VerificationMeta('createdAt');
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+      'created_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        sessionId,
+        exerciseSlug,
+        setOrder,
+        weight,
+        reps,
+        createdAt,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'set_entries';
+  @override
+  VerificationContext validateIntegrity(Insertable<SetEntry> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('session_id')) {
+      context.handle(_sessionIdMeta,
+          sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta));
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('exercise_slug')) {
+      context.handle(
+          _exerciseSlugMeta,
+          exerciseSlug.isAcceptableOrUnknown(
+              data['exercise_slug']!, _exerciseSlugMeta));
+    } else if (isInserting) {
+      context.missing(_exerciseSlugMeta);
+    }
+    if (data.containsKey('set_order')) {
+      context.handle(_setOrderMeta,
+          setOrder.isAcceptableOrUnknown(data['set_order']!, _setOrderMeta));
+    } else if (isInserting) {
+      context.missing(_setOrderMeta);
+    }
+    if (data.containsKey('weight')) {
+      context.handle(_weightMeta,
+          weight.isAcceptableOrUnknown(data['weight']!, _weightMeta));
+    } else if (isInserting) {
+      context.missing(_weightMeta);
+    }
+    if (data.containsKey('reps')) {
+      context.handle(
+          _repsMeta, reps.isAcceptableOrUnknown(data['reps']!, _repsMeta));
+    } else if (isInserting) {
+      context.missing(_repsMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SetEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SetEntry(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      sessionId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}session_id'])!,
+      exerciseSlug: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}exercise_slug'])!,
+      setOrder: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}set_order'])!,
+      weight: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}weight'])!,
+      reps: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}reps'])!,
+      createdAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $SetEntriesTable createAlias(String alias) {
+    return $SetEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class SetEntry extends DataClass implements Insertable<SetEntry> {
+  final String id;
+  final String sessionId;
+  final String exerciseSlug;
+  final int setOrder;
+  final double weight;
+  final int reps;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const SetEntry(
+      {required this.id,
+      required this.sessionId,
+      required this.exerciseSlug,
+      required this.setOrder,
+      required this.weight,
+      required this.reps,
+      required this.createdAt,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['session_id'] = Variable<String>(sessionId);
+    map['exercise_slug'] = Variable<String>(exerciseSlug);
+    map['set_order'] = Variable<int>(setOrder);
+    map['weight'] = Variable<double>(weight);
+    map['reps'] = Variable<int>(reps);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  SetEntriesCompanion toCompanion(bool nullToAbsent) {
+    return SetEntriesCompanion(
+      id: Value(id),
+      sessionId: Value(sessionId),
+      exerciseSlug: Value(exerciseSlug),
+      setOrder: Value(setOrder),
+      weight: Value(weight),
+      reps: Value(reps),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory SetEntry.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SetEntry(
+      id: serializer.fromJson<String>(json['id']),
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      exerciseSlug: serializer.fromJson<String>(json['exerciseSlug']),
+      setOrder: serializer.fromJson<int>(json['setOrder']),
+      weight: serializer.fromJson<double>(json['weight']),
+      reps: serializer.fromJson<int>(json['reps']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'sessionId': serializer.toJson<String>(sessionId),
+      'exerciseSlug': serializer.toJson<String>(exerciseSlug),
+      'setOrder': serializer.toJson<int>(setOrder),
+      'weight': serializer.toJson<double>(weight),
+      'reps': serializer.toJson<int>(reps),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  SetEntry copyWith(
+          {String? id,
+          String? sessionId,
+          String? exerciseSlug,
+          int? setOrder,
+          double? weight,
+          int? reps,
+          DateTime? createdAt,
+          DateTime? updatedAt}) =>
+      SetEntry(
+        id: id ?? this.id,
+        sessionId: sessionId ?? this.sessionId,
+        exerciseSlug: exerciseSlug ?? this.exerciseSlug,
+        setOrder: setOrder ?? this.setOrder,
+        weight: weight ?? this.weight,
+        reps: reps ?? this.reps,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  SetEntry copyWithCompanion(SetEntriesCompanion data) {
+    return SetEntry(
+      id: data.id.present ? data.id.value : this.id,
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      exerciseSlug: data.exerciseSlug.present
+          ? data.exerciseSlug.value
+          : this.exerciseSlug,
+      setOrder: data.setOrder.present ? data.setOrder.value : this.setOrder,
+      weight: data.weight.present ? data.weight.value : this.weight,
+      reps: data.reps.present ? data.reps.value : this.reps,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SetEntry(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('exerciseSlug: $exerciseSlug, ')
+          ..write('setOrder: $setOrder, ')
+          ..write('weight: $weight, ')
+          ..write('reps: $reps, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, sessionId, exerciseSlug, setOrder, weight,
+      reps, createdAt, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SetEntry &&
+          other.id == this.id &&
+          other.sessionId == this.sessionId &&
+          other.exerciseSlug == this.exerciseSlug &&
+          other.setOrder == this.setOrder &&
+          other.weight == this.weight &&
+          other.reps == this.reps &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
+  final Value<String> id;
+  final Value<String> sessionId;
+  final Value<String> exerciseSlug;
+  final Value<int> setOrder;
+  final Value<double> weight;
+  final Value<int> reps;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const SetEntriesCompanion({
+    this.id = const Value.absent(),
+    this.sessionId = const Value.absent(),
+    this.exerciseSlug = const Value.absent(),
+    this.setOrder = const Value.absent(),
+    this.weight = const Value.absent(),
+    this.reps = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SetEntriesCompanion.insert({
+    required String id,
+    required String sessionId,
+    required String exerciseSlug,
+    required int setOrder,
+    required double weight,
+    required int reps,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        sessionId = Value(sessionId),
+        exerciseSlug = Value(exerciseSlug),
+        setOrder = Value(setOrder),
+        weight = Value(weight),
+        reps = Value(reps),
+        createdAt = Value(createdAt),
+        updatedAt = Value(updatedAt);
+  static Insertable<SetEntry> custom({
+    Expression<String>? id,
+    Expression<String>? sessionId,
+    Expression<String>? exerciseSlug,
+    Expression<int>? setOrder,
+    Expression<double>? weight,
+    Expression<int>? reps,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sessionId != null) 'session_id': sessionId,
+      if (exerciseSlug != null) 'exercise_slug': exerciseSlug,
+      if (setOrder != null) 'set_order': setOrder,
+      if (weight != null) 'weight': weight,
+      if (reps != null) 'reps': reps,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SetEntriesCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? sessionId,
+      Value<String>? exerciseSlug,
+      Value<int>? setOrder,
+      Value<double>? weight,
+      Value<int>? reps,
+      Value<DateTime>? createdAt,
+      Value<DateTime>? updatedAt,
+      Value<int>? rowid}) {
+    return SetEntriesCompanion(
+      id: id ?? this.id,
+      sessionId: sessionId ?? this.sessionId,
+      exerciseSlug: exerciseSlug ?? this.exerciseSlug,
+      setOrder: setOrder ?? this.setOrder,
+      weight: weight ?? this.weight,
+      reps: reps ?? this.reps,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (exerciseSlug.present) {
+      map['exercise_slug'] = Variable<String>(exerciseSlug.value);
+    }
+    if (setOrder.present) {
+      map['set_order'] = Variable<int>(setOrder.value);
+    }
+    if (weight.present) {
+      map['weight'] = Variable<double>(weight.value);
+    }
+    if (reps.present) {
+      map['reps'] = Variable<int>(reps.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SetEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('sessionId: $sessionId, ')
+          ..write('exerciseSlug: $exerciseSlug, ')
+          ..write('setOrder: $setOrder, ')
+          ..write('weight: $weight, ')
+          ..write('reps: $reps, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $SessionsTable sessions = $SessionsTable(this);
-  late final $SetEntriesTable setEntries = $SetEntriesTable(this);
   late final $ExerciseInstancesTable exerciseInstances =
       $ExerciseInstancesTable(this);
+  late final $SetEntriesTable setEntries = $SetEntriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [sessions, setEntries, exerciseInstances];
+      [sessions, exerciseInstances, setEntries];
 }
 
 typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
@@ -1353,325 +1346,6 @@ typedef $$SessionsTableProcessedTableManager = ProcessedTableManager<
     (Session, $$SessionsTableReferences),
     Session,
     PrefetchHooks Function({bool setEntriesRefs})>;
-typedef $$SetEntriesTableCreateCompanionBuilder = SetEntriesCompanion Function({
-  required String id,
-  required String sessionId,
-  required String exerciseName,
-  required int setOrder,
-  required double weight,
-  required int reps,
-  required DateTime createdAt,
-  required DateTime updatedAt,
-  Value<int> rowid,
-});
-typedef $$SetEntriesTableUpdateCompanionBuilder = SetEntriesCompanion Function({
-  Value<String> id,
-  Value<String> sessionId,
-  Value<String> exerciseName,
-  Value<int> setOrder,
-  Value<double> weight,
-  Value<int> reps,
-  Value<DateTime> createdAt,
-  Value<DateTime> updatedAt,
-  Value<int> rowid,
-});
-
-final class $$SetEntriesTableReferences
-    extends BaseReferences<_$AppDatabase, $SetEntriesTable, SetEntry> {
-  $$SetEntriesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $SessionsTable _sessionIdTable(_$AppDatabase db) =>
-      db.sessions.createAlias(
-          $_aliasNameGenerator(db.setEntries.sessionId, db.sessions.id));
-
-  $$SessionsTableProcessedTableManager get sessionId {
-    final $_column = $_itemColumn<String>('session_id')!;
-
-    final manager = $$SessionsTableTableManager($_db, $_db.sessions)
-        .filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_sessionIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-        manager.$state.copyWith(prefetchedData: [item]));
-  }
-}
-
-class $$SetEntriesTableFilterComposer
-    extends Composer<_$AppDatabase, $SetEntriesTable> {
-  $$SetEntriesTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get exerciseName => $composableBuilder(
-      column: $table.exerciseName, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get setOrder => $composableBuilder(
-      column: $table.setOrder, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<double> get weight => $composableBuilder(
-      column: $table.weight, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get reps => $composableBuilder(
-      column: $table.reps, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
-
-  $$SessionsTableFilterComposer get sessionId {
-    final $$SessionsTableFilterComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.sessionId,
-        referencedTable: $db.sessions,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$SessionsTableFilterComposer(
-              $db: $db,
-              $table: $db.sessions,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-}
-
-class $$SetEntriesTableOrderingComposer
-    extends Composer<_$AppDatabase, $SetEntriesTable> {
-  $$SetEntriesTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get exerciseName => $composableBuilder(
-      column: $table.exerciseName,
-      builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get setOrder => $composableBuilder(
-      column: $table.setOrder, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<double> get weight => $composableBuilder(
-      column: $table.weight, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get reps => $composableBuilder(
-      column: $table.reps, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
-
-  $$SessionsTableOrderingComposer get sessionId {
-    final $$SessionsTableOrderingComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.sessionId,
-        referencedTable: $db.sessions,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$SessionsTableOrderingComposer(
-              $db: $db,
-              $table: $db.sessions,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-}
-
-class $$SetEntriesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $SetEntriesTable> {
-  $$SetEntriesTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get exerciseName => $composableBuilder(
-      column: $table.exerciseName, builder: (column) => column);
-
-  GeneratedColumn<int> get setOrder =>
-      $composableBuilder(column: $table.setOrder, builder: (column) => column);
-
-  GeneratedColumn<double> get weight =>
-      $composableBuilder(column: $table.weight, builder: (column) => column);
-
-  GeneratedColumn<int> get reps =>
-      $composableBuilder(column: $table.reps, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
-  $$SessionsTableAnnotationComposer get sessionId {
-    final $$SessionsTableAnnotationComposer composer = $composerBuilder(
-        composer: this,
-        getCurrentColumn: (t) => t.sessionId,
-        referencedTable: $db.sessions,
-        getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder,
-                {$addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer}) =>
-            $$SessionsTableAnnotationComposer(
-              $db: $db,
-              $table: $db.sessions,
-              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-              joinBuilder: joinBuilder,
-              $removeJoinBuilderFromRootComposer:
-                  $removeJoinBuilderFromRootComposer,
-            ));
-    return composer;
-  }
-}
-
-class $$SetEntriesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $SetEntriesTable,
-    SetEntry,
-    $$SetEntriesTableFilterComposer,
-    $$SetEntriesTableOrderingComposer,
-    $$SetEntriesTableAnnotationComposer,
-    $$SetEntriesTableCreateCompanionBuilder,
-    $$SetEntriesTableUpdateCompanionBuilder,
-    (SetEntry, $$SetEntriesTableReferences),
-    SetEntry,
-    PrefetchHooks Function({bool sessionId})> {
-  $$SetEntriesTableTableManager(_$AppDatabase db, $SetEntriesTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$SetEntriesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$SetEntriesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$SetEntriesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<String> id = const Value.absent(),
-            Value<String> sessionId = const Value.absent(),
-            Value<String> exerciseName = const Value.absent(),
-            Value<int> setOrder = const Value.absent(),
-            Value<double> weight = const Value.absent(),
-            Value<int> reps = const Value.absent(),
-            Value<DateTime> createdAt = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              SetEntriesCompanion(
-            id: id,
-            sessionId: sessionId,
-            exerciseName: exerciseName,
-            setOrder: setOrder,
-            weight: weight,
-            reps: reps,
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String id,
-            required String sessionId,
-            required String exerciseName,
-            required int setOrder,
-            required double weight,
-            required int reps,
-            required DateTime createdAt,
-            required DateTime updatedAt,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              SetEntriesCompanion.insert(
-            id: id,
-            sessionId: sessionId,
-            exerciseName: exerciseName,
-            setOrder: setOrder,
-            weight: weight,
-            reps: reps,
-            createdAt: createdAt,
-            updatedAt: updatedAt,
-            rowid: rowid,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable(table),
-                    $$SetEntriesTableReferences(db, table, e)
-                  ))
-              .toList(),
-          prefetchHooksCallback: ({sessionId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins: <
-                  T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic>>(state) {
-                if (sessionId) {
-                  state = state.withJoin(
-                    currentTable: table,
-                    currentColumn: table.sessionId,
-                    referencedTable:
-                        $$SetEntriesTableReferences._sessionIdTable(db),
-                    referencedColumn:
-                        $$SetEntriesTableReferences._sessionIdTable(db).id,
-                  ) as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
-        ));
-}
-
-typedef $$SetEntriesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $SetEntriesTable,
-    SetEntry,
-    $$SetEntriesTableFilterComposer,
-    $$SetEntriesTableOrderingComposer,
-    $$SetEntriesTableAnnotationComposer,
-    $$SetEntriesTableCreateCompanionBuilder,
-    $$SetEntriesTableUpdateCompanionBuilder,
-    (SetEntry, $$SetEntriesTableReferences),
-    SetEntry,
-    PrefetchHooks Function({bool sessionId})>;
 typedef $$ExerciseInstancesTableCreateCompanionBuilder
     = ExerciseInstancesCompanion Function({
   required String slug,
@@ -1690,6 +1364,27 @@ typedef $$ExerciseInstancesTableUpdateCompanionBuilder
   Value<DateTime> firstSeenAt,
   Value<int> rowid,
 });
+
+final class $$ExerciseInstancesTableReferences extends BaseReferences<
+    _$AppDatabase, $ExerciseInstancesTable, ExerciseInstance> {
+  $$ExerciseInstancesTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$SetEntriesTable, List<SetEntry>>
+      _setEntriesRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.setEntries,
+              aliasName: $_aliasNameGenerator(
+                  db.exerciseInstances.slug, db.setEntries.exerciseSlug));
+
+  $$SetEntriesTableProcessedTableManager get setEntriesRefs {
+    final manager = $$SetEntriesTableTableManager($_db, $_db.setEntries).filter(
+        (f) => f.exerciseSlug.slug.sqlEquals($_itemColumn<String>('slug')!));
+
+    final cache = $_typedResult.readTableOrNull(_setEntriesRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
 
 class $$ExerciseInstancesTableFilterComposer
     extends Composer<_$AppDatabase, $ExerciseInstancesTable> {
@@ -1717,6 +1412,27 @@ class $$ExerciseInstancesTableFilterComposer
 
   ColumnFilters<DateTime> get firstSeenAt => $composableBuilder(
       column: $table.firstSeenAt, builder: (column) => ColumnFilters(column));
+
+  Expression<bool> setEntriesRefs(
+      Expression<bool> Function($$SetEntriesTableFilterComposer f) f) {
+    final $$SetEntriesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.slug,
+        referencedTable: $db.setEntries,
+        getReferencedColumn: (t) => t.exerciseSlug,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SetEntriesTableFilterComposer(
+              $db: $db,
+              $table: $db.setEntries,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$ExerciseInstancesTableOrderingComposer
@@ -1769,6 +1485,27 @@ class $$ExerciseInstancesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get firstSeenAt => $composableBuilder(
       column: $table.firstSeenAt, builder: (column) => column);
+
+  Expression<T> setEntriesRefs<T extends Object>(
+      Expression<T> Function($$SetEntriesTableAnnotationComposer a) f) {
+    final $$SetEntriesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.slug,
+        referencedTable: $db.setEntries,
+        getReferencedColumn: (t) => t.exerciseSlug,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SetEntriesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.setEntries,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$ExerciseInstancesTableTableManager extends RootTableManager<
@@ -1780,12 +1517,9 @@ class $$ExerciseInstancesTableTableManager extends RootTableManager<
     $$ExerciseInstancesTableAnnotationComposer,
     $$ExerciseInstancesTableCreateCompanionBuilder,
     $$ExerciseInstancesTableUpdateCompanionBuilder,
-    (
-      ExerciseInstance,
-      BaseReferences<_$AppDatabase, $ExerciseInstancesTable, ExerciseInstance>
-    ),
+    (ExerciseInstance, $$ExerciseInstancesTableReferences),
     ExerciseInstance,
-    PrefetchHooks Function()> {
+    PrefetchHooks Function({bool setEntriesRefs})> {
   $$ExerciseInstancesTableTableManager(
       _$AppDatabase db, $ExerciseInstancesTable table)
       : super(TableManagerState(
@@ -1831,9 +1565,35 @@ class $$ExerciseInstancesTableTableManager extends RootTableManager<
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .map((e) => (
+                    e.readTable(table),
+                    $$ExerciseInstancesTableReferences(db, table, e)
+                  ))
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({setEntriesRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (setEntriesRefs) db.setEntries],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (setEntriesRefs)
+                    await $_getPrefetchedData<ExerciseInstance,
+                            $ExerciseInstancesTable, SetEntry>(
+                        currentTable: table,
+                        referencedTable: $$ExerciseInstancesTableReferences
+                            ._setEntriesRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$ExerciseInstancesTableReferences(db, table, p0)
+                                .setEntriesRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.exerciseSlug == item.slug),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
         ));
 }
 
@@ -1846,20 +1606,413 @@ typedef $$ExerciseInstancesTableProcessedTableManager = ProcessedTableManager<
     $$ExerciseInstancesTableAnnotationComposer,
     $$ExerciseInstancesTableCreateCompanionBuilder,
     $$ExerciseInstancesTableUpdateCompanionBuilder,
-    (
-      ExerciseInstance,
-      BaseReferences<_$AppDatabase, $ExerciseInstancesTable, ExerciseInstance>
-    ),
+    (ExerciseInstance, $$ExerciseInstancesTableReferences),
     ExerciseInstance,
-    PrefetchHooks Function()>;
+    PrefetchHooks Function({bool setEntriesRefs})>;
+typedef $$SetEntriesTableCreateCompanionBuilder = SetEntriesCompanion Function({
+  required String id,
+  required String sessionId,
+  required String exerciseSlug,
+  required int setOrder,
+  required double weight,
+  required int reps,
+  required DateTime createdAt,
+  required DateTime updatedAt,
+  Value<int> rowid,
+});
+typedef $$SetEntriesTableUpdateCompanionBuilder = SetEntriesCompanion Function({
+  Value<String> id,
+  Value<String> sessionId,
+  Value<String> exerciseSlug,
+  Value<int> setOrder,
+  Value<double> weight,
+  Value<int> reps,
+  Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
+  Value<int> rowid,
+});
+
+final class $$SetEntriesTableReferences
+    extends BaseReferences<_$AppDatabase, $SetEntriesTable, SetEntry> {
+  $$SetEntriesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $SessionsTable _sessionIdTable(_$AppDatabase db) =>
+      db.sessions.createAlias(
+          $_aliasNameGenerator(db.setEntries.sessionId, db.sessions.id));
+
+  $$SessionsTableProcessedTableManager get sessionId {
+    final $_column = $_itemColumn<String>('session_id')!;
+
+    final manager = $$SessionsTableTableManager($_db, $_db.sessions)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_sessionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static $ExerciseInstancesTable _exerciseSlugTable(_$AppDatabase db) =>
+      db.exerciseInstances.createAlias($_aliasNameGenerator(
+          db.setEntries.exerciseSlug, db.exerciseInstances.slug));
+
+  $$ExerciseInstancesTableProcessedTableManager get exerciseSlug {
+    final $_column = $_itemColumn<String>('exercise_slug')!;
+
+    final manager =
+        $$ExerciseInstancesTableTableManager($_db, $_db.exerciseInstances)
+            .filter((f) => f.slug.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_exerciseSlugTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$SetEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $SetEntriesTable> {
+  $$SetEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get setOrder => $composableBuilder(
+      column: $table.setOrder, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get weight => $composableBuilder(
+      column: $table.weight, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get reps => $composableBuilder(
+      column: $table.reps, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  $$SessionsTableFilterComposer get sessionId {
+    final $$SessionsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.sessionId,
+        referencedTable: $db.sessions,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SessionsTableFilterComposer(
+              $db: $db,
+              $table: $db.sessions,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$ExerciseInstancesTableFilterComposer get exerciseSlug {
+    final $$ExerciseInstancesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.exerciseSlug,
+        referencedTable: $db.exerciseInstances,
+        getReferencedColumn: (t) => t.slug,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ExerciseInstancesTableFilterComposer(
+              $db: $db,
+              $table: $db.exerciseInstances,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$SetEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $SetEntriesTable> {
+  $$SetEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get setOrder => $composableBuilder(
+      column: $table.setOrder, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get weight => $composableBuilder(
+      column: $table.weight, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get reps => $composableBuilder(
+      column: $table.reps, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+
+  $$SessionsTableOrderingComposer get sessionId {
+    final $$SessionsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.sessionId,
+        referencedTable: $db.sessions,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SessionsTableOrderingComposer(
+              $db: $db,
+              $table: $db.sessions,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$ExerciseInstancesTableOrderingComposer get exerciseSlug {
+    final $$ExerciseInstancesTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.exerciseSlug,
+        referencedTable: $db.exerciseInstances,
+        getReferencedColumn: (t) => t.slug,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ExerciseInstancesTableOrderingComposer(
+              $db: $db,
+              $table: $db.exerciseInstances,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$SetEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SetEntriesTable> {
+  $$SetEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get setOrder =>
+      $composableBuilder(column: $table.setOrder, builder: (column) => column);
+
+  GeneratedColumn<double> get weight =>
+      $composableBuilder(column: $table.weight, builder: (column) => column);
+
+  GeneratedColumn<int> get reps =>
+      $composableBuilder(column: $table.reps, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$SessionsTableAnnotationComposer get sessionId {
+    final $$SessionsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.sessionId,
+        referencedTable: $db.sessions,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SessionsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.sessions,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$ExerciseInstancesTableAnnotationComposer get exerciseSlug {
+    final $$ExerciseInstancesTableAnnotationComposer composer =
+        $composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.exerciseSlug,
+            referencedTable: $db.exerciseInstances,
+            getReferencedColumn: (t) => t.slug,
+            builder: (joinBuilder,
+                    {$addJoinBuilderToRootComposer,
+                    $removeJoinBuilderFromRootComposer}) =>
+                $$ExerciseInstancesTableAnnotationComposer(
+                  $db: $db,
+                  $table: $db.exerciseInstances,
+                  $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                  joinBuilder: joinBuilder,
+                  $removeJoinBuilderFromRootComposer:
+                      $removeJoinBuilderFromRootComposer,
+                ));
+    return composer;
+  }
+}
+
+class $$SetEntriesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SetEntriesTable,
+    SetEntry,
+    $$SetEntriesTableFilterComposer,
+    $$SetEntriesTableOrderingComposer,
+    $$SetEntriesTableAnnotationComposer,
+    $$SetEntriesTableCreateCompanionBuilder,
+    $$SetEntriesTableUpdateCompanionBuilder,
+    (SetEntry, $$SetEntriesTableReferences),
+    SetEntry,
+    PrefetchHooks Function({bool sessionId, bool exerciseSlug})> {
+  $$SetEntriesTableTableManager(_$AppDatabase db, $SetEntriesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SetEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SetEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SetEntriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> sessionId = const Value.absent(),
+            Value<String> exerciseSlug = const Value.absent(),
+            Value<int> setOrder = const Value.absent(),
+            Value<double> weight = const Value.absent(),
+            Value<int> reps = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SetEntriesCompanion(
+            id: id,
+            sessionId: sessionId,
+            exerciseSlug: exerciseSlug,
+            setOrder: setOrder,
+            weight: weight,
+            reps: reps,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String sessionId,
+            required String exerciseSlug,
+            required int setOrder,
+            required double weight,
+            required int reps,
+            required DateTime createdAt,
+            required DateTime updatedAt,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SetEntriesCompanion.insert(
+            id: id,
+            sessionId: sessionId,
+            exerciseSlug: exerciseSlug,
+            setOrder: setOrder,
+            weight: weight,
+            reps: reps,
+            createdAt: createdAt,
+            updatedAt: updatedAt,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$SetEntriesTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({sessionId = false, exerciseSlug = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (sessionId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.sessionId,
+                    referencedTable:
+                        $$SetEntriesTableReferences._sessionIdTable(db),
+                    referencedColumn:
+                        $$SetEntriesTableReferences._sessionIdTable(db).id,
+                  ) as T;
+                }
+                if (exerciseSlug) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.exerciseSlug,
+                    referencedTable:
+                        $$SetEntriesTableReferences._exerciseSlugTable(db),
+                    referencedColumn:
+                        $$SetEntriesTableReferences._exerciseSlugTable(db).slug,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$SetEntriesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $SetEntriesTable,
+    SetEntry,
+    $$SetEntriesTableFilterComposer,
+    $$SetEntriesTableOrderingComposer,
+    $$SetEntriesTableAnnotationComposer,
+    $$SetEntriesTableCreateCompanionBuilder,
+    $$SetEntriesTableUpdateCompanionBuilder,
+    (SetEntry, $$SetEntriesTableReferences),
+    SetEntry,
+    PrefetchHooks Function({bool sessionId, bool exerciseSlug})>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$SessionsTableTableManager get sessions =>
       $$SessionsTableTableManager(_db, _db.sessions);
-  $$SetEntriesTableTableManager get setEntries =>
-      $$SetEntriesTableTableManager(_db, _db.setEntries);
   $$ExerciseInstancesTableTableManager get exerciseInstances =>
       $$ExerciseInstancesTableTableManager(_db, _db.exerciseInstances);
+  $$SetEntriesTableTableManager get setEntries =>
+      $$SetEntriesTableTableManager(_db, _db.setEntries);
 }

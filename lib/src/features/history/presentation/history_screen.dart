@@ -16,7 +16,6 @@ import 'package:intl/intl.dart';
 // --- HISTORY SCREEN WIDGET ---------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// The screen for displaying a log of all past workouts.
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
 
@@ -42,20 +41,17 @@ class HistoryScreen extends ConsumerWidget {
             itemCount: workouts.length,
             itemBuilder: (context, index) {
               final workout = workouts[index];
-              // --- UI FIX ---
-              // Each card is now wrapped in a Dismissible widget.
               return Dismissible(
                 key: ValueKey(workout.session.id),
                 direction: DismissDirection.endToStart,
                 background: _buildDismissBackground(),
-                // This function is called before the item is dismissed.
-                // It shows a confirmation dialog.
                 confirmDismiss: (direction) async {
                   return await _showDeleteConfirmationDialog(context);
                 },
-                // This function is called after the dismiss is confirmed.
                 onDismissed: (direction) {
-                  ref.read(workoutHistoryProvider.notifier).deleteWorkout(workout.session.id);
+                  ref
+                      .read(workoutHistoryProvider.notifier)
+                      .deleteWorkout(workout.session.id);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Workout deleted')),
                   );
@@ -73,7 +69,7 @@ class HistoryScreen extends ConsumerWidget {
   Widget _buildDismissBackground() {
     return Container(
       color: AppTheme.colors.danger,
-      margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       alignment: Alignment.centerRight,
       child: const Icon(
@@ -112,11 +108,15 @@ class HistoryScreen extends ConsumerWidget {
 
   /// Builds the card for a single workout session.
   Widget _buildWorkoutCard(FullWorkoutSession workout) {
-    final setsByExercise = groupBy(workout.sets, (set) => set.exerciseName);
+    // --- DATA MODEL FIX ---
+    // The `groupBy` function now correctly groups by the `exerciseDisplayName`
+    // from our new `SetEntryWithExercise` helper class.
+    final setsByExercise =
+        groupBy(workout.sets, (setWithExercise) => setWithExercise.exerciseDisplayName);
 
     return Card(
       color: AppTheme.colors.surface,
-      margin: EdgeInsets.zero, // Margin is now handled by the Dismissible's background
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.sizing.cardRadius),
       ),
@@ -140,7 +140,7 @@ class HistoryScreen extends ConsumerWidget {
   }
 
   /// Builds the summary for a single exercise within a workout card.
-  Widget _buildExerciseSummary(String name, List<SetEntry> sets) {
+  Widget _buildExerciseSummary(String name, List<SetEntryWithExercise> sets) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
@@ -154,7 +154,11 @@ class HistoryScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 4),
-          ...sets.map((set) {
+          // --- DATA MODEL FIX ---
+          // We now map over the `SetEntryWithExercise` objects and access the
+          // underlying `set` property to get the weight and reps.
+          ...sets.map((setWithExercise) {
+            final set = setWithExercise.set;
             return Text(
               '  •  ${set.weight} lb x ${set.reps} reps',
               style: AppTheme.typography.body,
