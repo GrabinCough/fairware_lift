@@ -114,6 +114,13 @@ enum Angle {
   // standing, seated,
   // ignore: constant_identifier_names
   incline_bench,
+
+  // --- NEW: Shoulder Raise Variants ---
+  lateral,
+  // ignore: constant_identifier_names
+  front_raise,
+  // ignore: constant_identifier_names
+  rear_delt_raise,
 }
 
 /// Whether the movement is performed with one or two limbs.

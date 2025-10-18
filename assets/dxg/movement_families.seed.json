@@ -106,6 +106,27 @@
       "notes": "Use 'Chin-Up' for supinated."
     },
     {
+      "id": "shoulder_raise",
+      "name": "Shoulder Raise",
+      "pattern": "isolation",
+      "primary_muscles": ["shoulders"],
+      "secondary_muscles": ["traps"],
+      "allowed": {
+        "equipment": ["dumbbell", "cable", "band", "machine"],
+        "angle": ["lateral", "front_raise", "rear_delt_raise"],
+        "unilateral": ["bilateral", "unilateral"],
+        "orientation": ["standing", "seated", "prone", "side_lying"],
+        "attachment": ["d_handle", "single_d_handle", "none"],
+        "grip": ["neutral", "pronated"]
+      },
+      "display_name_template": "{{equipment?}} {{angle?}}",
+      "naming_rules": [
+        { "if": { "angle": "rear_delt_raise" }, "name": "{{equipment?}} Rear Delt Raise" }
+      ],
+      "aliases": ["Lateral Raise", "Front Raise", "Rear Delt Raise"],
+      "notes": "Covers lateral, front, and rear delt raises."
+    },
+    {
       "id": "curl",
       "name": "Curl",
       "pattern": "isolation",
