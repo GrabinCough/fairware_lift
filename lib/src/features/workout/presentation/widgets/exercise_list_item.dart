@@ -12,15 +12,14 @@ import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 // --- EXERCISE LIST ITEM WIDGET -----------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// A widget that displays a single exercise within the session's exercise list.
 class ExerciseListItem extends StatelessWidget {
-  // --- DATA MODEL UPGRADE ---
   final String displayName;
   final Map<String, String> discriminators;
   final String target;
   final bool isCurrent;
   final List<LoggedSet> loggedSets;
   final VoidCallback onInfoTap;
+  final VoidCallback onCardTap;
 
   const ExerciseListItem({
     super.key,
@@ -29,6 +28,7 @@ class ExerciseListItem extends StatelessWidget {
     required this.target,
     required this.loggedSets,
     required this.onInfoTap,
+    required this.onCardTap,
     this.isCurrent = false,
   });
 
@@ -44,55 +44,56 @@ class ExerciseListItem extends StatelessWidget {
             ? BorderSide(color: AppTheme.colors.accent, width: 2)
             : BorderSide.none,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // --- EXERCISE NAME & TARGET ---
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    displayName, // Use displayName
-                    style: AppTheme.typography.title.copyWith(fontSize: 20),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
+      child: InkWell(
+        onTap: onCardTap,
+        borderRadius: BorderRadius.circular(AppTheme.sizing.cardRadius),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      displayName,
+                      style: AppTheme.typography.title.copyWith(fontSize: 20),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Row(
-                  children: [
-                    Text(
-                      target,
-                      style: AppTheme.typography.body,
-                    ),
-                    const SizedBox(width: 4),
-                    IconButton(
-                      icon: const Icon(Icons.info_outline_rounded),
-                      onPressed: onInfoTap,
-                      color: AppTheme.colors.textMuted,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // --- LOGGED SETS ---
-            ...loggedSets.asMap().entries.map((entry) {
-              final index = entry.key;
-              final set = entry.value;
-              return _buildSetRow(
-                setNumber: index + 1,
-                details: '${set.weight} lb x ${set.reps} reps',
-              );
-            }),
-          ],
+                  const SizedBox(width: 8),
+                  Row(
+                    children: [
+                      Text(
+                        target,
+                        style: AppTheme.typography.body,
+                      ),
+                      const SizedBox(width: 4),
+                      IconButton(
+                        icon: const Icon(Icons.info_outline_rounded),
+                        onPressed: onInfoTap,
+                        color: AppTheme.colors.textMuted,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              ...loggedSets.asMap().entries.map((entry) {
+                final index = entry.key;
+                final set = entry.value;
+                return _buildSetRow(
+                  setNumber: index + 1,
+                  details: '${set.weight} lb x ${set.reps} reps',
+                );
+              }),
+            ],
+          ),
         ),
       ),
     );
@@ -100,6 +101,8 @@ class ExerciseListItem extends StatelessWidget {
 
   /// A private helper to build a row for a logged set.
   Widget _buildSetRow({required int setNumber, required String details}) {
+    // --- FIX ---
+    // The method body has been restored.
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(

@@ -28,12 +28,15 @@ class FullWorkoutSession {
   FullWorkoutSession({required this.session, required this.sets});
 }
 
-/// A helper class to hold a set entry joined with its exercise display name.
+/// A helper class to hold a set entry joined with its full exercise instance.
 class SetEntryWithExercise {
   final SetEntry set;
-  final String exerciseDisplayName;
+  // --- BUG FIX: Data Verification ---
+  // We now include the full ExerciseInstance object, not just the display name.
+  // This gives the History screen access to the discriminators for the info button.
+  final ExerciseInstance exercise;
 
-  SetEntryWithExercise({required this.set, required this.exerciseDisplayName});
+  SetEntryWithExercise({required this.set, required this.exercise});
 }
 
 // -----------------------------------------------------------------------------
@@ -97,8 +100,6 @@ class AppDatabase extends _$AppDatabase {
   MigrationStrategy get migration {
     return MigrationStrategy(
       onUpgrade: (migrator, from, to) async {
-        // --- MIGRATION FIX ---
-        // The correct method to delete all data from a table is `deleteTable`.
         await migrator.deleteTable('sessions');
         await migrator.deleteTable('set_entries');
         await migrator.deleteTable('exercise_instances');
@@ -125,10 +126,13 @@ class AppDatabase extends _$AppDatabase {
 
     final result = groupedData.entries.map((entry) {
       final session = entry.key;
+      // --- BUG FIX: Data Verification ---
+      // The mapping now creates a SetEntryWithExercise containing the full
+      // ExerciseInstance object from the database query.
       final setsWithExercise = entry.value.map((row) {
         return SetEntryWithExercise(
           set: row.readTable(setEntries),
-          exerciseDisplayName: row.readTable(exerciseInstances).displayName,
+          exercise: row.readTable(exerciseInstances),
         );
       }).toList();
       return FullWorkoutSession(session: session, sets: setsWithExercise);

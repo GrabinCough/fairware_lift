@@ -31,6 +31,8 @@ class SessionScreen extends ConsumerWidget {
     String _formatTitle(String key) =>
         '${key[0].toUpperCase()}${key.substring(1)}';
 
+    // --- FIX ---
+    // The method body has been restored.
     showDialog(
       context: context,
       builder: (context) {
@@ -78,8 +80,6 @@ class SessionScreen extends ConsumerWidget {
         backgroundColor: AppTheme.colors.background,
         elevation: 0,
         title: const Text('Quick Workout'),
-        // --- UI FIX ---
-        // The `actions` property with the "Finish" button has been restored.
         actions: [
           TextButton(
             onPressed: () {
@@ -110,25 +110,21 @@ class SessionScreen extends ConsumerWidget {
             _buildEmptyState()
           else
             ...sessionExercises.map((exercise) {
-              return GestureDetector(
-                onTap: () {
+              return ExerciseListItem(
+                displayName: exercise.displayName,
+                discriminators: exercise.discriminators,
+                target: exercise.target,
+                loggedSets: exercise.loggedSets,
+                isCurrent: exercise.isCurrent,
+                onCardTap: () {
                   ref
                       .read(sessionStateProvider.notifier)
                       .setCurrentExercise(exercise.id);
                 },
-                child: AbsorbPointer(
-                  child: ExerciseListItem(
-                    displayName: exercise.displayName,
-                    discriminators: exercise.discriminators,
-                    target: exercise.target,
-                    loggedSets: exercise.loggedSets,
-                    isCurrent: exercise.isCurrent,
-                    onInfoTap: () => _showExerciseInfo(
-                      context,
-                      displayName: exercise.displayName,
-                      discriminators: exercise.discriminators,
-                    ),
-                  ),
+                onInfoTap: () => _showExerciseInfo(
+                  context,
+                  displayName: exercise.displayName,
+                  discriminators: exercise.discriminators,
                 ),
               );
             }),

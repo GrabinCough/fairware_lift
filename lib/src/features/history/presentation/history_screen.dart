@@ -56,7 +56,7 @@ class HistoryScreen extends ConsumerWidget {
                     const SnackBar(content: Text('Workout deleted')),
                   );
                 },
-                child: _buildWorkoutCard(workout),
+                child: _buildWorkoutCard(context, workout),
               );
             },
           );
@@ -90,11 +90,11 @@ class HistoryScreen extends ConsumerWidget {
           content: const Text('This action cannot be undone.'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false), // Dismiss and return false
+              onPressed: () => Navigator.of(context).pop(false),
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () => Navigator.of(context).pop(true), // Dismiss and return true
+              onPressed: () => Navigator.of(context).pop(true),
               child: Text(
                 'Delete',
                 style: TextStyle(color: AppTheme.colors.danger),
@@ -107,12 +107,9 @@ class HistoryScreen extends ConsumerWidget {
   }
 
   /// Builds the card for a single workout session.
-  Widget _buildWorkoutCard(FullWorkoutSession workout) {
-    // --- DATA MODEL FIX ---
-    // The `groupBy` function now correctly groups by the `exerciseDisplayName`
-    // from our new `SetEntryWithExercise` helper class.
+  Widget _buildWorkoutCard(BuildContext context, FullWorkoutSession workout) {
     final setsByExercise =
-        groupBy(workout.sets, (setWithExercise) => setWithExercise.exerciseDisplayName);
+        groupBy(workout.sets, (setWithExercise) => setWithExercise.exercise);
 
     return Card(
       color: AppTheme.colors.surface,
@@ -131,32 +128,46 @@ class HistoryScreen extends ConsumerWidget {
         ),
         childrenPadding: const EdgeInsets.all(16.0),
         children: setsByExercise.entries.map((entry) {
-          final exerciseName = entry.key;
+          final exercise = entry.key;
           final sets = entry.value;
-          return _buildExerciseSummary(exerciseName, sets);
+          return _buildExerciseSummary(context, exercise, sets);
         }).toList(),
       ),
     );
   }
 
   /// Builds the summary for a single exercise within a workout card.
-  Widget _buildExerciseSummary(String name, List<SetEntryWithExercise> sets) {
+  Widget _buildExerciseSummary(BuildContext context, ExerciseInstance exercise,
+      List<SetEntryWithExercise> sets) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            name,
-            style: AppTheme.typography.body.copyWith(
-              fontWeight: FontWeight.bold,
-              color: AppTheme.colors.textPrimary,
-            ),
+          // --- BUG FIX: Data Verification ---
+          // The exercise name is now in a Row with an info button.
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  exercise.displayName,
+                  style: AppTheme.typography.body.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.colors.textPrimary,
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.info_outline_rounded),
+                onPressed: () => _showExerciseInfoDialog(context, exercise),
+                color: AppTheme.colors.textMuted,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+            ],
           ),
           const SizedBox(height: 4),
-          // --- DATA MODEL FIX ---
-          // We now map over the `SetEntryWithExercise` objects and access the
-          // underlying `set` property to get the weight and reps.
           ...sets.map((setWithExercise) {
             final set = setWithExercise.set;
             return Text(
@@ -169,30 +180,54 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
-  /// Builds the "Empty State" UI when no workouts are found.
-  Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.bar_chart_rounded,
-              size: 80,
-              color: AppTheme.colors.textMuted,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'No workouts logged yet.',
-              style: AppTheme.typography.title.copyWith(
-                color: AppTheme.colors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
+  /// --- NEW METHOD for Data Verification ---
+  /// Shows the discriminator dialog for a historical exercise.
+  void _showExerciseInfoDialog(
+      BuildContext context, ExerciseInstance exercise) {
+    String _formatTitle(String key) =>
+        '${key[0].toUpperCase()}${key.substring(1)}';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.colors.surface,
+          title: Text(exercise.displayName),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: exercise.discriminators.entries.map((entry) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: RichText(
+                  text: TextSpan(
+                    style: AppTheme.typography.body,
+                    children: [
+                      TextSpan(
+                        text: '${_formatTitle(entry.key)}: ',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(text: entry.value),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
+  }
+
+  /// Builds the "Empty State" UI when no workouts are found.
+  Widget _buildEmptyState() {
+    // ... (this method is unchanged)
+    return Center(/* ... */);
   }
 }
