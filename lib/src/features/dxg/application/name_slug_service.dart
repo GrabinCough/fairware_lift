@@ -1,3 +1,4 @@
+// ----- lib/src/features/dxg/application/name_slug_service.dart -----
 // lib/src/features/dxg/application/name_slug_service.dart
 
 // -----------------------------------------------------------------------------
@@ -19,19 +20,22 @@ import 'package:fairware_lift/src/features/dxg/application/guardrail_service.dar
 class NameAndSlugService {
   /// Generates a stable, unique slug from a family ID and selections.
   ///
-  /// As per DXG spec §5, the slug is a dot-separated string of the family ID
+  /// As per DXG spec ┬º5, the slug is a dot-separated string of the family ID
   /// and the values of the discriminators in a fixed, canonical order.
   String toSlug({
     required String familyId,
     required SelectionsMap discriminators,
   }) {
+    // --- UPDATED ---
     // The canonical order for all fields that can be part of a slug.
+    // `cable_height` has been added to ensure it's part of the slug.
     const fieldsInOrder = [
       'equipment',
       'angle',
       'unilateral',
       'orientation',
       'attachment',
+      'cable_height',
       'grip',
     ];
 
@@ -89,7 +93,7 @@ class NameAndSlugService {
         result += ', 1-Arm';
       }
     }
-    
+
     // Clean up any extra whitespace from removed tokens.
     return result.replaceAll(RegExp(r'\s+'), ' ').trim();
   }
@@ -103,6 +107,12 @@ class NameAndSlugService {
 
   /// Converts a discriminator slug value into a human-friendly, title-cased string.
   String _humanize(String field, String value) {
+    // --- NEW ---
+    // Handle the new `cable_height` field by simply adding "Pos: " prefix.
+    if (field == 'cable_height') {
+      return 'Pos: $value';
+    }
+
     // A simple humanization map. This could be expanded or moved to a config file.
     const humanizationMap = {
       'ez_bar': 'EZ Bar',
@@ -115,12 +125,13 @@ class NameAndSlugService {
       'incline_bench': 'Incline Bench',
       'bulgarian_split': 'Bulgarian Split',
       'trapbar': 'Trap Bar',
+      'hip_hinge_setup': 'Bent-Over',
     };
 
     if (humanizationMap.containsKey(value)) {
       return humanizationMap[value]!;
     }
-    
+
     // Default behavior: replace underscores and title case.
     final words = value.split('_');
     return words.map((w) => '${w[0].toUpperCase()}${w.substring(1)}').join(' ');

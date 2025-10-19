@@ -1,3 +1,4 @@
+// ----- lib/src/features/dxg/application/dxg_state.dart -----
 // lib/src/features/dxg/application/dxg_state.dart
 
 // -----------------------------------------------------------------------------
@@ -140,16 +141,25 @@ class DXGStateNotifier extends AutoDisposeAsyncNotifier<DXGState> {
       selections: newState.selections,
     );
 
-    // 2. Determine if a canonical exercise can be generated.
-    // A simple heuristic: check if all non-optional fields in the display
-    // template have been selected.
-    final requiredFields = RegExp(r'\{\{(\w+)\?\}\}')
-        .allMatches(family.display_name_template)
-        .map((m) => m.group(1)!)
-        .toSet();
+    // --- BUG FIX ---
+    // The logic to determine if a canonical exercise can be generated is now
+    // more robust. Instead of relying on the display template, it checks if
+    // a selection has been made for every available (i.e., visible)
+    // discriminator category.
+    bool hasAllRequiredFields = true;
+    for (final entry in availableOptions.entries) {
+      final field = entry.key;
+      final options = entry.value;
 
-    final hasAllRequiredFields =
-        requiredFields.every((field) => newState.selections.containsKey(field));
+      // A field is considered required if it has options available to choose from.
+      // We ignore fields that only contain 'none'.
+      final bool isEffectivelyEmpty = options.isEmpty || (options.length == 1 && options.first == 'none');
+
+      if (!isEffectivelyEmpty && !newState.selections.containsKey(field)) {
+        hasAllRequiredFields = false;
+        break;
+      }
+    }
 
     GeneratedExerciseResult? canonicalExercise;
     if (hasAllRequiredFields) {
@@ -181,8 +191,7 @@ class DXGStateNotifier extends AutoDisposeAsyncNotifier<DXGState> {
 // --- PROVIDER ----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// --- BUG FIX: State Not Resetting ---
-// The provider is now an `AutoDisposeAsyncNotifierProvider`. This ensures that
+// The provider is an `AutoDisposeAsyncNotifierProvider`. This ensures that
 // when the exercise picker screen is closed (and no longer being listened to),
 // the state is automatically destroyed. The next time the user opens the
 // picker, a fresh instance of the notifier will be created.

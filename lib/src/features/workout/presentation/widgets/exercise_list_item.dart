@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/presentation/widgets/exercise_list_item.dart -----
 // lib/src/features/workout/presentation/widgets/exercise_list_item.dart
 
 // -----------------------------------------------------------------------------

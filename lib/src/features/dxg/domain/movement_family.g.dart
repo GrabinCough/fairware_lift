@@ -86,6 +86,10 @@ _$AllowedDiscriminatorsImpl _$$AllowedDiscriminatorsImplFromJson(
               ?.map((e) => e as String)
               .toList() ??
           const [],
+      cable_height: (json['cable_height'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
       grip:
           (json['grip'] as List<dynamic>?)?.map((e) => e as String).toList() ??
               const [],
@@ -99,6 +103,7 @@ Map<String, dynamic> _$$AllowedDiscriminatorsImplToJson(
       'unilateral': instance.unilateral,
       'orientation': instance.orientation,
       'attachment': instance.attachment,
+      'cable_height': instance.cable_height,
       'grip': instance.grip,
     };
 

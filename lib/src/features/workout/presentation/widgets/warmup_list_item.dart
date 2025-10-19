@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/presentation/widgets/warmup_list_item.dart -----
 // lib/src/features/workout/presentation/widgets/warmup_list_item.dart
 
 // -----------------------------------------------------------------------------
@@ -13,8 +14,6 @@ import 'package:fairware_lift/src/features/workout/domain/session_item.dart';
 // -----------------------------------------------------------------------------
 
 class WarmupListItem extends StatelessWidget {
-  // --- REFACTOR ---
-  // Now accepts the full SessionWarmupItem to access selected parameters.
   final SessionWarmupItem warmup;
 
   const WarmupListItem({
@@ -24,11 +23,13 @@ class WarmupListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // --- NEW: Displaying Parameters ---
-    // Create a subtitle string from the selected parameters.
+    // --- BUG FIX ---
+    // The subtitle now correctly formats each parameter as "Key: Value".
+    // This fixes the issue where only the value was shown (e.g., "5.0" instead
+    // of "Incline: 5.0") and ensures all selected parameters are visible.
     final subtitle = warmup.selectedParameters.entries
         .map((e) => '${e.key}: ${e.value}')
-        .join(', ');
+        .join('  •  ');
 
     return Card(
       color: AppTheme.colors.surface,

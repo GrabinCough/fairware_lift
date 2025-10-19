@@ -1,3 +1,4 @@
+// ----- lib/src/features/dxg/application/guardrail_service.dart -----
 // lib/src/features/dxg/application/guardrail_service.dart
 
 // -----------------------------------------------------------------------------
@@ -66,12 +67,17 @@ class GuardrailService {
       return options;
     }
 
-    // --- BUG FIX: Irrelevant "Attachment" Section ---
     // Attachments are only relevant for cable exercises. This logic now
     // checks the selected equipment. If it's not 'cable', the attachment
     // options will be an empty set, preventing the UI from showing the section.
     final attachmentOptions = (selections['equipment'] == 'cable')
         ? _getOptionsForField(allowed.attachment, 'attachment')
+        : <String>{};
+
+    // --- NEW ---
+    // Cable height is only relevant for cable exercises.
+    final cableHeightOptions = (selections['equipment'] == 'cable')
+        ? Set<String>.from(allowed.cable_height)
         : <String>{};
 
     return {
@@ -80,6 +86,7 @@ class GuardrailService {
       'unilateral': Set<String>.from(allowed.unilateral),
       'orientation': Set<String>.from(allowed.orientation),
       'attachment': attachmentOptions,
+      'cable_height': cableHeightOptions,
       'grip': Set<String>.from(allowed.grip),
     };
   }

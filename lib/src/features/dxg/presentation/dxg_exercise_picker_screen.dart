@@ -1,3 +1,4 @@
+// ----- lib/src/features/dxg/presentation/dxg_exercise_picker_screen.dart -----
 // lib/src/features/dxg/presentation/dxg_exercise_picker_screen.dart
 
 // -----------------------------------------------------------------------------
@@ -85,6 +86,9 @@ class DXGExercisePickerScreen extends ConsumerWidget {
             _buildDiscriminatorChips(ref, 'Unilateral', 'unilateral', dxgState),
             _buildDiscriminatorChips(ref, 'Orientation', 'orientation', dxgState),
             _buildDiscriminatorChips(ref, 'Attachment', 'attachment', dxgState),
+            // --- NEW ---
+            // Added the new discriminator for cable height.
+            _buildDiscriminatorChips(ref, 'Cable Height', 'cable_height', dxgState),
             _buildDiscriminatorChips(ref, 'Grip', 'grip', dxgState),
             if (dxgState.canonicalExercise != null)
               _buildResultCard(context, dxgState.canonicalExercise!),
@@ -129,34 +133,40 @@ class DXGExercisePickerScreen extends ConsumerWidget {
     return showDialog<Map<String, String>>(
       context: context,
       builder: (context) {
+        // Use a map to hold the selections, initialized with the first option.
+        final selections = <String, String>{};
+        for (var p in item.parameters) {
+          if (p.options.isNotEmpty) {
+            selections[p.name] = p.options.first;
+          }
+        }
+
         return StatefulBuilder(
           builder: (context, setState) {
-            final selections = {
-              for (var p in item.parameters) p.name: p.options.first
-            };
-
             return AlertDialog(
               backgroundColor: AppTheme.colors.surface,
               title: Text(item.displayName),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: item.parameters.map((param) {
-                  return DropdownButtonFormField<String>(
-                    value: selections[param.name],
-                    items: param.options.map((option) {
-                      return DropdownMenuItem(
-                        value: option,
-                        child: Text(option),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() => selections[param.name] = value);
-                      }
-                    },
-                    decoration: InputDecoration(labelText: param.name),
-                  );
-                }).toList(),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: item.parameters.map((param) {
+                    return DropdownButtonFormField<String>(
+                      value: selections[param.name],
+                      items: param.options.map((option) {
+                        return DropdownMenuItem(
+                          value: option,
+                          child: Text(option),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => selections[param.name] = value);
+                        }
+                      },
+                      decoration: InputDecoration(labelText: param.name),
+                    );
+                  }).toList(),
+                ),
               ),
               actions: [
                 TextButton(
@@ -188,10 +198,14 @@ class DXGExercisePickerScreen extends ConsumerWidget {
   }
 
   Widget _buildFamilyChips(WidgetRef ref, DXGState dxgState) {
+    // Sort families alphabetically by name for consistent ordering.
+    final sortedFamilies = List.from(dxgState.allFamilies)
+      ..sort((a, b) => a.name.compareTo(b.name));
+
     return Wrap(
       spacing: 8.0,
       runSpacing: 4.0,
-      children: dxgState.allFamilies.map((family) {
+      children: sortedFamilies.map((family) {
         return FilterChip(
           label: Text(family.name),
           selected: dxgState.selectedFamilyId == family.id,

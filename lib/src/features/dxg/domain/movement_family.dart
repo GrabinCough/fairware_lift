@@ -1,3 +1,4 @@
+// ----- lib/src/features/dxg/domain/movement_family.dart -----
 // lib/src/features/dxg/domain/movement_family.dart
 
 // -----------------------------------------------------------------------------
@@ -52,6 +53,9 @@ class AllowedDiscriminators with _$AllowedDiscriminators {
     @Default([]) List<String> unilateral,
     @Default([]) List<String> orientation,
     @Default([]) List<String> attachment,
+    // --- NEW ---
+    // Added cable_height to support the new discriminator.
+    @Default([]) List<String> cable_height,
     @Default([]) List<String> grip,
   }) = _AllowedDiscriminators;
 

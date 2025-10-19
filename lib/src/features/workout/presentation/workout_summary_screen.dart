@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/presentation/workout_summary_screen.dart -----
 // lib/src/features/workout/presentation/workout_summary_screen.dart
 
 // -----------------------------------------------------------------------------
@@ -183,9 +184,11 @@ class WorkoutSummaryScreen extends ConsumerWidget {
   }
 
   Widget _buildWarmupSummary(SessionWarmupItem warmup) {
+    // --- BUG FIX ---
+    // The subtitle now correctly formats each parameter as "Key: Value".
     final subtitle = warmup.selectedParameters.entries
-        .map((e) => e.value)
-        .join(' • ');
+        .map((e) => '${e.key}: ${e.value}')
+        .join('  •  ');
 
     return Card(
       color: AppTheme.colors.surface,

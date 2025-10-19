@@ -12,6 +12,7 @@
         "unilateral": ["bilateral", "unilateral"],
         "orientation": ["supine", "seated", "standing"],
         "attachment": ["none", "straight_bar", "ez_bar", "rope", "v_bar", "d_handle"],
+        "cable_height": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
         "grip": ["neutral", "pronated"]
       },
       "denies": [
@@ -36,6 +37,7 @@
         "unilateral": ["bilateral", "unilateral"],
         "orientation": ["supine", "seated", "standing"],
         "attachment": ["none", "d_handle"],
+        "cable_height": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
         "grip": ["neutral"]
       },
       "denies": [
@@ -44,6 +46,25 @@
       "display_name_template": "{{angle?}} {{equipment?}} Fly",
       "aliases": [],
       "notes": "No barbell for fly."
+    },
+    {
+      "id": "fly_reverse",
+      "name": "Reverse Fly",
+      "pattern": "pull",
+      "primary_muscles": ["rear_delts"],
+      "secondary_muscles": ["upper_back"],
+      "allowed": {
+        "equipment": ["dumbbell", "cable", "machine"],
+        "angle": ["horizontal"],
+        "unilateral": ["bilateral", "unilateral"],
+        "orientation": ["standing", "hip_hinge_setup", "chest_supported", "seated"],
+        "attachment": ["none", "d_handle", "single_d_handle"],
+        "cable_height": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
+        "grip": ["neutral"]
+      },
+      "display_name_template": "{{orientation?}} {{equipment?}} Reverse Fly{{cable_height_paren?}}",
+      "aliases": ["Rear Delt Fly"],
+      "notes": "Dedicated family for reverse fly movements."
     },
     {
       "id": "row",
@@ -57,6 +78,7 @@
         "unilateral": ["bilateral", "unilateral"],
         "orientation": ["standing", "seated", "chest_supported", "prone"],
         "attachment": ["v_bar", "straight_bar", "d_handle", "rope", "lat_bar", "single_d_handle"],
+        "cable_height": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
         "grip": ["neutral", "supinated", "pronated"]
       },
       "display_name_template": "{{angle?}} {{equipment?}} Row",
@@ -78,6 +100,7 @@
         "unilateral": ["bilateral", "unilateral"],
         "orientation": ["seated", "kneeling"],
         "attachment": ["lat_bar", "straight_bar", "rope", "d_handle", "single_d_handle", "v_bar"],
+        "cable_height": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
         "grip": ["pronated", "supinated", "neutral"]
       },
       "display_name_template": "{{attachment?}} {{equipment?}} Pulldown",
@@ -117,6 +140,7 @@
         "unilateral": ["bilateral", "unilateral"],
         "orientation": ["standing", "seated", "prone", "side_lying"],
         "attachment": ["d_handle", "single_d_handle", "none"],
+        "cable_height": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
         "grip": ["neutral", "pronated"]
       },
       "display_name_template": "{{equipment?}} {{angle?}}",
@@ -138,6 +162,7 @@
         "unilateral": ["bilateral", "unilateral"],
         "orientation": ["standing", "seated", "supine"],
         "attachment": ["straight_bar", "ez_bar", "rope", "d_handle", "single_d_handle", "none"],
+        "cable_height": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
         "grip": ["supinated", "neutral", "pronated"]
       },
       "display_name_template": "{{angle?}} {{equipment?}} Curl",
@@ -159,11 +184,12 @@
         "unilateral": ["bilateral", "unilateral"],
         "orientation": ["standing", "seated", "supine"],
         "attachment": ["rope", "straight_bar", "ez_bar", "d_handle", "single_d_handle", "none"],
+        "cable_height": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
         "grip": ["neutral", "pronated"]
       },
       "display_name_template": "{{angle?}} {{equipment?}} Triceps Extension",
       "aliases": ["Skullcrusher (horizontal barbell/ez_bar)"],
-      "notes": "Horizontal barbell/ez_bar in supine → Skullcrusher alias."
+      "notes": "Horizontal barbell/ez_bar in supine ΓåÆ Skullcrusher alias."
     },
     {
       "id": "squat",
@@ -249,6 +275,7 @@
         "unilateral": ["bilateral", "unilateral"],
         "orientation": ["standing", "half_kneel", "tall_kneel", "seated"],
         "attachment": ["rope", "d_handle", "single_d_handle", "none"],
+        "cable_height": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"],
         "grip": ["neutral"]
       },
       "display_name_template": "{{angle?}} {{equipment?}} Rotation",

@@ -1,3 +1,4 @@
+// ----- lib/src/features/history/presentation/history_screen.dart -----
 // lib/src/features/history/presentation/history_screen.dart
 
 // -----------------------------------------------------------------------------
@@ -138,8 +139,11 @@ class HistoryScreen extends ConsumerWidget {
   }
 
   Widget _buildWarmupSummary(SavedWarmup warmup) {
-    final subtitle =
-        warmup.parameters.entries.map((e) => e.value).join(' • ');
+    // --- BUG FIX ---
+    // The subtitle now correctly formats each parameter as "Key: Value".
+    final subtitle = warmup.parameters.entries
+        .map((e) => '${e.key}: ${e.value}')
+        .join('  •  ');
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
@@ -207,7 +211,7 @@ class HistoryScreen extends ConsumerWidget {
   void _showExerciseInfoDialog(
       BuildContext context, ExerciseInstance exercise) {
     String _formatTitle(String key) =>
-        '${key[0].toUpperCase()}${key.substring(1)}';
+        '${key[0].toUpperCase()}${key.substring(1)}'.replaceAll('_', ' ');
 
     showDialog(
       context: context,

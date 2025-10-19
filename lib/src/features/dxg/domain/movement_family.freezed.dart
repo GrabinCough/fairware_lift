@@ -449,7 +449,10 @@ mixin _$AllowedDiscriminators {
   List<String> get angle => throw _privateConstructorUsedError;
   List<String> get unilateral => throw _privateConstructorUsedError;
   List<String> get orientation => throw _privateConstructorUsedError;
-  List<String> get attachment => throw _privateConstructorUsedError;
+  List<String> get attachment =>
+      throw _privateConstructorUsedError; // --- NEW ---
+// Added cable_height to support the new discriminator.
+  List<String> get cable_height => throw _privateConstructorUsedError;
   List<String> get grip => throw _privateConstructorUsedError;
 
   /// Serializes this AllowedDiscriminators to a JSON map.
@@ -474,6 +477,7 @@ abstract class $AllowedDiscriminatorsCopyWith<$Res> {
       List<String> unilateral,
       List<String> orientation,
       List<String> attachment,
+      List<String> cable_height,
       List<String> grip});
 }
 
@@ -498,6 +502,7 @@ class _$AllowedDiscriminatorsCopyWithImpl<$Res,
     Object? unilateral = null,
     Object? orientation = null,
     Object? attachment = null,
+    Object? cable_height = null,
     Object? grip = null,
   }) {
     return _then(_value.copyWith(
@@ -520,6 +525,10 @@ class _$AllowedDiscriminatorsCopyWithImpl<$Res,
       attachment: null == attachment
           ? _value.attachment
           : attachment // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      cable_height: null == cable_height
+          ? _value.cable_height
+          : cable_height // ignore: cast_nullable_to_non_nullable
               as List<String>,
       grip: null == grip
           ? _value.grip
@@ -544,6 +553,7 @@ abstract class _$$AllowedDiscriminatorsImplCopyWith<$Res>
       List<String> unilateral,
       List<String> orientation,
       List<String> attachment,
+      List<String> cable_height,
       List<String> grip});
 }
 
@@ -566,6 +576,7 @@ class __$$AllowedDiscriminatorsImplCopyWithImpl<$Res>
     Object? unilateral = null,
     Object? orientation = null,
     Object? attachment = null,
+    Object? cable_height = null,
     Object? grip = null,
   }) {
     return _then(_$AllowedDiscriminatorsImpl(
@@ -589,6 +600,10 @@ class __$$AllowedDiscriminatorsImplCopyWithImpl<$Res>
           ? _value._attachment
           : attachment // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      cable_height: null == cable_height
+          ? _value._cable_height
+          : cable_height // ignore: cast_nullable_to_non_nullable
+              as List<String>,
       grip: null == grip
           ? _value._grip
           : grip // ignore: cast_nullable_to_non_nullable
@@ -606,12 +621,14 @@ class _$AllowedDiscriminatorsImpl implements _AllowedDiscriminators {
       final List<String> unilateral = const [],
       final List<String> orientation = const [],
       final List<String> attachment = const [],
+      final List<String> cable_height = const [],
       final List<String> grip = const []})
       : _equipment = equipment,
         _angle = angle,
         _unilateral = unilateral,
         _orientation = orientation,
         _attachment = attachment,
+        _cable_height = cable_height,
         _grip = grip;
 
   factory _$AllowedDiscriminatorsImpl.fromJson(Map<String, dynamic> json) =>
@@ -662,6 +679,19 @@ class _$AllowedDiscriminatorsImpl implements _AllowedDiscriminators {
     return EqualUnmodifiableListView(_attachment);
   }
 
+// --- NEW ---
+// Added cable_height to support the new discriminator.
+  final List<String> _cable_height;
+// --- NEW ---
+// Added cable_height to support the new discriminator.
+  @override
+  @JsonKey()
+  List<String> get cable_height {
+    if (_cable_height is EqualUnmodifiableListView) return _cable_height;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_cable_height);
+  }
+
   final List<String> _grip;
   @override
   @JsonKey()
@@ -673,7 +703,7 @@ class _$AllowedDiscriminatorsImpl implements _AllowedDiscriminators {
 
   @override
   String toString() {
-    return 'AllowedDiscriminators(equipment: $equipment, angle: $angle, unilateral: $unilateral, orientation: $orientation, attachment: $attachment, grip: $grip)';
+    return 'AllowedDiscriminators(equipment: $equipment, angle: $angle, unilateral: $unilateral, orientation: $orientation, attachment: $attachment, cable_height: $cable_height, grip: $grip)';
   }
 
   @override
@@ -690,6 +720,8 @@ class _$AllowedDiscriminatorsImpl implements _AllowedDiscriminators {
                 .equals(other._orientation, _orientation) &&
             const DeepCollectionEquality()
                 .equals(other._attachment, _attachment) &&
+            const DeepCollectionEquality()
+                .equals(other._cable_height, _cable_height) &&
             const DeepCollectionEquality().equals(other._grip, _grip));
   }
 
@@ -702,6 +734,7 @@ class _$AllowedDiscriminatorsImpl implements _AllowedDiscriminators {
       const DeepCollectionEquality().hash(_unilateral),
       const DeepCollectionEquality().hash(_orientation),
       const DeepCollectionEquality().hash(_attachment),
+      const DeepCollectionEquality().hash(_cable_height),
       const DeepCollectionEquality().hash(_grip));
 
   /// Create a copy of AllowedDiscriminators
@@ -728,6 +761,7 @@ abstract class _AllowedDiscriminators implements AllowedDiscriminators {
       final List<String> unilateral,
       final List<String> orientation,
       final List<String> attachment,
+      final List<String> cable_height,
       final List<String> grip}) = _$AllowedDiscriminatorsImpl;
 
   factory _AllowedDiscriminators.fromJson(Map<String, dynamic> json) =
@@ -742,7 +776,10 @@ abstract class _AllowedDiscriminators implements AllowedDiscriminators {
   @override
   List<String> get orientation;
   @override
-  List<String> get attachment;
+  List<String> get attachment; // --- NEW ---
+// Added cable_height to support the new discriminator.
+  @override
+  List<String> get cable_height;
   @override
   List<String> get grip;
 
