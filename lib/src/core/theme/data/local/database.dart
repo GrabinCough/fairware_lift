@@ -48,9 +48,11 @@ class SetEntryWithExercise {
 class Sessions extends Table {
   TextColumn get id => text()();
   DateTimeColumn get sessionDateTime => dateTime().named('date_time')();
-  // --- NEW COLUMNS ---
   IntColumn get totalDurationSeconds =>
       integer().named('total_duration_seconds').nullable()();
+  // --- NEW COLUMN ---
+  IntColumn get totalActivitySeconds =>
+      integer().named('total_activity_seconds').nullable()();
   IntColumn get totalRestSeconds =>
       integer().named('total_rest_seconds').nullable()();
   TextColumn get notes => text().nullable()();
@@ -113,7 +115,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration {
@@ -123,6 +125,9 @@ class AppDatabase extends _$AppDatabase {
         if (from < 5) {
           await migrator.addColumn(sessions, sessions.totalDurationSeconds);
           await migrator.addColumn(sessions, sessions.totalRestSeconds);
+        }
+        if (from < 6) {
+          await migrator.addColumn(sessions, sessions.totalActivitySeconds);
         }
       },
     );

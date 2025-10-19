@@ -20,8 +20,6 @@ import 'package:intl/intl.dart';
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
 
-  // --- NEW HELPER ---
-  // Formats a duration in seconds into a "Xh Ym Zs" string.
   String _formatDuration(int totalSeconds) {
     if (totalSeconds < 0) return "0s";
     final duration = Duration(seconds: totalSeconds);
@@ -125,8 +123,6 @@ class HistoryScreen extends ConsumerWidget {
         groupBy(workout.sets, (setWithExercise) => setWithExercise.exercise);
     final totalItems = setsByExercise.keys.length + workout.warmups.length;
 
-    // --- NEW ---
-    // Build the subtitle string with the new timing data, if available.
     final subtitleParts = <String>[
       '$totalItems items',
       '${workout.sets.length} total sets',
@@ -153,11 +149,12 @@ class HistoryScreen extends ConsumerWidget {
         ),
         childrenPadding: const EdgeInsets.all(16.0),
         children: [
-          // --- NEW ---
-          // Add a summary row for timing data inside the expanded card.
+          // --- REFACTORED ---
+          // Now displays all three timing metrics if they are available.
           if (workout.session.totalDurationSeconds != null) ...[
             _buildTimingDetails(
               totalDuration: workout.session.totalDurationSeconds!,
+              totalActivity: workout.session.totalActivitySeconds ?? 0,
               totalRest: workout.session.totalRestSeconds ?? 0,
             ),
             const Divider(height: 24),
@@ -173,9 +170,7 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
-  /// --- NEW WIDGET BUILDER ---
-  /// Creates the timing details row for the expanded history card.
-  Widget _buildTimingDetails({required int totalDuration, required int totalRest}) {
+  Widget _buildTimingDetails({required int totalDuration, required int totalActivity, required int totalRest}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Row(
@@ -183,14 +178,21 @@ class HistoryScreen extends ConsumerWidget {
         children: [
           Column(
             children: [
-              Text('Total Time', style: AppTheme.typography.caption),
+              Text('Duration', style: AppTheme.typography.caption),
               const SizedBox(height: 4),
               Text(_formatDuration(totalDuration), style: AppTheme.typography.body),
             ],
           ),
           Column(
             children: [
-              Text('Total Rest', style: AppTheme.typography.caption),
+              Text('Activity', style: AppTheme.typography.caption),
+              const SizedBox(height: 4),
+              Text(_formatDuration(totalActivity), style: AppTheme.typography.body),
+            ],
+          ),
+          Column(
+            children: [
+              Text('Rest', style: AppTheme.typography.caption),
               const SizedBox(height: 4),
               Text(_formatDuration(totalRest), style: AppTheme.typography.body),
             ],

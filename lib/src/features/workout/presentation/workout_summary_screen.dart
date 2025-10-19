@@ -27,8 +27,6 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     required this.completedItems,
   });
 
-  // --- NEW HELPER ---
-  // Formats a duration in seconds into a "Xh Ym Zs" string.
   String _formatDuration(int totalSeconds) {
     if (totalSeconds < 0) return "0s";
     final duration = Duration(seconds: totalSeconds);
@@ -53,6 +51,7 @@ class WorkoutSummaryScreen extends ConsumerWidget {
       id: drift.Value(sessionId),
       sessionDateTime: drift.Value(now),
       totalDurationSeconds: drift.Value(metrics.totalDurationSeconds),
+      totalActivitySeconds: drift.Value(metrics.totalActivitySeconds),
       totalRestSeconds: drift.Value(metrics.totalRestSeconds),
       createdAt: drift.Value(now),
       updatedAt: drift.Value(now),
@@ -160,8 +159,6 @@ class WorkoutSummaryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // --- NEW ---
-    // Read the metrics to display them in the UI.
     final metrics = ref.watch(workoutMetricsProvider);
 
     return Scaffold(
@@ -174,8 +171,6 @@ class WorkoutSummaryScreen extends ConsumerWidget {
           ),
         ],
       ),
-      // --- REFACTORED ---
-      // The body is now a ListView that includes the new metrics card at the top.
       body: ListView(
         padding: const EdgeInsets.all(8.0),
         children: [
@@ -195,8 +190,8 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     );
   }
 
-  /// --- NEW WIDGET BUILDER ---
-  /// Creates a card to display the workout timing metrics.
+  /// --- REFACTORED ---
+  /// The metrics card now displays all three timing values.
   Widget _buildMetricsCard(WorkoutMetrics metrics) {
     return Card(
       color: AppTheme.colors.surface,
@@ -211,12 +206,17 @@ class WorkoutSummaryScreen extends ConsumerWidget {
           children: [
             _buildMetricItem(
               icon: Icons.timer_outlined,
-              label: 'Total Time',
+              label: 'Duration',
               value: _formatDuration(metrics.totalDurationSeconds),
             ),
             _buildMetricItem(
+              icon: Icons.local_fire_department_outlined,
+              label: 'Activity',
+              value: _formatDuration(metrics.totalActivitySeconds),
+            ),
+            _buildMetricItem(
               icon: Icons.pause_circle_outline,
-              label: 'Total Rest',
+              label: 'Rest',
               value: _formatDuration(metrics.totalRestSeconds),
             ),
           ],
@@ -225,8 +225,6 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     );
   }
 
-  /// --- NEW HELPER ---
-  /// Builds a single item for the metrics card.
   Widget _buildMetricItem({required IconData icon, required String label, required String value}) {
     return Column(
       children: [

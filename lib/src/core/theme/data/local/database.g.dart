@@ -25,6 +25,12 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
   late final GeneratedColumn<int> totalDurationSeconds = GeneratedColumn<int>(
       'total_duration_seconds', aliasedName, true,
       type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _totalActivitySecondsMeta =
+      const VerificationMeta('totalActivitySeconds');
+  @override
+  late final GeneratedColumn<int> totalActivitySeconds = GeneratedColumn<int>(
+      'total_activity_seconds', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _totalRestSecondsMeta =
       const VerificationMeta('totalRestSeconds');
   @override
@@ -53,6 +59,7 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
         id,
         sessionDateTime,
         totalDurationSeconds,
+        totalActivitySeconds,
         totalRestSeconds,
         notes,
         createdAt,
@@ -86,6 +93,12 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
           _totalDurationSecondsMeta,
           totalDurationSeconds.isAcceptableOrUnknown(
               data['total_duration_seconds']!, _totalDurationSecondsMeta));
+    }
+    if (data.containsKey('total_activity_seconds')) {
+      context.handle(
+          _totalActivitySecondsMeta,
+          totalActivitySeconds.isAcceptableOrUnknown(
+              data['total_activity_seconds']!, _totalActivitySecondsMeta));
     }
     if (data.containsKey('total_rest_seconds')) {
       context.handle(
@@ -124,6 +137,8 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
           .read(DriftSqlType.dateTime, data['${effectivePrefix}date_time'])!,
       totalDurationSeconds: attachedDatabase.typeMapping.read(
           DriftSqlType.int, data['${effectivePrefix}total_duration_seconds']),
+      totalActivitySeconds: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}total_activity_seconds']),
       totalRestSeconds: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}total_rest_seconds']),
       notes: attachedDatabase.typeMapping
@@ -145,6 +160,7 @@ class Session extends DataClass implements Insertable<Session> {
   final String id;
   final DateTime sessionDateTime;
   final int? totalDurationSeconds;
+  final int? totalActivitySeconds;
   final int? totalRestSeconds;
   final String? notes;
   final DateTime createdAt;
@@ -153,6 +169,7 @@ class Session extends DataClass implements Insertable<Session> {
       {required this.id,
       required this.sessionDateTime,
       this.totalDurationSeconds,
+      this.totalActivitySeconds,
       this.totalRestSeconds,
       this.notes,
       required this.createdAt,
@@ -164,6 +181,9 @@ class Session extends DataClass implements Insertable<Session> {
     map['date_time'] = Variable<DateTime>(sessionDateTime);
     if (!nullToAbsent || totalDurationSeconds != null) {
       map['total_duration_seconds'] = Variable<int>(totalDurationSeconds);
+    }
+    if (!nullToAbsent || totalActivitySeconds != null) {
+      map['total_activity_seconds'] = Variable<int>(totalActivitySeconds);
     }
     if (!nullToAbsent || totalRestSeconds != null) {
       map['total_rest_seconds'] = Variable<int>(totalRestSeconds);
@@ -183,6 +203,9 @@ class Session extends DataClass implements Insertable<Session> {
       totalDurationSeconds: totalDurationSeconds == null && nullToAbsent
           ? const Value.absent()
           : Value(totalDurationSeconds),
+      totalActivitySeconds: totalActivitySeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(totalActivitySeconds),
       totalRestSeconds: totalRestSeconds == null && nullToAbsent
           ? const Value.absent()
           : Value(totalRestSeconds),
@@ -201,6 +224,8 @@ class Session extends DataClass implements Insertable<Session> {
       sessionDateTime: serializer.fromJson<DateTime>(json['sessionDateTime']),
       totalDurationSeconds:
           serializer.fromJson<int?>(json['totalDurationSeconds']),
+      totalActivitySeconds:
+          serializer.fromJson<int?>(json['totalActivitySeconds']),
       totalRestSeconds: serializer.fromJson<int?>(json['totalRestSeconds']),
       notes: serializer.fromJson<String?>(json['notes']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -214,6 +239,7 @@ class Session extends DataClass implements Insertable<Session> {
       'id': serializer.toJson<String>(id),
       'sessionDateTime': serializer.toJson<DateTime>(sessionDateTime),
       'totalDurationSeconds': serializer.toJson<int?>(totalDurationSeconds),
+      'totalActivitySeconds': serializer.toJson<int?>(totalActivitySeconds),
       'totalRestSeconds': serializer.toJson<int?>(totalRestSeconds),
       'notes': serializer.toJson<String?>(notes),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -225,6 +251,7 @@ class Session extends DataClass implements Insertable<Session> {
           {String? id,
           DateTime? sessionDateTime,
           Value<int?> totalDurationSeconds = const Value.absent(),
+          Value<int?> totalActivitySeconds = const Value.absent(),
           Value<int?> totalRestSeconds = const Value.absent(),
           Value<String?> notes = const Value.absent(),
           DateTime? createdAt,
@@ -235,6 +262,9 @@ class Session extends DataClass implements Insertable<Session> {
         totalDurationSeconds: totalDurationSeconds.present
             ? totalDurationSeconds.value
             : this.totalDurationSeconds,
+        totalActivitySeconds: totalActivitySeconds.present
+            ? totalActivitySeconds.value
+            : this.totalActivitySeconds,
         totalRestSeconds: totalRestSeconds.present
             ? totalRestSeconds.value
             : this.totalRestSeconds,
@@ -251,6 +281,9 @@ class Session extends DataClass implements Insertable<Session> {
       totalDurationSeconds: data.totalDurationSeconds.present
           ? data.totalDurationSeconds.value
           : this.totalDurationSeconds,
+      totalActivitySeconds: data.totalActivitySeconds.present
+          ? data.totalActivitySeconds.value
+          : this.totalActivitySeconds,
       totalRestSeconds: data.totalRestSeconds.present
           ? data.totalRestSeconds.value
           : this.totalRestSeconds,
@@ -266,6 +299,7 @@ class Session extends DataClass implements Insertable<Session> {
           ..write('id: $id, ')
           ..write('sessionDateTime: $sessionDateTime, ')
           ..write('totalDurationSeconds: $totalDurationSeconds, ')
+          ..write('totalActivitySeconds: $totalActivitySeconds, ')
           ..write('totalRestSeconds: $totalRestSeconds, ')
           ..write('notes: $notes, ')
           ..write('createdAt: $createdAt, ')
@@ -276,7 +310,7 @@ class Session extends DataClass implements Insertable<Session> {
 
   @override
   int get hashCode => Object.hash(id, sessionDateTime, totalDurationSeconds,
-      totalRestSeconds, notes, createdAt, updatedAt);
+      totalActivitySeconds, totalRestSeconds, notes, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -284,6 +318,7 @@ class Session extends DataClass implements Insertable<Session> {
           other.id == this.id &&
           other.sessionDateTime == this.sessionDateTime &&
           other.totalDurationSeconds == this.totalDurationSeconds &&
+          other.totalActivitySeconds == this.totalActivitySeconds &&
           other.totalRestSeconds == this.totalRestSeconds &&
           other.notes == this.notes &&
           other.createdAt == this.createdAt &&
@@ -294,6 +329,7 @@ class SessionsCompanion extends UpdateCompanion<Session> {
   final Value<String> id;
   final Value<DateTime> sessionDateTime;
   final Value<int?> totalDurationSeconds;
+  final Value<int?> totalActivitySeconds;
   final Value<int?> totalRestSeconds;
   final Value<String?> notes;
   final Value<DateTime> createdAt;
@@ -303,6 +339,7 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     this.id = const Value.absent(),
     this.sessionDateTime = const Value.absent(),
     this.totalDurationSeconds = const Value.absent(),
+    this.totalActivitySeconds = const Value.absent(),
     this.totalRestSeconds = const Value.absent(),
     this.notes = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -313,6 +350,7 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     required String id,
     required DateTime sessionDateTime,
     this.totalDurationSeconds = const Value.absent(),
+    this.totalActivitySeconds = const Value.absent(),
     this.totalRestSeconds = const Value.absent(),
     this.notes = const Value.absent(),
     required DateTime createdAt,
@@ -326,6 +364,7 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     Expression<String>? id,
     Expression<DateTime>? sessionDateTime,
     Expression<int>? totalDurationSeconds,
+    Expression<int>? totalActivitySeconds,
     Expression<int>? totalRestSeconds,
     Expression<String>? notes,
     Expression<DateTime>? createdAt,
@@ -337,6 +376,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
       if (sessionDateTime != null) 'date_time': sessionDateTime,
       if (totalDurationSeconds != null)
         'total_duration_seconds': totalDurationSeconds,
+      if (totalActivitySeconds != null)
+        'total_activity_seconds': totalActivitySeconds,
       if (totalRestSeconds != null) 'total_rest_seconds': totalRestSeconds,
       if (notes != null) 'notes': notes,
       if (createdAt != null) 'created_at': createdAt,
@@ -349,6 +390,7 @@ class SessionsCompanion extends UpdateCompanion<Session> {
       {Value<String>? id,
       Value<DateTime>? sessionDateTime,
       Value<int?>? totalDurationSeconds,
+      Value<int?>? totalActivitySeconds,
       Value<int?>? totalRestSeconds,
       Value<String?>? notes,
       Value<DateTime>? createdAt,
@@ -358,6 +400,7 @@ class SessionsCompanion extends UpdateCompanion<Session> {
       id: id ?? this.id,
       sessionDateTime: sessionDateTime ?? this.sessionDateTime,
       totalDurationSeconds: totalDurationSeconds ?? this.totalDurationSeconds,
+      totalActivitySeconds: totalActivitySeconds ?? this.totalActivitySeconds,
       totalRestSeconds: totalRestSeconds ?? this.totalRestSeconds,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
@@ -377,6 +420,9 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     }
     if (totalDurationSeconds.present) {
       map['total_duration_seconds'] = Variable<int>(totalDurationSeconds.value);
+    }
+    if (totalActivitySeconds.present) {
+      map['total_activity_seconds'] = Variable<int>(totalActivitySeconds.value);
     }
     if (totalRestSeconds.present) {
       map['total_rest_seconds'] = Variable<int>(totalRestSeconds.value);
@@ -402,6 +448,7 @@ class SessionsCompanion extends UpdateCompanion<Session> {
           ..write('id: $id, ')
           ..write('sessionDateTime: $sessionDateTime, ')
           ..write('totalDurationSeconds: $totalDurationSeconds, ')
+          ..write('totalActivitySeconds: $totalActivitySeconds, ')
           ..write('totalRestSeconds: $totalRestSeconds, ')
           ..write('notes: $notes, ')
           ..write('createdAt: $createdAt, ')
@@ -1551,6 +1598,7 @@ typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
   required String id,
   required DateTime sessionDateTime,
   Value<int?> totalDurationSeconds,
+  Value<int?> totalActivitySeconds,
   Value<int?> totalRestSeconds,
   Value<String?> notes,
   required DateTime createdAt,
@@ -1561,6 +1609,7 @@ typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<String> id,
   Value<DateTime> sessionDateTime,
   Value<int?> totalDurationSeconds,
+  Value<int?> totalActivitySeconds,
   Value<int?> totalRestSeconds,
   Value<String?> notes,
   Value<DateTime> createdAt,
@@ -1621,6 +1670,10 @@ class $$SessionsTableFilterComposer
 
   ColumnFilters<int> get totalDurationSeconds => $composableBuilder(
       column: $table.totalDurationSeconds,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get totalActivitySeconds => $composableBuilder(
+      column: $table.totalActivitySeconds,
       builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get totalRestSeconds => $composableBuilder(
@@ -1699,6 +1752,10 @@ class $$SessionsTableOrderingComposer
       column: $table.totalDurationSeconds,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get totalActivitySeconds => $composableBuilder(
+      column: $table.totalActivitySeconds,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<int> get totalRestSeconds => $composableBuilder(
       column: $table.totalRestSeconds,
       builder: (column) => ColumnOrderings(column));
@@ -1730,6 +1787,9 @@ class $$SessionsTableAnnotationComposer
 
   GeneratedColumn<int> get totalDurationSeconds => $composableBuilder(
       column: $table.totalDurationSeconds, builder: (column) => column);
+
+  GeneratedColumn<int> get totalActivitySeconds => $composableBuilder(
+      column: $table.totalActivitySeconds, builder: (column) => column);
 
   GeneratedColumn<int> get totalRestSeconds => $composableBuilder(
       column: $table.totalRestSeconds, builder: (column) => column);
@@ -1812,6 +1872,7 @@ class $$SessionsTableTableManager extends RootTableManager<
             Value<String> id = const Value.absent(),
             Value<DateTime> sessionDateTime = const Value.absent(),
             Value<int?> totalDurationSeconds = const Value.absent(),
+            Value<int?> totalActivitySeconds = const Value.absent(),
             Value<int?> totalRestSeconds = const Value.absent(),
             Value<String?> notes = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
@@ -1822,6 +1883,7 @@ class $$SessionsTableTableManager extends RootTableManager<
             id: id,
             sessionDateTime: sessionDateTime,
             totalDurationSeconds: totalDurationSeconds,
+            totalActivitySeconds: totalActivitySeconds,
             totalRestSeconds: totalRestSeconds,
             notes: notes,
             createdAt: createdAt,
@@ -1832,6 +1894,7 @@ class $$SessionsTableTableManager extends RootTableManager<
             required String id,
             required DateTime sessionDateTime,
             Value<int?> totalDurationSeconds = const Value.absent(),
+            Value<int?> totalActivitySeconds = const Value.absent(),
             Value<int?> totalRestSeconds = const Value.absent(),
             Value<String?> notes = const Value.absent(),
             required DateTime createdAt,
@@ -1842,6 +1905,7 @@ class $$SessionsTableTableManager extends RootTableManager<
             id: id,
             sessionDateTime: sessionDateTime,
             totalDurationSeconds: totalDurationSeconds,
+            totalActivitySeconds: totalActivitySeconds,
             totalRestSeconds: totalRestSeconds,
             notes: notes,
             createdAt: createdAt,

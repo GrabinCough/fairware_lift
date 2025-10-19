@@ -25,8 +25,6 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     return [];
   }
 
-  /// --- NEW ---
-  /// Sets all exercises (standalone or in supersets) to not be the current one.
   List<SessionItem> _deactivateAllExercises(List<SessionItem> currentState) {
     return currentState.map((item) {
       return switch (item) {
@@ -40,7 +38,6 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     }).toList();
   }
 
-  /// Adds a new standalone strength exercise to the current session.
   void addDxgExercise(GeneratedExerciseResult result) {
     final newExercise = SessionItem.exercise(
       id: _uuid.v4(),
@@ -54,25 +51,30 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     state = [...deactivatedState, newExercise];
   }
 
-  /// Adds a new warm-up item to the current session.
   void addWarmupItem(WarmupItem item, Map<String, String> selectedParameters) {
     final newWarmup = SessionItem.warmup(
       id: _uuid.v4(),
       item: item,
       selectedParameters: selectedParameters,
     );
+
+    // If the warmup has a time parameter, add its duration to the workout metrics.
+    final timeParam = selectedParameters['Time (minutes)'];
+    if (timeParam != null) {
+      final minutes = int.tryParse(timeParam) ?? 0;
+      if (minutes > 0) {
+        ref.read(workoutMetricsProvider.notifier).addActivityTime(seconds: minutes * 60);
+      }
+    }
+
     state = [...state, newWarmup];
   }
 
-  /// --- NEW ---
-  /// Adds an empty superset block to the session.
   void addSuperset() {
     final newSuperset = SessionItem.superset(id: _uuid.v4());
     state = [...state, newSuperset];
   }
 
-  /// --- NEW ---
-  /// Adds a selected exercise to a specific superset block.
   void addExerciseToSuperset({
     required String supersetId,
     required GeneratedExerciseResult result,
@@ -98,8 +100,6 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     }).toList();
   }
 
-  /// Sets the specified exercise as the current one for logging sets.
-  /// Can handle exercises that are standalone or inside a superset.
   void setCurrentItem({required String itemId}) {
     final newState = _deactivateAllExercises(state);
 
@@ -115,14 +115,11 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     }).toList();
   }
 
-  /// Logs a new set for the currently active exercise.
-  /// Contains special logic to only start the timer after the last exercise in a superset.
   void logSet({required double weight, required int reps}) {
     SessionSuperset? parentSuperset;
     SessionExercise? currentExercise;
     int currentExerciseIndex = -1;
 
-    // Find the current exercise and its parent superset, if any.
     for (final item in state) {
       if (item is SessionExercise && item.isCurrent) {
         currentExercise = item;
@@ -146,7 +143,6 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     final updatedExercise =
         currentExercise.copyWith(loggedSets: [...currentExercise.loggedSets, newSet]);
 
-    // Update the state with the new set.
     state = state.map((item) {
       if (item.id == currentExercise!.id) return updatedExercise;
       if (item.id == parentSuperset?.id) {
@@ -159,20 +155,16 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
       return item;
     }).toList();
 
-    // Timer logic: only start if it's a standalone exercise or the last in a superset.
     if (parentSuperset == null ||
         currentExerciseIndex == parentSuperset.exercises.length - 1) {
       ref.read(timerStateProvider.notifier).startTimer();
     }
   }
 
-  /// Deletes a top-level item (exercise, warm-up, or entire superset) from the session.
   void deleteItem(String itemId) {
     state = state.where((item) => item.id != itemId).toList();
   }
 
-  /// --- NEW ---
-  /// Deletes a single exercise from within a superset block.
   void deleteExerciseFromSuperset({
     required String supersetId,
     required String exerciseId,
@@ -188,7 +180,6 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     }).toList();
   }
 
-  /// Reorders top-level items in the current session.
   void reorderItem(int oldIndex, int newIndex) {
     final items = List<SessionItem>.from(state);
     if (newIndex > oldIndex) {

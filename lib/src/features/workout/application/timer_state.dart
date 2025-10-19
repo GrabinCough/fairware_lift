@@ -18,20 +18,27 @@ import 'package:fairware_lift/src/features/settings/application/settings_provide
 /// A data class to hold live metrics for the current workout session.
 @immutable
 class WorkoutMetrics {
+  /// Wall-clock time from start to finish.
   final int totalDurationSeconds;
+  /// Sum of all timed warm-ups and completed rest periods.
+  final int totalActivitySeconds;
+  /// Sum of all completed rest periods.
   final int totalRestSeconds;
 
   const WorkoutMetrics({
     this.totalDurationSeconds = 0,
+    this.totalActivitySeconds = 0,
     this.totalRestSeconds = 0,
   });
 
   WorkoutMetrics copyWith({
     int? totalDurationSeconds,
+    int? totalActivitySeconds,
     int? totalRestSeconds,
   }) {
     return WorkoutMetrics(
       totalDurationSeconds: totalDurationSeconds ?? this.totalDurationSeconds,
+      totalActivitySeconds: totalActivitySeconds ?? this.totalActivitySeconds,
       totalRestSeconds: totalRestSeconds ?? this.totalRestSeconds,
     );
   }
@@ -51,8 +58,11 @@ class WorkoutMetricsNotifier extends StateNotifier<WorkoutMetrics> {
     });
   }
 
-  void addRestTime(int seconds) {
-    state = state.copyWith(totalRestSeconds: state.totalRestSeconds + seconds);
+  void addActivityTime({required int seconds, bool isRest = false}) {
+    state = state.copyWith(
+      totalActivitySeconds: state.totalActivitySeconds + seconds,
+      totalRestSeconds: isRest ? state.totalRestSeconds + seconds : state.totalRestSeconds,
+    );
   }
 
   void stopWorkout() {
@@ -60,12 +70,6 @@ class WorkoutMetricsNotifier extends StateNotifier<WorkoutMetrics> {
   }
 }
 
-// --- BUG FIX ---
-// The `.autoDispose` modifier has been removed from the provider.
-// This ensures that the provider's state persists for the entire duration of
-// the workout session, even when the UI is rebuilt or navigated away from.
-// The state will now only be reset when manually invalidated (e.g., when a
-// workout is saved).
 final workoutMetricsProvider =
     StateNotifierProvider<WorkoutMetricsNotifier, WorkoutMetrics>(
   (ref) => WorkoutMetricsNotifier(),
@@ -161,7 +165,7 @@ class TimerStateNotifier extends Notifier<TimerState> {
 
   void stopTimer({bool isFinished = false}) {
     if (isFinished) {
-      ref.read(workoutMetricsProvider.notifier).addRestTime(state.initialDuration);
+      ref.read(workoutMetricsProvider.notifier).addActivityTime(seconds: state.initialDuration, isRest: true);
     }
     _timer?.cancel();
     state = const TimerState(secondsRemaining: 0, isRunning: false);
