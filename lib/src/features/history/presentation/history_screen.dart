@@ -20,6 +20,21 @@ import 'package:intl/intl.dart';
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
 
+  // --- NEW HELPER ---
+  // Formats a duration in seconds into a "Xh Ym Zs" string.
+  String _formatDuration(int totalSeconds) {
+    if (totalSeconds < 0) return "0s";
+    final duration = Duration(seconds: totalSeconds);
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+    final parts = <String>[];
+    if (hours > 0) parts.add('${hours}h');
+    if (minutes > 0) parts.add('${minutes}m');
+    if (seconds > 0 || parts.isEmpty) parts.add('${seconds}s');
+    return parts.join(' ');
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final historyAsync = ref.watch(workoutHistoryProvider);
@@ -110,6 +125,17 @@ class HistoryScreen extends ConsumerWidget {
         groupBy(workout.sets, (setWithExercise) => setWithExercise.exercise);
     final totalItems = setsByExercise.keys.length + workout.warmups.length;
 
+    // --- NEW ---
+    // Build the subtitle string with the new timing data, if available.
+    final subtitleParts = <String>[
+      '$totalItems items',
+      '${workout.sets.length} total sets',
+    ];
+    if (workout.session.totalDurationSeconds != null) {
+      subtitleParts.add(_formatDuration(workout.session.totalDurationSeconds!));
+    }
+    final subtitle = subtitleParts.join('  •  ');
+
     return Card(
       color: AppTheme.colors.surface,
       margin: const EdgeInsets.symmetric(vertical: 4.0),
@@ -122,11 +148,20 @@ class HistoryScreen extends ConsumerWidget {
           style: AppTheme.typography.title.copyWith(fontSize: 18),
         ),
         subtitle: Text(
-          '$totalItems items, ${workout.sets.length} total sets',
+          subtitle,
           style: AppTheme.typography.caption,
         ),
         childrenPadding: const EdgeInsets.all(16.0),
         children: [
+          // --- NEW ---
+          // Add a summary row for timing data inside the expanded card.
+          if (workout.session.totalDurationSeconds != null) ...[
+            _buildTimingDetails(
+              totalDuration: workout.session.totalDurationSeconds!,
+              totalRest: workout.session.totalRestSeconds ?? 0,
+            ),
+            const Divider(height: 24),
+          ],
           ...workout.warmups.map((warmup) => _buildWarmupSummary(warmup)),
           ...setsByExercise.entries.map((entry) {
             final exercise = entry.key;
@@ -138,9 +173,34 @@ class HistoryScreen extends ConsumerWidget {
     );
   }
 
+  /// --- NEW WIDGET BUILDER ---
+  /// Creates the timing details row for the expanded history card.
+  Widget _buildTimingDetails({required int totalDuration, required int totalRest}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Column(
+            children: [
+              Text('Total Time', style: AppTheme.typography.caption),
+              const SizedBox(height: 4),
+              Text(_formatDuration(totalDuration), style: AppTheme.typography.body),
+            ],
+          ),
+          Column(
+            children: [
+              Text('Total Rest', style: AppTheme.typography.caption),
+              const SizedBox(height: 4),
+              Text(_formatDuration(totalRest), style: AppTheme.typography.body),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildWarmupSummary(SavedWarmup warmup) {
-    // --- BUG FIX ---
-    // The subtitle now correctly formats each parameter as "Key: Value".
     final subtitle = warmup.parameters.entries
         .map((e) => '${e.key}: ${e.value}')
         .join('  •  ');

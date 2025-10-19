@@ -12,6 +12,8 @@ import 'package:fairware_lift/src/features/dxg/application/dxg_state.dart';
 import 'package:fairware_lift/src/features/dxg/domain/warmup_item.dart';
 import 'package:fairware_lift/src/features/dxg/presentation/dxg_exercise_picker_screen.dart';
 import 'package:fairware_lift/src/features/workout/application/session_state.dart';
+// --- NEW IMPORT ---
+import 'package:fairware_lift/src/features/workout/application/timer_state.dart';
 import 'package:fairware_lift/src/features/workout/domain/session_item.dart';
 import 'package:fairware_lift/src/features/workout/presentation/widgets/exercise_list_item.dart';
 import 'package:fairware_lift/src/features/workout/presentation/widgets/warmup_list_item.dart';
@@ -22,8 +24,34 @@ import 'package:fairware_lift/src/features/workout/presentation/workout_summary_
 // --- SESSION SCREEN WIDGET ---------------------------------------------------
 // -----------------------------------------------------------------------------
 
-class SessionScreen extends ConsumerWidget {
+// --- REFACTORED to ConsumerStatefulWidget ---
+// This allows us to use initState and dispose to manage the workout timer.
+class SessionScreen extends ConsumerStatefulWidget {
   const SessionScreen({super.key});
+
+  @override
+  ConsumerState<SessionScreen> createState() => _SessionScreenState();
+}
+
+class _SessionScreenState extends ConsumerState<SessionScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // --- NEW ---
+    // Start the workout timer as soon as the screen is initialized.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(workoutMetricsProvider.notifier).startWorkout();
+    });
+  }
+
+  @override
+  void dispose() {
+    // --- NEW ---
+    // Stop the workout timer when the screen is disposed.
+    // This is a safeguard, the main stop is in the Finish button.
+    ref.read(workoutMetricsProvider.notifier).stopWorkout();
+    super.dispose();
+  }
 
   void _showExerciseInfo(
     BuildContext context, {
@@ -72,7 +100,7 @@ class SessionScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final sessionItems = ref.watch(sessionStateProvider);
 
     return Scaffold(
@@ -83,6 +111,9 @@ class SessionScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () {
+              // --- NEW ---
+              // Stop the workout timer before navigating to the summary.
+              ref.read(workoutMetricsProvider.notifier).stopWorkout();
               final completedWorkout = ref.read(sessionStateProvider);
               Navigator.of(context).push(
                 MaterialPageRoute(
@@ -112,8 +143,6 @@ class SessionScreen extends ConsumerWidget {
                     .reorderItem(oldIndex, newIndex);
               },
               children: sessionItems.map((item) {
-                // --- REFACTORED ---
-                // The switch statement now handles all three types of SessionItem.
                 return switch (item) {
                   SessionExercise e => Dismissible(
                       key: ValueKey(item.id),
@@ -146,8 +175,6 @@ class SessionScreen extends ConsumerWidget {
               }).toList(),
             ),
           const SizedBox(height: 16),
-          // --- NEW ---
-          // A Row now holds both "Add Exercise" and "Add Superset" buttons.
           Row(
             children: [
               Expanded(
@@ -226,10 +253,6 @@ class SessionScreen extends ConsumerWidget {
     );
   }
 }
-
-// -----------------------------------------------------------------------------
-// --- NEW SUPERSET LIST ITEM WIDGET -------------------------------------------
-// -----------------------------------------------------------------------------
 
 class _SupersetListItem extends ConsumerWidget {
   final SessionSuperset superset;

@@ -1,3 +1,4 @@
+// ----- lib/src/core/theme/data/local/database.dart -----
 // lib/src/core/theme/data/local/database.dart
 
 // -----------------------------------------------------------------------------
@@ -47,6 +48,11 @@ class SetEntryWithExercise {
 class Sessions extends Table {
   TextColumn get id => text()();
   DateTimeColumn get sessionDateTime => dateTime().named('date_time')();
+  // --- NEW COLUMNS ---
+  IntColumn get totalDurationSeconds =>
+      integer().named('total_duration_seconds').nullable()();
+  IntColumn get totalRestSeconds =>
+      integer().named('total_rest_seconds').nullable()();
   TextColumn get notes => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
@@ -107,17 +113,17 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration {
     return MigrationStrategy(
+      onCreate: (m) => m.createAll(),
       onUpgrade: (migrator, from, to) async {
-        await migrator.deleteTable('sessions');
-        await migrator.deleteTable('set_entries');
-        await migrator.deleteTable('exercise_instances');
-        await migrator.deleteTable('saved_warmups');
-        await migrator.createAll();
+        if (from < 5) {
+          await migrator.addColumn(sessions, sessions.totalDurationSeconds);
+          await migrator.addColumn(sessions, sessions.totalRestSeconds);
+        }
       },
     );
   }

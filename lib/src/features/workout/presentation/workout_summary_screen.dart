@@ -12,6 +12,7 @@ import 'package:uuid/uuid.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
 import 'package:fairware_lift/src/core/theme/data/local/database.dart';
 import 'package:fairware_lift/src/features/workout/application/session_state.dart';
+import 'package:fairware_lift/src/features/workout/application/timer_state.dart';
 import 'package:fairware_lift/src/features/workout/domain/session_item.dart';
 
 // -----------------------------------------------------------------------------
@@ -26,8 +27,24 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     required this.completedItems,
   });
 
+  // --- NEW HELPER ---
+  // Formats a duration in seconds into a "Xh Ym Zs" string.
+  String _formatDuration(int totalSeconds) {
+    if (totalSeconds < 0) return "0s";
+    final duration = Duration(seconds: totalSeconds);
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+    final parts = <String>[];
+    if (hours > 0) parts.add('${hours}h');
+    if (minutes > 0) parts.add('${minutes}m');
+    if (seconds > 0 || parts.isEmpty) parts.add('${seconds}s');
+    return parts.join(' ');
+  }
+
   Future<void> _saveWorkout(BuildContext context, WidgetRef ref) async {
     final db = ref.read(databaseProvider);
+    final metrics = ref.read(workoutMetricsProvider);
     const uuid = Uuid();
     final now = DateTime.now();
     final sessionId = uuid.v4();
@@ -35,6 +52,8 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     final sessionCompanion = SessionsCompanion(
       id: drift.Value(sessionId),
       sessionDateTime: drift.Value(now),
+      totalDurationSeconds: drift.Value(metrics.totalDurationSeconds),
+      totalRestSeconds: drift.Value(metrics.totalRestSeconds),
       createdAt: drift.Value(now),
       updatedAt: drift.Value(now),
     );
@@ -43,8 +62,6 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     final exerciseInstancesToSave = <ExerciseInstancesCompanion>[];
     final savedWarmupsCompanion = <SavedWarmupsCompanion>[];
 
-    // --- REFACTORED ---
-    // This loop now handles all three SessionItem types, including SessionSuperset.
     for (final item in completedItems) {
       switch (item) {
         case SessionExercise e when e.loggedSets.isNotEmpty:
@@ -66,7 +83,7 @@ class WorkoutSummaryScreen extends ConsumerWidget {
               _processExerciseForSaving(exerciseInSuperset, sessionId, now, exerciseInstancesToSave, setEntriesCompanion);
             }
           }
-        case _: // Handles empty exercises or other types
+        case _:
       }
     }
 
@@ -102,12 +119,11 @@ class WorkoutSummaryScreen extends ConsumerWidget {
           )
           .closed;
       ref.invalidate(sessionStateProvider);
+      ref.invalidate(workoutMetricsProvider);
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
   }
 
-  /// --- NEW HELPER METHOD ---
-  /// Extracts the logic for processing a SessionExercise to avoid code duplication.
   void _processExerciseForSaving(
     SessionExercise e,
     String sessionId,
@@ -144,6 +160,10 @@ class WorkoutSummaryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // --- NEW ---
+    // Read the metrics to display them in the UI.
+    final metrics = ref.watch(workoutMetricsProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Workout Summary'),
@@ -154,23 +174,68 @@ class WorkoutSummaryScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: ListView.builder(
+      // --- REFACTORED ---
+      // The body is now a ListView that includes the new metrics card at the top.
+      body: ListView(
         padding: const EdgeInsets.all(8.0),
-        itemCount: completedItems.length,
-        itemBuilder: (context, index) {
-          final item = completedItems[index];
-          // --- REFACTORED ---
-          // The switch statement now handles all three SessionItem types.
-          return switch (item) {
-            SessionExercise e when e.loggedSets.isNotEmpty =>
-              _buildExerciseSummary(e),
-            SessionWarmupItem w => _buildWarmupSummary(w),
-            SessionSuperset s when s.exercises.any((e) => e.loggedSets.isNotEmpty) =>
-              _buildSupersetSummary(s),
-            _ => const SizedBox.shrink(),
-          };
-        },
+        children: [
+          _buildMetricsCard(metrics),
+          ...completedItems.map((item) {
+            return switch (item) {
+              SessionExercise e when e.loggedSets.isNotEmpty =>
+                _buildExerciseSummary(e),
+              SessionWarmupItem w => _buildWarmupSummary(w),
+              SessionSuperset s when s.exercises.any((e) => e.loggedSets.isNotEmpty) =>
+                _buildSupersetSummary(s),
+              _ => const SizedBox.shrink(),
+            };
+          }),
+        ],
       ),
+    );
+  }
+
+  /// --- NEW WIDGET BUILDER ---
+  /// Creates a card to display the workout timing metrics.
+  Widget _buildMetricsCard(WorkoutMetrics metrics) {
+    return Card(
+      color: AppTheme.colors.surface,
+      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.sizing.cardRadius),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildMetricItem(
+              icon: Icons.timer_outlined,
+              label: 'Total Time',
+              value: _formatDuration(metrics.totalDurationSeconds),
+            ),
+            _buildMetricItem(
+              icon: Icons.pause_circle_outline,
+              label: 'Total Rest',
+              value: _formatDuration(metrics.totalRestSeconds),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// --- NEW HELPER ---
+  /// Builds a single item for the metrics card.
+  Widget _buildMetricItem({required IconData icon, required String label, required String value}) {
+    return Column(
+      children: [
+        Icon(icon, color: AppTheme.colors.textMuted, size: 28),
+        const SizedBox(height: 8),
+        Text(label, style: AppTheme.typography.caption),
+        const SizedBox(height: 4),
+        Text(value, style: AppTheme.typography.title.copyWith(fontSize: 18)),
+      ],
     );
   }
 
@@ -242,8 +307,6 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     );
   }
 
-  /// --- NEW WIDGET BUILDER ---
-  /// Renders a superset block in the summary.
   Widget _buildSupersetSummary(SessionSuperset superset) {
     return Card(
       color: AppTheme.colors.surface,

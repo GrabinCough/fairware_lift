@@ -19,6 +19,18 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
   late final GeneratedColumn<DateTime> sessionDateTime =
       GeneratedColumn<DateTime>('date_time', aliasedName, false,
           type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _totalDurationSecondsMeta =
+      const VerificationMeta('totalDurationSeconds');
+  @override
+  late final GeneratedColumn<int> totalDurationSeconds = GeneratedColumn<int>(
+      'total_duration_seconds', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _totalRestSecondsMeta =
+      const VerificationMeta('totalRestSeconds');
+  @override
+  late final GeneratedColumn<int> totalRestSeconds = GeneratedColumn<int>(
+      'total_rest_seconds', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _notesMeta = const VerificationMeta('notes');
   @override
   late final GeneratedColumn<String> notes = GeneratedColumn<String>(
@@ -37,8 +49,15 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
       'updated_at', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, sessionDateTime, notes, createdAt, updatedAt];
+  List<GeneratedColumn> get $columns => [
+        id,
+        sessionDateTime,
+        totalDurationSeconds,
+        totalRestSeconds,
+        notes,
+        createdAt,
+        updatedAt
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -61,6 +80,18 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
               data['date_time']!, _sessionDateTimeMeta));
     } else if (isInserting) {
       context.missing(_sessionDateTimeMeta);
+    }
+    if (data.containsKey('total_duration_seconds')) {
+      context.handle(
+          _totalDurationSecondsMeta,
+          totalDurationSeconds.isAcceptableOrUnknown(
+              data['total_duration_seconds']!, _totalDurationSecondsMeta));
+    }
+    if (data.containsKey('total_rest_seconds')) {
+      context.handle(
+          _totalRestSecondsMeta,
+          totalRestSeconds.isAcceptableOrUnknown(
+              data['total_rest_seconds']!, _totalRestSecondsMeta));
     }
     if (data.containsKey('notes')) {
       context.handle(
@@ -91,6 +122,10 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       sessionDateTime: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}date_time'])!,
+      totalDurationSeconds: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}total_duration_seconds']),
+      totalRestSeconds: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}total_rest_seconds']),
       notes: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}notes']),
       createdAt: attachedDatabase.typeMapping
@@ -109,12 +144,16 @@ class $SessionsTable extends Sessions with TableInfo<$SessionsTable, Session> {
 class Session extends DataClass implements Insertable<Session> {
   final String id;
   final DateTime sessionDateTime;
+  final int? totalDurationSeconds;
+  final int? totalRestSeconds;
   final String? notes;
   final DateTime createdAt;
   final DateTime updatedAt;
   const Session(
       {required this.id,
       required this.sessionDateTime,
+      this.totalDurationSeconds,
+      this.totalRestSeconds,
       this.notes,
       required this.createdAt,
       required this.updatedAt});
@@ -123,6 +162,12 @@ class Session extends DataClass implements Insertable<Session> {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['date_time'] = Variable<DateTime>(sessionDateTime);
+    if (!nullToAbsent || totalDurationSeconds != null) {
+      map['total_duration_seconds'] = Variable<int>(totalDurationSeconds);
+    }
+    if (!nullToAbsent || totalRestSeconds != null) {
+      map['total_rest_seconds'] = Variable<int>(totalRestSeconds);
+    }
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
     }
@@ -135,6 +180,12 @@ class Session extends DataClass implements Insertable<Session> {
     return SessionsCompanion(
       id: Value(id),
       sessionDateTime: Value(sessionDateTime),
+      totalDurationSeconds: totalDurationSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(totalDurationSeconds),
+      totalRestSeconds: totalRestSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(totalRestSeconds),
       notes:
           notes == null && nullToAbsent ? const Value.absent() : Value(notes),
       createdAt: Value(createdAt),
@@ -148,6 +199,9 @@ class Session extends DataClass implements Insertable<Session> {
     return Session(
       id: serializer.fromJson<String>(json['id']),
       sessionDateTime: serializer.fromJson<DateTime>(json['sessionDateTime']),
+      totalDurationSeconds:
+          serializer.fromJson<int?>(json['totalDurationSeconds']),
+      totalRestSeconds: serializer.fromJson<int?>(json['totalRestSeconds']),
       notes: serializer.fromJson<String?>(json['notes']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -159,6 +213,8 @@ class Session extends DataClass implements Insertable<Session> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'sessionDateTime': serializer.toJson<DateTime>(sessionDateTime),
+      'totalDurationSeconds': serializer.toJson<int?>(totalDurationSeconds),
+      'totalRestSeconds': serializer.toJson<int?>(totalRestSeconds),
       'notes': serializer.toJson<String?>(notes),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -168,12 +224,20 @@ class Session extends DataClass implements Insertable<Session> {
   Session copyWith(
           {String? id,
           DateTime? sessionDateTime,
+          Value<int?> totalDurationSeconds = const Value.absent(),
+          Value<int?> totalRestSeconds = const Value.absent(),
           Value<String?> notes = const Value.absent(),
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       Session(
         id: id ?? this.id,
         sessionDateTime: sessionDateTime ?? this.sessionDateTime,
+        totalDurationSeconds: totalDurationSeconds.present
+            ? totalDurationSeconds.value
+            : this.totalDurationSeconds,
+        totalRestSeconds: totalRestSeconds.present
+            ? totalRestSeconds.value
+            : this.totalRestSeconds,
         notes: notes.present ? notes.value : this.notes,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
@@ -184,6 +248,12 @@ class Session extends DataClass implements Insertable<Session> {
       sessionDateTime: data.sessionDateTime.present
           ? data.sessionDateTime.value
           : this.sessionDateTime,
+      totalDurationSeconds: data.totalDurationSeconds.present
+          ? data.totalDurationSeconds.value
+          : this.totalDurationSeconds,
+      totalRestSeconds: data.totalRestSeconds.present
+          ? data.totalRestSeconds.value
+          : this.totalRestSeconds,
       notes: data.notes.present ? data.notes.value : this.notes,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -195,6 +265,8 @@ class Session extends DataClass implements Insertable<Session> {
     return (StringBuffer('Session(')
           ..write('id: $id, ')
           ..write('sessionDateTime: $sessionDateTime, ')
+          ..write('totalDurationSeconds: $totalDurationSeconds, ')
+          ..write('totalRestSeconds: $totalRestSeconds, ')
           ..write('notes: $notes, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -203,14 +275,16 @@ class Session extends DataClass implements Insertable<Session> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, sessionDateTime, notes, createdAt, updatedAt);
+  int get hashCode => Object.hash(id, sessionDateTime, totalDurationSeconds,
+      totalRestSeconds, notes, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Session &&
           other.id == this.id &&
           other.sessionDateTime == this.sessionDateTime &&
+          other.totalDurationSeconds == this.totalDurationSeconds &&
+          other.totalRestSeconds == this.totalRestSeconds &&
           other.notes == this.notes &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -219,6 +293,8 @@ class Session extends DataClass implements Insertable<Session> {
 class SessionsCompanion extends UpdateCompanion<Session> {
   final Value<String> id;
   final Value<DateTime> sessionDateTime;
+  final Value<int?> totalDurationSeconds;
+  final Value<int?> totalRestSeconds;
   final Value<String?> notes;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -226,6 +302,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
   const SessionsCompanion({
     this.id = const Value.absent(),
     this.sessionDateTime = const Value.absent(),
+    this.totalDurationSeconds = const Value.absent(),
+    this.totalRestSeconds = const Value.absent(),
     this.notes = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -234,6 +312,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
   SessionsCompanion.insert({
     required String id,
     required DateTime sessionDateTime,
+    this.totalDurationSeconds = const Value.absent(),
+    this.totalRestSeconds = const Value.absent(),
     this.notes = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -245,6 +325,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
   static Insertable<Session> custom({
     Expression<String>? id,
     Expression<DateTime>? sessionDateTime,
+    Expression<int>? totalDurationSeconds,
+    Expression<int>? totalRestSeconds,
     Expression<String>? notes,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -253,6 +335,9 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (sessionDateTime != null) 'date_time': sessionDateTime,
+      if (totalDurationSeconds != null)
+        'total_duration_seconds': totalDurationSeconds,
+      if (totalRestSeconds != null) 'total_rest_seconds': totalRestSeconds,
       if (notes != null) 'notes': notes,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -263,6 +348,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
   SessionsCompanion copyWith(
       {Value<String>? id,
       Value<DateTime>? sessionDateTime,
+      Value<int?>? totalDurationSeconds,
+      Value<int?>? totalRestSeconds,
       Value<String?>? notes,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
@@ -270,6 +357,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     return SessionsCompanion(
       id: id ?? this.id,
       sessionDateTime: sessionDateTime ?? this.sessionDateTime,
+      totalDurationSeconds: totalDurationSeconds ?? this.totalDurationSeconds,
+      totalRestSeconds: totalRestSeconds ?? this.totalRestSeconds,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -285,6 +374,12 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     }
     if (sessionDateTime.present) {
       map['date_time'] = Variable<DateTime>(sessionDateTime.value);
+    }
+    if (totalDurationSeconds.present) {
+      map['total_duration_seconds'] = Variable<int>(totalDurationSeconds.value);
+    }
+    if (totalRestSeconds.present) {
+      map['total_rest_seconds'] = Variable<int>(totalRestSeconds.value);
     }
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
@@ -306,6 +401,8 @@ class SessionsCompanion extends UpdateCompanion<Session> {
     return (StringBuffer('SessionsCompanion(')
           ..write('id: $id, ')
           ..write('sessionDateTime: $sessionDateTime, ')
+          ..write('totalDurationSeconds: $totalDurationSeconds, ')
+          ..write('totalRestSeconds: $totalRestSeconds, ')
           ..write('notes: $notes, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -1453,6 +1550,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
   required String id,
   required DateTime sessionDateTime,
+  Value<int?> totalDurationSeconds,
+  Value<int?> totalRestSeconds,
   Value<String?> notes,
   required DateTime createdAt,
   required DateTime updatedAt,
@@ -1461,6 +1560,8 @@ typedef $$SessionsTableCreateCompanionBuilder = SessionsCompanion Function({
 typedef $$SessionsTableUpdateCompanionBuilder = SessionsCompanion Function({
   Value<String> id,
   Value<DateTime> sessionDateTime,
+  Value<int?> totalDurationSeconds,
+  Value<int?> totalRestSeconds,
   Value<String?> notes,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
@@ -1516,6 +1617,14 @@ class $$SessionsTableFilterComposer
 
   ColumnFilters<DateTime> get sessionDateTime => $composableBuilder(
       column: $table.sessionDateTime,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get totalDurationSeconds => $composableBuilder(
+      column: $table.totalDurationSeconds,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get totalRestSeconds => $composableBuilder(
+      column: $table.totalRestSeconds,
       builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get notes => $composableBuilder(
@@ -1586,6 +1695,14 @@ class $$SessionsTableOrderingComposer
       column: $table.sessionDateTime,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get totalDurationSeconds => $composableBuilder(
+      column: $table.totalDurationSeconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get totalRestSeconds => $composableBuilder(
+      column: $table.totalRestSeconds,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<String> get notes => $composableBuilder(
       column: $table.notes, builder: (column) => ColumnOrderings(column));
 
@@ -1610,6 +1727,12 @@ class $$SessionsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get sessionDateTime => $composableBuilder(
       column: $table.sessionDateTime, builder: (column) => column);
+
+  GeneratedColumn<int> get totalDurationSeconds => $composableBuilder(
+      column: $table.totalDurationSeconds, builder: (column) => column);
+
+  GeneratedColumn<int> get totalRestSeconds => $composableBuilder(
+      column: $table.totalRestSeconds, builder: (column) => column);
 
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
@@ -1688,6 +1811,8 @@ class $$SessionsTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
             Value<DateTime> sessionDateTime = const Value.absent(),
+            Value<int?> totalDurationSeconds = const Value.absent(),
+            Value<int?> totalRestSeconds = const Value.absent(),
             Value<String?> notes = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
@@ -1696,6 +1821,8 @@ class $$SessionsTableTableManager extends RootTableManager<
               SessionsCompanion(
             id: id,
             sessionDateTime: sessionDateTime,
+            totalDurationSeconds: totalDurationSeconds,
+            totalRestSeconds: totalRestSeconds,
             notes: notes,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -1704,6 +1831,8 @@ class $$SessionsTableTableManager extends RootTableManager<
           createCompanionCallback: ({
             required String id,
             required DateTime sessionDateTime,
+            Value<int?> totalDurationSeconds = const Value.absent(),
+            Value<int?> totalRestSeconds = const Value.absent(),
             Value<String?> notes = const Value.absent(),
             required DateTime createdAt,
             required DateTime updatedAt,
@@ -1712,6 +1841,8 @@ class $$SessionsTableTableManager extends RootTableManager<
               SessionsCompanion.insert(
             id: id,
             sessionDateTime: sessionDateTime,
+            totalDurationSeconds: totalDurationSeconds,
+            totalRestSeconds: totalRestSeconds,
             notes: notes,
             createdAt: createdAt,
             updatedAt: updatedAt,

@@ -61,9 +61,15 @@ class DXGExercisePickerScreen extends ConsumerWidget {
           ),
         ),
       ),
+      // --- BUG FIX ---
+      // The body is now wrapped in a `switch` expression that correctly returns
+      // the view based on the picker mode. This ensures the `_buildPrepView` is
+      // always rendered when the "Prep" mode is selected.
       body: SafeArea(
-        child:
-            pickerMode == PickerMode.strength ? _buildStrengthView(context, ref) : _buildPrepView(context, ref),
+        child: switch (pickerMode) {
+          PickerMode.strength => _buildStrengthView(context, ref),
+          PickerMode.prep => _buildPrepView(context, ref),
+        },
       ),
     );
   }
@@ -86,8 +92,6 @@ class DXGExercisePickerScreen extends ConsumerWidget {
             _buildDiscriminatorChips(ref, 'Unilateral', 'unilateral', dxgState),
             _buildDiscriminatorChips(ref, 'Orientation', 'orientation', dxgState),
             _buildDiscriminatorChips(ref, 'Attachment', 'attachment', dxgState),
-            // --- NEW ---
-            // Added the new discriminator for cable height.
             _buildDiscriminatorChips(ref, 'Cable Height', 'cable_height', dxgState),
             _buildDiscriminatorChips(ref, 'Grip', 'grip', dxgState),
             if (dxgState.canonicalExercise != null)
@@ -133,7 +137,6 @@ class DXGExercisePickerScreen extends ConsumerWidget {
     return showDialog<Map<String, String>>(
       context: context,
       builder: (context) {
-        // Use a map to hold the selections, initialized with the first option.
         final selections = <String, String>{};
         for (var p in item.parameters) {
           if (p.options.isNotEmpty) {
@@ -198,7 +201,6 @@ class DXGExercisePickerScreen extends ConsumerWidget {
   }
 
   Widget _buildFamilyChips(WidgetRef ref, DXGState dxgState) {
-    // Sort families alphabetically by name for consistent ordering.
     final sortedFamilies = List.from(dxgState.allFamilies)
       ..sort((a, b) => a.name.compareTo(b.name));
 
