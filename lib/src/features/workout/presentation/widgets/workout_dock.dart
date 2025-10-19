@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/presentation/widgets/workout_dock.dart -----
 // lib/src/features/workout/presentation/widgets/workout_dock.dart
 
 // -----------------------------------------------------------------------------
@@ -116,7 +117,16 @@ class WorkoutDock extends ConsumerWidget {
         : 0.0;
 
     return GestureDetector(
-      onTap: () => ref.read(timerStateProvider.notifier).startTimer(duration: presetDuration),
+      // --- FIX ---
+      // The onTap behavior is now a toggle. If the tapped timer is already
+      // active, it stops it. Otherwise, it starts it.
+      onTap: () {
+        if (isThisTimerActive) {
+          ref.read(timerStateProvider.notifier).stopTimer();
+        } else {
+          ref.read(timerStateProvider.notifier).startTimer(duration: presetDuration);
+        }
+      },
       onLongPress: () => _showKeypadPicker(context, ref, timerIndex),
       child: Container(
         width: 50,

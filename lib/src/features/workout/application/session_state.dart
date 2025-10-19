@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/application/session_state.dart -----
 // lib/src/features/workout/application/session_state.dart
 
 // -----------------------------------------------------------------------------
@@ -54,7 +55,9 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
 
   /// Sets the specified exercise as the current one for logging sets.
   void setCurrentItem(String itemId) {
-    ref.read(timerStateProvider.notifier).stopTimer();
+    // --- FIX ---
+    // The line that automatically stopped the timer has been removed.
+    // The timer will now continue to run when the user switches between exercises.
     final newState = [
       for (final item in state)
         if (item is SessionExercise)
