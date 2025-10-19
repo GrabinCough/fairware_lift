@@ -31,6 +31,8 @@ mixin _$SessionItem {
     required TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)
         warmup,
+    required TResult Function(String id, List<SessionExercise> exercises)
+        superset,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -47,6 +49,7 @@ mixin _$SessionItem {
     TResult? Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
         warmup,
+    TResult? Function(String id, List<SessionExercise> exercises)? superset,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -63,6 +66,7 @@ mixin _$SessionItem {
     TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
         warmup,
+    TResult Function(String id, List<SessionExercise> exercises)? superset,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -70,18 +74,21 @@ mixin _$SessionItem {
   TResult map<TResult extends Object?>({
     required TResult Function(SessionExercise value) exercise,
     required TResult Function(SessionWarmupItem value) warmup,
+    required TResult Function(SessionSuperset value) superset,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SessionExercise value)? exercise,
     TResult? Function(SessionWarmupItem value)? warmup,
+    TResult? Function(SessionSuperset value)? superset,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SessionExercise value)? exercise,
     TResult Function(SessionWarmupItem value)? warmup,
+    TResult Function(SessionSuperset value)? superset,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -301,6 +308,8 @@ class _$SessionExerciseImpl implements SessionExercise {
     required TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)
         warmup,
+    required TResult Function(String id, List<SessionExercise> exercises)
+        superset,
   }) {
     return exercise(
         id, slug, displayName, discriminators, target, loggedSets, isCurrent);
@@ -321,6 +330,7 @@ class _$SessionExerciseImpl implements SessionExercise {
     TResult? Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
         warmup,
+    TResult? Function(String id, List<SessionExercise> exercises)? superset,
   }) {
     return exercise?.call(
         id, slug, displayName, discriminators, target, loggedSets, isCurrent);
@@ -341,6 +351,7 @@ class _$SessionExerciseImpl implements SessionExercise {
     TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
         warmup,
+    TResult Function(String id, List<SessionExercise> exercises)? superset,
     required TResult orElse(),
   }) {
     if (exercise != null) {
@@ -355,6 +366,7 @@ class _$SessionExerciseImpl implements SessionExercise {
   TResult map<TResult extends Object?>({
     required TResult Function(SessionExercise value) exercise,
     required TResult Function(SessionWarmupItem value) warmup,
+    required TResult Function(SessionSuperset value) superset,
   }) {
     return exercise(this);
   }
@@ -364,6 +376,7 @@ class _$SessionExerciseImpl implements SessionExercise {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SessionExercise value)? exercise,
     TResult? Function(SessionWarmupItem value)? warmup,
+    TResult? Function(SessionSuperset value)? superset,
   }) {
     return exercise?.call(this);
   }
@@ -373,6 +386,7 @@ class _$SessionExerciseImpl implements SessionExercise {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SessionExercise value)? exercise,
     TResult Function(SessionWarmupItem value)? warmup,
+    TResult Function(SessionSuperset value)? superset,
     required TResult orElse(),
   }) {
     if (exercise != null) {
@@ -480,11 +494,7 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
   final String id;
   @override
   final WarmupItem item;
-// --- NEW ---
-// Stores the user's selections, e.g., {'Grip': 'Wide'}
   final Map<String, String> _selectedParameters;
-// --- NEW ---
-// Stores the user's selections, e.g., {'Grip': 'Wide'}
   @override
   Map<String, String> get selectedParameters {
     if (_selectedParameters is EqualUnmodifiableMapView)
@@ -537,6 +547,8 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
     required TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)
         warmup,
+    required TResult Function(String id, List<SessionExercise> exercises)
+        superset,
   }) {
     return warmup(id, item, selectedParameters);
   }
@@ -556,6 +568,7 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
     TResult? Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
         warmup,
+    TResult? Function(String id, List<SessionExercise> exercises)? superset,
   }) {
     return warmup?.call(id, item, selectedParameters);
   }
@@ -575,6 +588,7 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
     TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
         warmup,
+    TResult Function(String id, List<SessionExercise> exercises)? superset,
     required TResult orElse(),
   }) {
     if (warmup != null) {
@@ -588,6 +602,7 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
   TResult map<TResult extends Object?>({
     required TResult Function(SessionExercise value) exercise,
     required TResult Function(SessionWarmupItem value) warmup,
+    required TResult Function(SessionSuperset value) superset,
   }) {
     return warmup(this);
   }
@@ -597,6 +612,7 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SessionExercise value)? exercise,
     TResult? Function(SessionWarmupItem value)? warmup,
+    TResult? Function(SessionSuperset value)? superset,
   }) {
     return warmup?.call(this);
   }
@@ -606,6 +622,7 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SessionExercise value)? exercise,
     TResult Function(SessionWarmupItem value)? warmup,
+    TResult Function(SessionSuperset value)? superset,
     required TResult orElse(),
   }) {
     if (warmup != null) {
@@ -624,8 +641,7 @@ abstract class SessionWarmupItem implements SessionItem {
 
   @override
   String get id;
-  WarmupItem get item; // --- NEW ---
-// Stores the user's selections, e.g., {'Grip': 'Wide'}
+  WarmupItem get item;
   Map<String, String> get selectedParameters;
 
   /// Create a copy of SessionItem
@@ -633,5 +649,208 @@ abstract class SessionWarmupItem implements SessionItem {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$SessionWarmupItemImplCopyWith<_$SessionWarmupItemImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$SessionSupersetImplCopyWith<$Res>
+    implements $SessionItemCopyWith<$Res> {
+  factory _$$SessionSupersetImplCopyWith(_$SessionSupersetImpl value,
+          $Res Function(_$SessionSupersetImpl) then) =
+      __$$SessionSupersetImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String id, List<SessionExercise> exercises});
+}
+
+/// @nodoc
+class __$$SessionSupersetImplCopyWithImpl<$Res>
+    extends _$SessionItemCopyWithImpl<$Res, _$SessionSupersetImpl>
+    implements _$$SessionSupersetImplCopyWith<$Res> {
+  __$$SessionSupersetImplCopyWithImpl(
+      _$SessionSupersetImpl _value, $Res Function(_$SessionSupersetImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of SessionItem
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? exercises = null,
+  }) {
+    return _then(_$SessionSupersetImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      exercises: null == exercises
+          ? _value._exercises
+          : exercises // ignore: cast_nullable_to_non_nullable
+              as List<SessionExercise>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$SessionSupersetImpl implements SessionSuperset {
+  const _$SessionSupersetImpl(
+      {required this.id, final List<SessionExercise> exercises = const []})
+      : _exercises = exercises;
+
+  @override
+  final String id;
+  final List<SessionExercise> _exercises;
+  @override
+  @JsonKey()
+  List<SessionExercise> get exercises {
+    if (_exercises is EqualUnmodifiableListView) return _exercises;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_exercises);
+  }
+
+  @override
+  String toString() {
+    return 'SessionItem.superset(id: $id, exercises: $exercises)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SessionSupersetImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            const DeepCollectionEquality()
+                .equals(other._exercises, _exercises));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, id, const DeepCollectionEquality().hash(_exercises));
+
+  /// Create a copy of SessionItem
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SessionSupersetImplCopyWith<_$SessionSupersetImpl> get copyWith =>
+      __$$SessionSupersetImplCopyWithImpl<_$SessionSupersetImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(
+            String id,
+            String slug,
+            String displayName,
+            Map<String, String> discriminators,
+            String target,
+            List<LoggedSet> loggedSets,
+            bool isCurrent)
+        exercise,
+    required TResult Function(
+            String id, WarmupItem item, Map<String, String> selectedParameters)
+        warmup,
+    required TResult Function(String id, List<SessionExercise> exercises)
+        superset,
+  }) {
+    return superset(id, exercises);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(
+            String id,
+            String slug,
+            String displayName,
+            Map<String, String> discriminators,
+            String target,
+            List<LoggedSet> loggedSets,
+            bool isCurrent)?
+        exercise,
+    TResult? Function(
+            String id, WarmupItem item, Map<String, String> selectedParameters)?
+        warmup,
+    TResult? Function(String id, List<SessionExercise> exercises)? superset,
+  }) {
+    return superset?.call(id, exercises);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(
+            String id,
+            String slug,
+            String displayName,
+            Map<String, String> discriminators,
+            String target,
+            List<LoggedSet> loggedSets,
+            bool isCurrent)?
+        exercise,
+    TResult Function(
+            String id, WarmupItem item, Map<String, String> selectedParameters)?
+        warmup,
+    TResult Function(String id, List<SessionExercise> exercises)? superset,
+    required TResult orElse(),
+  }) {
+    if (superset != null) {
+      return superset(id, exercises);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(SessionExercise value) exercise,
+    required TResult Function(SessionWarmupItem value) warmup,
+    required TResult Function(SessionSuperset value) superset,
+  }) {
+    return superset(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(SessionExercise value)? exercise,
+    TResult? Function(SessionWarmupItem value)? warmup,
+    TResult? Function(SessionSuperset value)? superset,
+  }) {
+    return superset?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(SessionExercise value)? exercise,
+    TResult Function(SessionWarmupItem value)? warmup,
+    TResult Function(SessionSuperset value)? superset,
+    required TResult orElse(),
+  }) {
+    if (superset != null) {
+      return superset(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class SessionSuperset implements SessionItem {
+  const factory SessionSuperset(
+      {required final String id,
+      final List<SessionExercise> exercises}) = _$SessionSupersetImpl;
+
+  @override
+  String get id;
+  List<SessionExercise> get exercises;
+
+  /// Create a copy of SessionItem
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$SessionSupersetImplCopyWith<_$SessionSupersetImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

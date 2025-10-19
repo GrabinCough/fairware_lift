@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/domain/session_item.dart -----
 // lib/src/features/workout/domain/session_item.dart
 
 // -----------------------------------------------------------------------------
@@ -16,7 +17,7 @@ part 'session_item.freezed.dart';
 
 @freezed
 sealed class SessionItem with _$SessionItem {
-  /// Represents a strength training exercise with loggable sets.
+  /// Represents a standalone strength training exercise.
   const factory SessionItem.exercise({
     required String id,
     required String slug,
@@ -27,12 +28,17 @@ sealed class SessionItem with _$SessionItem {
     @Default(false) bool isCurrent,
   }) = SessionExercise;
 
-  /// Represents a warm-up or prep item with its selected parameters.
+  /// Represents a warm-up or prep item.
   const factory SessionItem.warmup({
     required String id,
     required WarmupItem item,
-    // --- NEW ---
-    // Stores the user's selections, e.g., {'Grip': 'Wide'}
     required Map<String, String> selectedParameters,
   }) = SessionWarmupItem;
+
+  /// --- NEW ---
+  /// Represents a superset block, which contains a list of exercises.
+  const factory SessionItem.superset({
+    required String id,
+    @Default([]) List<SessionExercise> exercises,
+  }) = SessionSuperset;
 }

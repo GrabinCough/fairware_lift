@@ -25,7 +25,22 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     return [];
   }
 
-  /// Adds a new strength exercise to the current session.
+  /// --- NEW ---
+  /// Sets all exercises (standalone or in supersets) to not be the current one.
+  List<SessionItem> _deactivateAllExercises(List<SessionItem> currentState) {
+    return currentState.map((item) {
+      return switch (item) {
+        SessionExercise e => e.copyWith(isCurrent: false),
+        SessionSuperset s => s.copyWith(
+            exercises: s.exercises
+                .map((e) => e.copyWith(isCurrent: false))
+                .toList()),
+        _ => item,
+      };
+    }).toList();
+  }
+
+  /// Adds a new standalone strength exercise to the current session.
   void addDxgExercise(GeneratedExerciseResult result) {
     final newExercise = SessionItem.exercise(
       id: _uuid.v4(),
@@ -35,15 +50,11 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
       target: '3 sets x 10 reps',
       isCurrent: true,
     );
-    final updatedState = [
-      for (final item in state)
-        if (item is SessionExercise) item.copyWith(isCurrent: false) else item,
-      newExercise,
-    ];
-    state = updatedState;
+    final deactivatedState = _deactivateAllExercises(state);
+    state = [...deactivatedState, newExercise];
   }
 
-  /// Adds a new warm-up item to the current session with its selected parameters.
+  /// Adds a new warm-up item to the current session.
   void addWarmupItem(WarmupItem item, Map<String, String> selectedParameters) {
     final newWarmup = SessionItem.warmup(
       id: _uuid.v4(),
@@ -53,51 +64,131 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     state = [...state, newWarmup];
   }
 
+  /// --- NEW ---
+  /// Adds an empty superset block to the session.
+  void addSuperset() {
+    final newSuperset = SessionItem.superset(id: _uuid.v4());
+    state = [...state, newSuperset];
+  }
+
+  /// --- NEW ---
+  /// Adds a selected exercise to a specific superset block.
+  void addExerciseToSuperset({
+    required String supersetId,
+    required GeneratedExerciseResult result,
+  }) {
+    final newExercise = SessionExercise(
+      id: _uuid.v4(),
+      slug: result.slug,
+      displayName: result.displayName,
+      discriminators: result.discriminators,
+      target: '3 sets x 10 reps',
+      isCurrent: true,
+    );
+
+    final deactivatedState = _deactivateAllExercises(state);
+
+    state = deactivatedState.map((item) {
+      if (item is SessionSuperset && item.id == supersetId) {
+        return item.copyWith(
+          exercises: [...item.exercises, newExercise],
+        );
+      }
+      return item;
+    }).toList();
+  }
+
   /// Sets the specified exercise as the current one for logging sets.
-  void setCurrentItem(String itemId) {
-    // --- FIX ---
-    // The line that automatically stopped the timer has been removed.
-    // The timer will now continue to run when the user switches between exercises.
-    final newState = [
-      for (final item in state)
-        if (item is SessionExercise)
-          item.copyWith(isCurrent: item.id == itemId)
-        else
-          item,
-    ];
-    state = newState;
+  /// Can handle exercises that are standalone or inside a superset.
+  void setCurrentItem({required String itemId}) {
+    final newState = _deactivateAllExercises(state);
+
+    state = newState.map((item) {
+      return switch (item) {
+        SessionExercise e when e.id == itemId => e.copyWith(isCurrent: true),
+        SessionSuperset s => s.copyWith(
+            exercises: s.exercises.map((e) {
+            return e.id == itemId ? e.copyWith(isCurrent: true) : e;
+          }).toList()),
+        _ => item,
+      };
+    }).toList();
   }
 
   /// Logs a new set for the currently active exercise.
+  /// Contains special logic to only start the timer after the last exercise in a superset.
   void logSet({required double weight, required int reps}) {
-    final currentState = state;
-    final currentIndex = currentState.indexWhere(
-        (item) => item is SessionExercise && item.isCurrent);
-    if (currentIndex == -1) return;
+    SessionSuperset? parentSuperset;
+    SessionExercise? currentExercise;
+    int currentExerciseIndex = -1;
 
-    final currentExercise = currentState[currentIndex] as SessionExercise;
-    final newSet = LoggedSet(
-      weight: weight,
-      reps: reps,
-      id: _uuid.v4(),
-    );
-    final updatedExercise = currentExercise.copyWith(
-      loggedSets: [...currentExercise.loggedSets, newSet],
-    );
-    final newState = List<SessionItem>.from(currentState);
-    newState[currentIndex] = updatedExercise;
-    state = newState;
+    // Find the current exercise and its parent superset, if any.
+    for (final item in state) {
+      if (item is SessionExercise && item.isCurrent) {
+        currentExercise = item;
+        break;
+      }
+      if (item is SessionSuperset) {
+        final index =
+            item.exercises.indexWhere((e) => e.isCurrent);
+        if (index != -1) {
+          parentSuperset = item;
+          currentExercise = item.exercises[index];
+          currentExerciseIndex = index;
+          break;
+        }
+      }
+    }
 
-    ref.read(timerStateProvider.notifier).startTimer();
+    if (currentExercise == null) return;
+
+    final newSet = LoggedSet(weight: weight, reps: reps, id: _uuid.v4());
+    final updatedExercise =
+        currentExercise.copyWith(loggedSets: [...currentExercise.loggedSets, newSet]);
+
+    // Update the state with the new set.
+    state = state.map((item) {
+      if (item.id == currentExercise!.id) return updatedExercise;
+      if (item.id == parentSuperset?.id) {
+        return (item as SessionSuperset).copyWith(
+          exercises: item.exercises
+              .map((e) => e.id == updatedExercise.id ? updatedExercise : e)
+              .toList(),
+        );
+      }
+      return item;
+    }).toList();
+
+    // Timer logic: only start if it's a standalone exercise or the last in a superset.
+    if (parentSuperset == null ||
+        currentExerciseIndex == parentSuperset.exercises.length - 1) {
+      ref.read(timerStateProvider.notifier).startTimer();
+    }
   }
 
-  /// Deletes an item (exercise or warm-up) from the current session.
+  /// Deletes a top-level item (exercise, warm-up, or entire superset) from the session.
   void deleteItem(String itemId) {
-    final updatedState = state.where((item) => item.id != itemId).toList();
-    state = updatedState;
+    state = state.where((item) => item.id != itemId).toList();
   }
 
-  /// Reorders the items in the current session.
+  /// --- NEW ---
+  /// Deletes a single exercise from within a superset block.
+  void deleteExerciseFromSuperset({
+    required String supersetId,
+    required String exerciseId,
+  }) {
+    state = state.map((item) {
+      if (item is SessionSuperset && item.id == supersetId) {
+        return item.copyWith(
+          exercises:
+              item.exercises.where((e) => e.id != exerciseId).toList(),
+        );
+      }
+      return item;
+    }).toList();
+  }
+
+  /// Reorders top-level items in the current session.
   void reorderItem(int oldIndex, int newIndex) {
     final items = List<SessionItem>.from(state);
     if (newIndex > oldIndex) {

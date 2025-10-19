@@ -43,33 +43,12 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     final exerciseInstancesToSave = <ExerciseInstancesCompanion>[];
     final savedWarmupsCompanion = <SavedWarmupsCompanion>[];
 
+    // --- REFACTORED ---
+    // This loop now handles all three SessionItem types, including SessionSuperset.
     for (final item in completedItems) {
       switch (item) {
         case SessionExercise e when e.loggedSets.isNotEmpty:
-          exerciseInstancesToSave.add(
-            ExerciseInstancesCompanion(
-              slug: drift.Value(e.slug),
-              familyId: drift.Value(e.discriminators['family_id'] ?? ''),
-              displayName: drift.Value(e.displayName),
-              discriminators: drift.Value(e.discriminators),
-              firstSeenAt: drift.Value(now),
-            ),
-          );
-          for (int i = 0; i < e.loggedSets.length; i++) {
-            final set = e.loggedSets[i];
-            setEntriesCompanion.add(
-              SetEntriesCompanion(
-                id: drift.Value(uuid.v4()),
-                sessionId: drift.Value(sessionId),
-                exerciseSlug: drift.Value(e.slug),
-                setOrder: drift.Value(i + 1),
-                weight: drift.Value(set.weight),
-                reps: drift.Value(set.reps),
-                createdAt: drift.Value(now),
-                updatedAt: drift.Value(now),
-              ),
-            );
-          }
+          _processExerciseForSaving(e, sessionId, now, exerciseInstancesToSave, setEntriesCompanion);
         case SessionWarmupItem w:
           savedWarmupsCompanion.add(
             SavedWarmupsCompanion(
@@ -81,7 +60,13 @@ class WorkoutSummaryScreen extends ConsumerWidget {
               createdAt: drift.Value(now),
             ),
           );
-        case _:
+        case SessionSuperset s:
+          for (final exerciseInSuperset in s.exercises) {
+            if (exerciseInSuperset.loggedSets.isNotEmpty) {
+              _processExerciseForSaving(exerciseInSuperset, sessionId, now, exerciseInstancesToSave, setEntriesCompanion);
+            }
+          }
+        case _: // Handles empty exercises or other types
       }
     }
 
@@ -121,6 +106,42 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     }
   }
 
+  /// --- NEW HELPER METHOD ---
+  /// Extracts the logic for processing a SessionExercise to avoid code duplication.
+  void _processExerciseForSaving(
+    SessionExercise e,
+    String sessionId,
+    DateTime now,
+    List<ExerciseInstancesCompanion> exerciseInstancesToSave,
+    List<SetEntriesCompanion> setEntriesCompanion,
+  ) {
+    const uuid = Uuid();
+    exerciseInstancesToSave.add(
+      ExerciseInstancesCompanion(
+        slug: drift.Value(e.slug),
+        familyId: drift.Value(e.discriminators['family_id'] ?? ''),
+        displayName: drift.Value(e.displayName),
+        discriminators: drift.Value(e.discriminators),
+        firstSeenAt: drift.Value(now),
+      ),
+    );
+    for (int i = 0; i < e.loggedSets.length; i++) {
+      final set = e.loggedSets[i];
+      setEntriesCompanion.add(
+        SetEntriesCompanion(
+          id: drift.Value(uuid.v4()),
+          sessionId: drift.Value(sessionId),
+          exerciseSlug: drift.Value(e.slug),
+          setOrder: drift.Value(i + 1),
+          weight: drift.Value(set.weight),
+          reps: drift.Value(set.reps),
+          createdAt: drift.Value(now),
+          updatedAt: drift.Value(now),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
@@ -138,10 +159,14 @@ class WorkoutSummaryScreen extends ConsumerWidget {
         itemCount: completedItems.length,
         itemBuilder: (context, index) {
           final item = completedItems[index];
+          // --- REFACTORED ---
+          // The switch statement now handles all three SessionItem types.
           return switch (item) {
             SessionExercise e when e.loggedSets.isNotEmpty =>
               _buildExerciseSummary(e),
             SessionWarmupItem w => _buildWarmupSummary(w),
+            SessionSuperset s when s.exercises.any((e) => e.loggedSets.isNotEmpty) =>
+              _buildSupersetSummary(s),
             _ => const SizedBox.shrink(),
           };
         },
@@ -184,8 +209,6 @@ class WorkoutSummaryScreen extends ConsumerWidget {
   }
 
   Widget _buildWarmupSummary(SessionWarmupItem warmup) {
-    // --- BUG FIX ---
-    // The subtitle now correctly formats each parameter as "Key: Value".
     final subtitle = warmup.selectedParameters.entries
         .map((e) => '${e.key}: ${e.value}')
         .join('  •  ');
@@ -213,6 +236,64 @@ class WorkoutSummaryScreen extends ConsumerWidget {
                 style: AppTheme.typography.caption,
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// --- NEW WIDGET BUILDER ---
+  /// Renders a superset block in the summary.
+  Widget _buildSupersetSummary(SessionSuperset superset) {
+    return Card(
+      color: AppTheme.colors.surface,
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.sizing.cardRadius),
+        side: BorderSide(color: AppTheme.colors.surfaceAlt, width: 2),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.link_rounded, color: AppTheme.colors.textMuted),
+                const SizedBox(width: 8),
+                Text(
+                  'Superset',
+                  style: AppTheme.typography.title.copyWith(fontSize: 20),
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            ...superset.exercises.where((e) => e.loggedSets.isNotEmpty).map((exercise) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      exercise.displayName,
+                      style: AppTheme.typography.body.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    ...exercise.loggedSets.asMap().entries.map((entry) {
+                      final setIndex = entry.key + 1;
+                      final set = entry.value;
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 8.0, top: 2.0),
+                        child: Text(
+                          'Set $setIndex: ${set.weight} lb x ${set.reps} reps',
+                          style: AppTheme.typography.body,
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              );
+            }),
           ],
         ),
       ),

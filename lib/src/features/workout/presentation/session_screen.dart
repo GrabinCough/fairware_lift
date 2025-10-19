@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/presentation/session_screen.dart -----
 // lib/src/features/workout/presentation/session_screen.dart
 
 // -----------------------------------------------------------------------------
@@ -30,7 +31,7 @@ class SessionScreen extends ConsumerWidget {
     required Map<String, String> discriminators,
   }) {
     String _formatTitle(String key) =>
-        '${key[0].toUpperCase()}${key.substring(1)}';
+        '${key[0].toUpperCase()}${key.substring(1)}'.replaceAll('_', ' ');
 
     showDialog(
       context: context,
@@ -111,66 +112,90 @@ class SessionScreen extends ConsumerWidget {
                     .reorderItem(oldIndex, newIndex);
               },
               children: sessionItems.map((item) {
-                return Dismissible(
-                  key: ValueKey(item.id),
-                  direction: DismissDirection.endToStart,
-                  onDismissed: (direction) {
-                    ref.read(sessionStateProvider.notifier).deleteItem(item.id);
-                  },
-                  background: Container(
-                    color: AppTheme.colors.danger,
-                    margin: const EdgeInsets.symmetric(vertical: 4.0),
-                    alignment: Alignment.centerRight,
-                    child: const Icon(Icons.delete_forever_rounded),
-                  ),
-                  child: switch (item) {
-                    SessionExercise e => ExerciseListItem(
+                // --- REFACTORED ---
+                // The switch statement now handles all three types of SessionItem.
+                return switch (item) {
+                  SessionExercise e => Dismissible(
+                      key: ValueKey(item.id),
+                      direction: DismissDirection.endToStart,
+                      onDismissed: (_) => ref.read(sessionStateProvider.notifier).deleteItem(item.id),
+                      background: _buildDismissBackground(),
+                      child: ExerciseListItem(
                         displayName: e.displayName,
                         discriminators: e.discriminators,
                         target: e.target,
                         loggedSets: e.loggedSets,
                         isCurrent: e.isCurrent,
-                        onCardTap: () {
-                          ref
-                              .read(sessionStateProvider.notifier)
-                              .setCurrentItem(e.id);
-                        },
-                        onInfoTap: () => _showExerciseInfo(
-                          context,
-                          displayName: e.displayName,
-                          discriminators: e.discriminators,
-                        ),
+                        onCardTap: () => ref.read(sessionStateProvider.notifier).setCurrentItem(itemId: e.id),
+                        onInfoTap: () => _showExerciseInfo(context, displayName: e.displayName, discriminators: e.discriminators),
                       ),
-                    SessionWarmupItem w => WarmupListItem(
-                        warmup: w,
-                      ),
-                  },
-                );
+                    ),
+                  SessionWarmupItem w => Dismissible(
+                      key: ValueKey(item.id),
+                      direction: DismissDirection.endToStart,
+                      onDismissed: (_) => ref.read(sessionStateProvider.notifier).deleteItem(item.id),
+                      background: _buildDismissBackground(),
+                      child: WarmupListItem(warmup: w),
+                    ),
+                  SessionSuperset s => _SupersetListItem(
+                      key: ValueKey(item.id),
+                      superset: s,
+                      onInfoTap: _showExerciseInfo,
+                    ),
+                };
               }).toList(),
             ),
           const SizedBox(height: 16),
-          TextButton.icon(
-            onPressed: () async {
-              final result = await Navigator.of(context).push<dynamic>(
-                MaterialPageRoute(
-                  fullscreenDialog: true,
-                  builder: (context) => const DXGExercisePickerScreen(),
-                ),
-              );
+          // --- NEW ---
+          // A Row now holds both "Add Exercise" and "Add Superset" buttons.
+          Row(
+            children: [
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: () async {
+                    final result = await Navigator.of(context).push<dynamic>(
+                      MaterialPageRoute(
+                        fullscreenDialog: true,
+                        builder: (context) => const DXGExercisePickerScreen(),
+                      ),
+                    );
 
-              if (result is GeneratedExerciseResult) {
-                ref.read(sessionStateProvider.notifier).addDxgExercise(result);
-              } else if (result is Map) {
-                final item = result['item'] as WarmupItem;
-                final params = result['params'] as Map<String, String>;
-                ref.read(sessionStateProvider.notifier).addWarmupItem(item, params);
-              }
-            },
-            icon: const Icon(Icons.add_circle_outline_rounded),
-            label: const Text('Add Exercise'),
+                    if (result is GeneratedExerciseResult) {
+                      ref.read(sessionStateProvider.notifier).addDxgExercise(result);
+                    } else if (result is Map) {
+                      final item = result['item'] as WarmupItem;
+                      final params = result['params'] as Map<String, String>;
+                      ref.read(sessionStateProvider.notifier).addWarmupItem(item, params);
+                    }
+                  },
+                  icon: const Icon(Icons.add_circle_outline_rounded),
+                  label: const Text('Add Exercise'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: () {
+                    ref.read(sessionStateProvider.notifier).addSuperset();
+                  },
+                  icon: const Icon(Icons.link_rounded),
+                  label: const Text('Add Superset'),
+                ),
+              ),
+            ],
           ),
         ],
       ),
+    );
+  }
+
+  Container _buildDismissBackground() {
+    return Container(
+      color: AppTheme.colors.danger,
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: const Icon(Icons.delete_forever_rounded, color: Colors.white),
     );
   }
 
@@ -194,6 +219,85 @@ class SessionScreen extends ConsumerWidget {
             Text(
               'Tap "Add Exercise" to get started.',
               style: AppTheme.typography.body,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// --- NEW SUPERSET LIST ITEM WIDGET -------------------------------------------
+// -----------------------------------------------------------------------------
+
+class _SupersetListItem extends ConsumerWidget {
+  final SessionSuperset superset;
+  final void Function(BuildContext, {required String displayName, required Map<String, String> discriminators}) onInfoTap;
+
+  const _SupersetListItem({super.key, required this.superset, required this.onInfoTap});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Card(
+      key: key,
+      color: AppTheme.colors.surface,
+      elevation: 0,
+      margin: const EdgeInsets.symmetric(vertical: 4.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTheme.sizing.cardRadius),
+        side: BorderSide(color: AppTheme.colors.surfaceAlt, width: 2),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            ListTile(
+              leading: Icon(Icons.link_rounded, color: AppTheme.colors.textMuted),
+              title: Text('Superset', style: AppTheme.typography.body.copyWith(color: AppTheme.colors.textMuted)),
+              dense: true,
+            ),
+            ...superset.exercises.map((exercise) {
+              return Dismissible(
+                key: ValueKey(exercise.id),
+                direction: DismissDirection.endToStart,
+                onDismissed: (_) {
+                  ref.read(sessionStateProvider.notifier).deleteExerciseFromSuperset(
+                        supersetId: superset.id,
+                        exerciseId: exercise.id,
+                      );
+                },
+                background: Container(
+                  color: AppTheme.colors.danger,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: const Icon(Icons.delete_forever_rounded, color: Colors.white),
+                ),
+                child: ExerciseListItem(
+                  displayName: exercise.displayName,
+                  discriminators: exercise.discriminators,
+                  target: exercise.target,
+                  loggedSets: exercise.loggedSets,
+                  isCurrent: exercise.isCurrent,
+                  onCardTap: () => ref.read(sessionStateProvider.notifier).setCurrentItem(itemId: exercise.id),
+                  onInfoTap: () => onInfoTap(context, displayName: exercise.displayName, discriminators: exercise.discriminators),
+                ),
+              );
+            }).toList(),
+            TextButton.icon(
+              onPressed: () async {
+                final result = await Navigator.of(context).push<dynamic>(
+                  MaterialPageRoute(
+                    fullscreenDialog: true,
+                    builder: (context) => const DXGExercisePickerScreen(),
+                  ),
+                );
+                if (result is GeneratedExerciseResult) {
+                  ref.read(sessionStateProvider.notifier).addExerciseToSuperset(supersetId: superset.id, result: result);
+                }
+              },
+              icon: const Icon(Icons.add_circle_outline_rounded),
+              label: const Text('Add Exercise to Superset'),
             ),
           ],
         ),
