@@ -106,7 +106,13 @@
 "Neutral-Grip Barbell Bench (Swiss Bar)",
 "Close-Grip Smith Bench",
 "Feet-Up Bench Press",
-"Reverse Grip OHP"
+"Reverse Grip OHP",
+"Push-Up",
+"Pushup",
+"Bodyweight Press-Up",
+"Scap Push-Up",
+"Scapular Push-Up",
+"Serratus Push-Up"
 ],
 "fly": [
 "Chest Fly",
@@ -706,6 +712,9 @@
 "High-to-Low Cable Lift",
 "Band Woodchop",
 "Medicine Ball Scoop Toss (Rotational)",
-"Rotational Cable Punch-Out"
+"Rotational Cable Punch-Out",
+"Cable External Rotation",
+"ER Cable",
+"Rotator Cuff External Rotation"
 ]
 }

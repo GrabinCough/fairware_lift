@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
+import 'package:fairware_lift/src/features/exercises/data/presentation/exercise_picker_screen.dart';
+import 'package:fairware_lift/src/features/exercises/domain/exercise.dart' as lib_exercise;
 import 'package:fairware_lift/src/features/workout/application/session_state.dart';
 import 'package:fairware_lift/src/features/workout/application/timer_state.dart';
 import 'package:fairware_lift/src/features/workout/domain/session_item.dart';
@@ -37,31 +39,45 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
 
   void _showExerciseInfoSheet(BuildContext context, SessionExercise exercise) {
     final info = exercise.info;
+
+    // --- LOGIC FIX ---
+    // This logic now correctly handles all cases.
     if (info == null) {
-      // Fallback for exercises without an info block
-      showDialog(
+      // Case 1: No info block at all.
+      _showSimpleInfoDialog(context, exercise.displayName, 'No additional information available for this exercise.');
+    } else if (info.howTo != null && info.coachingCues == null && info.videoSearchQuery == null) {
+      // Case 2: Info block exists, but it's a simple one from the library (only has 'howTo').
+      _showSimpleInfoDialog(context, exercise.displayName, info.howTo!);
+    } else {
+      // Case 3: A rich info block exists from a JSON import.
+      showModalBottomSheet(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text(exercise.displayName),
-          content: const Text('No additional information available for this exercise.'),
-          actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
+        isScrollControlled: true,
+        backgroundColor: AppTheme.colors.surface,
+        builder: (context) => DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.6,
+          maxChildSize: 0.9,
+          builder: (_, controller) => _ExerciseInfoSheet(controller: controller, info: info, exerciseName: exercise.displayName),
         ),
       );
-      return;
     }
+  }
 
-    showModalBottomSheet(
+  /// --- NEW HELPER METHOD ---
+  /// Shows a simple AlertDialog for basic info text.
+  void _showSimpleInfoDialog(BuildContext context, String title, String content) {
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: AppTheme.colors.surface,
-      builder: (context) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.6,
-        maxChildSize: 0.9,
-        builder: (_, controller) => _ExerciseInfoSheet(controller: controller, info: info, exerciseName: exercise.displayName),
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.colors.surface,
+        title: Text(title),
+        content: Text(content, style: AppTheme.typography.body),
+        actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close'))],
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -83,9 +99,25 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          final result = await Navigator.of(context).push<lib_exercise.Exercise>(
+            MaterialPageRoute(
+              fullscreenDialog: true,
+              builder: (context) => const ExercisePickerScreen(),
+            ),
+          );
+
+          if (result != null && mounted) {
+            ref.read(sessionStateProvider.notifier).addExerciseFromLibrary(result);
+          }
+        },
+        label: const Text('Add Exercise'),
+        icon: const Icon(Icons.add),
+      ),
       bottomNavigationBar: const WorkoutDock(),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 100),
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 150), // Increased bottom padding for FAB
         children: [
           if (sessionItems.isEmpty) _buildEmptyState(context)
           else ReorderableListView(
@@ -146,7 +178,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
           const SizedBox(height: 16),
           Text('Your session is empty.', style: AppTheme.typography.title),
           const SizedBox(height: 8),
-          Text('Import a workout to get started.', style: AppTheme.typography.body, textAlign: TextAlign.center),
+          Text('Import a workout or add an exercise to get started.', style: AppTheme.typography.body, textAlign: TextAlign.center),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(fullscreenDialog: true, builder: (context) => const PasteWorkoutScreen())),
@@ -206,7 +238,7 @@ class _SupersetListItem extends ConsumerWidget {
   }
 }
 
-// --- NEW WIDGET ---
+
 class _ExerciseInfoSheet extends StatelessWidget {
   final ScrollController controller;
   final Info info;

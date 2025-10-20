@@ -4,12 +4,14 @@
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
+import 'package:fairware_lift/src/features/exercises/domain/exercise.dart' as lib_exercise;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fairware_lift/src/features/dxg/domain/warmup_item.dart';
 import 'package:fairware_lift/src/features/workout/application/timer_state.dart';
 import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 import 'package:fairware_lift/src/features/workout/domain/session_item.dart';
+import 'package:fairware_lift/src/features/workout_import/domain/lift_dsl.dart';
 
 // -----------------------------------------------------------------------------
 // --- SESSION STATE NOTIFIER --------------------------------------------------
@@ -50,6 +52,35 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     }).toList();
   }
 
+  /// --- UPDATED METHOD (FIX) ---
+  /// Adds a custom exercise selected from the main exercise library.
+  /// The Prescription now includes default values for all rest timer fields
+  /// to ensure the timer is always triggered.
+  void addExerciseFromLibrary(lib_exercise.Exercise exercise) {
+    final newExercise = SessionItem.exercise(
+      id: _uuid.v4(),
+      slug: exercise.name.toLowerCase().replaceAll(' ', '-'),
+      exerciseHash: 'library_${exercise.name}',
+      displayName: exercise.name,
+      // --- FIX ---
+      // Provide defaults for ALL rest-related fields.
+      prescription: const Prescription(
+        sets: 3,
+        reps: '8-12',
+        restSeconds: 90,
+        restSecondsAfter: 0, // Default for superset context
+      ),
+      variation: {
+        'equipment': exercise.equipment,
+        'pattern': exercise.movementPattern,
+      },
+      info: Info(howTo: exercise.howTo),
+      unmapped: false,
+    );
+
+    state = [...state, newExercise];
+  }
+
   void addWarmupItem(WarmupItem item, Map<String, String> selectedParameters) {
     final newWarmup = SessionItem.warmup(
       id: _uuid.v4(),
@@ -67,7 +98,7 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
 
     state = [...state, newWarmup];
   }
-  
+
   void setCurrentItem({required String itemId}) {
     final newState = _deactivateAllExercises(state);
 
@@ -130,7 +161,7 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
          restDuration = currentExercise.prescription.restSecondsAfter;
       }
     }
-    
+
     ref.read(timerStateProvider.notifier).startTimer(duration: restDuration);
   }
 

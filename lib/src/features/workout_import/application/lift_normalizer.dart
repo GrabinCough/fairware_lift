@@ -1,4 +1,4 @@
-  // lib/src/features/workout_import/application/lift_normalizer.dart
+// lib/src/features/workout_import/application/lift_normalizer.dart
 
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
@@ -23,11 +23,15 @@ class LiftNormalizer {
           rounds: block.rounds,
         );
 
+        // --- FIX ---
+        // The `info` block was being dropped here. It is now being correctly
+        // passed through to the next step in the import process.
         return Exercise(
           name: exercise.name,
           variation: exercise.variation,
           prescription: normalizedPrescription,
           metadata: exercise.metadata,
+          info: exercise.info, // This line was missing.
         );
       }).toList();
 
