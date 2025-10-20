@@ -39,17 +39,11 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
 
   void _showExerciseInfoSheet(BuildContext context, SessionExercise exercise) {
     final info = exercise.info;
-
-    // --- LOGIC FIX ---
-    // This logic now correctly handles all cases.
     if (info == null) {
-      // Case 1: No info block at all.
       _showSimpleInfoDialog(context, exercise.displayName, 'No additional information available for this exercise.');
     } else if (info.howTo != null && info.coachingCues == null && info.videoSearchQuery == null) {
-      // Case 2: Info block exists, but it's a simple one from the library (only has 'howTo').
       _showSimpleInfoDialog(context, exercise.displayName, info.howTo!);
     } else {
-      // Case 3: A rich info block exists from a JSON import.
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -64,8 +58,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     }
   }
 
-  /// --- NEW HELPER METHOD ---
-  /// Shows a simple AlertDialog for basic info text.
   void _showSimpleInfoDialog(BuildContext context, String title, String content) {
     showDialog(
       context: context,
@@ -116,47 +108,49 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
         icon: const Icon(Icons.add),
       ),
       bottomNavigationBar: const WorkoutDock(),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 150), // Increased bottom padding for FAB
-        children: [
-          if (sessionItems.isEmpty) _buildEmptyState(context)
-          else ReorderableListView(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            onReorder: (oldIndex, newIndex) => ref.read(sessionStateProvider.notifier).reorderItem(oldIndex, newIndex),
-            children: sessionItems.map((item) {
-              return switch (item) {
-                SessionExercise e => Dismissible(
-                    key: ValueKey(item.id),
-                    direction: DismissDirection.endToStart,
-                    onDismissed: (_) => ref.read(sessionStateProvider.notifier).deleteItem(item.id),
-                    background: _buildDismissBackground(),
-                    child: ExerciseListItem(
-                      displayName: e.displayName,
-                      prescription: e.prescription,
-                      variation: e.variation,
-                      loggedSets: e.loggedSets,
-                      isCurrent: e.isCurrent,
-                      onCardTap: () => ref.read(sessionStateProvider.notifier).setCurrentItem(itemId: e.id),
-                      onInfoTap: () => _showExerciseInfoSheet(context, e),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 150),
+          children: [
+            if (sessionItems.isEmpty) _buildEmptyState(context)
+            else ReorderableListView(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              onReorder: (oldIndex, newIndex) => ref.read(sessionStateProvider.notifier).reorderItem(oldIndex, newIndex),
+              children: sessionItems.map((item) {
+                return switch (item) {
+                  SessionExercise e => Dismissible(
+                      key: ValueKey(item.id),
+                      direction: DismissDirection.endToStart,
+                      onDismissed: (_) => ref.read(sessionStateProvider.notifier).deleteItem(item.id),
+                      background: _buildDismissBackground(),
+                      child: ExerciseListItem(
+                        displayName: e.displayName,
+                        prescription: e.prescription,
+                        variation: e.variation,
+                        loggedSets: e.loggedSets,
+                        isCurrent: e.isCurrent,
+                        onCardTap: () => ref.read(sessionStateProvider.notifier).setCurrentItem(itemId: e.id),
+                        onInfoTap: () => _showExerciseInfoSheet(context, e),
+                      ),
                     ),
-                  ),
-                SessionWarmupItem w => Dismissible(
-                    key: ValueKey(item.id),
-                    direction: DismissDirection.endToStart,
-                    onDismissed: (_) => ref.read(sessionStateProvider.notifier).deleteItem(item.id),
-                    background: _buildDismissBackground(),
-                    child: WarmupListItem(warmup: w),
-                  ),
-                SessionSuperset s => _SupersetListItem(
-                    key: ValueKey(item.id),
-                    superset: s,
-                    onInfoTap: (exercise) => _showExerciseInfoSheet(context, exercise),
-                  ),
-              };
-            }).toList(),
-          ),
-        ],
+                  SessionWarmupItem w => Dismissible(
+                      key: ValueKey(item.id),
+                      direction: DismissDirection.endToStart,
+                      onDismissed: (_) => ref.read(sessionStateProvider.notifier).deleteItem(item.id),
+                      background: _buildDismissBackground(),
+                      child: WarmupListItem(warmup: w),
+                    ),
+                  SessionSuperset s => _SupersetListItem(
+                      key: ValueKey(item.id),
+                      superset: s,
+                      onInfoTap: (exercise) => _showExerciseInfoSheet(context, exercise),
+                    ),
+                };
+              }).toList(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -247,28 +241,32 @@ class _ExerciseInfoSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      controller: controller,
-      padding: const EdgeInsets.all(24),
-      children: [
-        Text(exerciseName, style: AppTheme.typography.display.copyWith(fontSize: 28)),
-        const SizedBox(height: 24),
-        if (info.howTo != null) _buildSection('How To', Text(info.howTo!, style: AppTheme.typography.body)),
-        if (info.coachingCues?.isNotEmpty ?? false) _buildSection('Coaching Cues', _buildBulletList(info.coachingCues!)),
-        if (info.commonErrors?.isNotEmpty ?? false) _buildSection('Common Errors', _buildBulletList(info.commonErrors!)),
-        if (info.safetyNotes != null) _buildSection('Safety', Text(info.safetyNotes!, style: AppTheme.typography.body)),
-        if (info.progression != null) _buildSection('Progression', Text(info.progression!, style: AppTheme.typography.body)),
-        if (info.regression != null) _buildSection('Regression', Text(info.regression!, style: AppTheme.typography.body)),
-        if (info.equipmentNotes != null) _buildSection('Equipment', Text(info.equipmentNotes!, style: AppTheme.typography.body)),
-        const SizedBox(height: 24),
-        Row(
-          children: [
-            if (info.videoSearchQuery != null) Expanded(child: _buildSearchButton(icon: Icons.video_library_rounded, label: 'Search Video', query: info.videoSearchQuery!, isVideo: true)),
-            if (info.videoSearchQuery != null && info.webSearchQuery != null) const SizedBox(width: 16),
-            if (info.webSearchQuery != null) Expanded(child: _buildSearchButton(icon: Icons.search, label: 'Search Web', query: info.webSearchQuery!)),
-          ],
-        ),
-      ],
+    // --- FIX ---
+    // The entire content of the bottom sheet is now wrapped in a SafeArea.
+    return SafeArea(
+      child: ListView(
+        controller: controller,
+        padding: const EdgeInsets.all(24),
+        children: [
+          Text(exerciseName, style: AppTheme.typography.display.copyWith(fontSize: 28)),
+          const SizedBox(height: 24),
+          if (info.howTo != null) _buildSection('How To', Text(info.howTo!, style: AppTheme.typography.body)),
+          if (info.coachingCues?.isNotEmpty ?? false) _buildSection('Coaching Cues', _buildBulletList(info.coachingCues!)),
+          if (info.commonErrors?.isNotEmpty ?? false) _buildSection('Common Errors', _buildBulletList(info.commonErrors!)),
+          if (info.safetyNotes != null) _buildSection('Safety', Text(info.safetyNotes!, style: AppTheme.typography.body)),
+          if (info.progression != null) _buildSection('Progression', Text(info.progression!, style: AppTheme.typography.body)),
+          if (info.regression != null) _buildSection('Regression', Text(info.regression!, style: AppTheme.typography.body)),
+          if (info.equipmentNotes != null) _buildSection('Equipment', Text(info.equipmentNotes!, style: AppTheme.typography.body)),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              if (info.videoSearchQuery != null) Expanded(child: _buildSearchButton(icon: Icons.video_library_rounded, label: 'Search Video', query: info.videoSearchQuery!, isVideo: true)),
+              if (info.videoSearchQuery != null && info.webSearchQuery != null) const SizedBox(width: 16),
+              if (info.webSearchQuery != null) Expanded(child: _buildSearchButton(icon: Icons.search, label: 'Search Web', query: info.webSearchQuery!)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

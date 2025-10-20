@@ -1,3 +1,5 @@
+// lib/src/app/shell.dart
+
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
@@ -73,7 +75,12 @@ class _AppShellState extends State<AppShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _widgetOptions.elementAt(_selectedIndex),
+      // --- FIX ---
+      // The body is now wrapped in a SafeArea. This prevents the content of
+      // each main screen from being drawn underneath the system navigation bar.
+      body: SafeArea(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
@@ -84,20 +91,15 @@ class _AppShellState extends State<AppShell> {
         child: const Icon(Icons.play_arrow_rounded),
       ),
 
-      // --- LAYOUT FIX: BottomAppBar with simplified IconButtons ---
-      // This implementation uses a more compact and standard way to display
-      // navigation items in a notched app bar, resolving the overflow issue.
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         color: AppTheme.colors.surfaceAlt,
         notchMargin: 8.0,
         child: Row(
-          // `spaceAround` provides even horizontal spacing.
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             _buildNavIcon(icon: Icons.today_rounded, index: 0),
             _buildNavIcon(icon: Icons.list_alt_rounded, index: 1),
-            // The spacer creates the gap for the FAB.
             const SizedBox(width: 48),
             _buildNavIcon(icon: Icons.monitor_weight_rounded, index: 2),
             _buildNavIcon(icon: Icons.settings_rounded, index: 3),
@@ -112,7 +114,6 @@ class _AppShellState extends State<AppShell> {
     required IconData icon,
     required int index,
   }) {
-    // Determine the color based on whether the icon is selected.
     final color = _selectedIndex == index
         ? AppTheme.colors.accent
         : AppTheme.colors.textMuted;
@@ -120,7 +121,6 @@ class _AppShellState extends State<AppShell> {
     return IconButton(
       icon: Icon(icon, color: color, size: 28),
       onPressed: () => _onItemTapped(index),
-      // Adding a tooltip for accessibility.
       tooltip: ['Today', 'Programs', 'Measurements', 'Settings'][index],
     );
   }
