@@ -1,24 +1,11 @@
 // lib/src/features/workout_import/domain/lift_dsl.dart
 
-// -----------------------------------------------------------------------------
-// --- IMPORTS -----------------------------------------------------------------
-// -----------------------------------------------------------------------------
-
 import 'package:flutter/foundation.dart';
-
-// -----------------------------------------------------------------------------
-// --- DATA MODELS FOR LIFT DSL V1 ---------------------------------------------
-// -----------------------------------------------------------------------------
-// These classes directly map to the `lift.v1` JSON schema. They are used for
-// parsing and validating the user's pasted workout text. Using immutable
-// classes ensures data consistency throughout the import pipeline.
-// -----------------------------------------------------------------------------
 
 @immutable
 class LiftWorkout {
   final String version;
   final Workout workout;
-
   const LiftWorkout({required this.version, required this.workout});
 }
 
@@ -27,7 +14,6 @@ class Workout {
   final String title;
   final String? notes;
   final List<Block> blocks;
-
   const Workout({required this.title, this.notes, required this.blocks});
 }
 
@@ -39,13 +25,7 @@ class Block {
   final String? label;
   final int? rounds;
   final List<Exercise> exercises;
-
-  const Block({
-    required this.type,
-    this.label,
-    this.rounds,
-    required this.exercises,
-  });
+  const Block({required this.type, this.label, this.rounds, required this.exercises});
 }
 
 @immutable
@@ -54,32 +34,19 @@ class Exercise {
   final Map<String, dynamic>? variation;
   final Prescription? prescription;
   final ExerciseMeta? metadata;
-
-  const Exercise({
-    required this.name,
-    this.variation,
-    this.prescription,
-    this.metadata,
-  });
+  final Info? info; // NEW
+  const Exercise({required this.name, this.variation, this.prescription, this.metadata, this.info});
 }
 
 @immutable
 class Prescription {
   final int? sets;
-  final dynamic reps; // Can be String or int
+  final dynamic reps;
   final Intensity? intensity;
   final int? restSeconds;
   final int? restSecondsAfter;
   final String? note;
-
-  const Prescription({
-    this.sets,
-    this.reps,
-    this.intensity,
-    this.restSeconds,
-    this.restSecondsAfter,
-    this.note,
-  });
+  const Prescription({this.sets, this.reps, this.intensity, this.restSeconds, this.restSecondsAfter, this.note});
 }
 
 enum IntensityType { rpe, percent_1rm, load, rir }
@@ -87,27 +54,40 @@ enum IntensityType { rpe, percent_1rm, load, rir }
 @immutable
 class Intensity {
   final IntensityType type;
-  final double? target; // For RPE
-  final double? value; // For percent_1RM
-  final double? kg;
-  final double? lb;
-  final double? rir; // For RIR
-
-  const Intensity({
-    required this.type,
-    this.target,
-    this.value,
-    this.kg,
-    this.lb,
-    this.rir,
-  });
+  final double? target, value, kg, lb, rir;
+  const Intensity({required this.type, this.target, this.value, this.kg, this.lb, this.rir});
 }
 
 @immutable
 class ExerciseMeta {
-  final List<String>? aliases;
-  final List<String>? equipment;
-  final List<String>? primaryMuscles;
-
+  final List<String>? aliases, equipment, primaryMuscles;
   const ExerciseMeta({this.aliases, this.equipment, this.primaryMuscles});
+}
+
+// --- NEW ---
+@immutable
+class Info {
+  final String? howTo;
+  final List<String>? coachingCues;
+  final List<String>? commonErrors;
+  final String? safetyNotes;
+  final String? videoSearchQuery;
+  final String? webSearchQuery;
+  final String? regression;
+  final String? progression;
+  final List<String>? muscles;
+  final String? equipmentNotes;
+
+  const Info({
+    this.howTo,
+    this.coachingCues,
+    this.commonErrors,
+    this.safetyNotes,
+    this.videoSearchQuery,
+    this.webSearchQuery,
+    this.regression,
+    this.progression,
+    this.muscles,
+    this.equipmentNotes,
+  });
 }

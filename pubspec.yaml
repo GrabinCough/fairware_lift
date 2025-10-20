@@ -46,9 +46,11 @@ dependencies:
   permission_handler: ^11.0.1
   shared_preferences: ^2.1.0
   collection: ^1.18.0
-  
+  characters: ^1.3.0 # For robust string normalization
+
   # --- NEW: For Workout DSL Importer ---
   crypto: ^3.0.3                 # For SHA1 hashing (exercise_hash).
+  url_launcher: ^6.3.1           # For opening web/video links from info sheet.
 
   # Code Gen - Unchanged
   freezed_annotation: ^2.4.1
@@ -71,7 +73,4 @@ flutter:
   assets:
     - assets/audio/
     - assets/data/
-    # --- NEW DXG ASSETS ---
-    - assets/dxg/movement_families.seed.json
-    - assets/dxg/synonyms.map.json
-    - assets/dxg/warmup_items.seed.json
+    - assets/dxg/

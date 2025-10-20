@@ -38,7 +38,9 @@ class _PasteWorkoutScreenState extends ConsumerState<PasteWorkoutScreen> {
   }
 
   Future<void> _handleImport() async {
-    final importer = ref.read(liftImporterProvider);
+    // --- FIX ---
+    // We now read the FutureProvider for the importer.
+    final importer = await ref.read(liftImporterProvider.future);
     final notifier = ref.read(_importStateProvider.notifier);
     
     notifier.state = const AsyncLoading();
@@ -50,7 +52,6 @@ class _PasteWorkoutScreenState extends ConsumerState<PasteWorkoutScreen> {
     if (output.hasError) {
       notifier.state = AsyncError(output.error!, StackTrace.current);
     } else if (output.hasIssues) {
-      // TODO: Navigate to MatchResolutionDialog
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${output.issues.length} exercises could not be matched and will be unmapped.'),
@@ -78,6 +79,9 @@ class _PasteWorkoutScreenState extends ConsumerState<PasteWorkoutScreen> {
   @override
   Widget build(BuildContext context) {
     final importState = ref.watch(_importStateProvider);
+    // --- FIX ---
+    // We watch the async provider to show a loading state while the matcher initializes.
+    final asyncImporter = ref.watch(liftImporterProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -86,48 +90,52 @@ class _PasteWorkoutScreenState extends ConsumerState<PasteWorkoutScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Paste the JSON output from your LLM below. The app will build the workout cards for you.',
-              style: AppTheme.typography.body,
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: TextField(
-                controller: _textController,
-                expands: true,
-                maxLines: null,
-                minLines: null,
-                style: AppTheme.typography.body.copyWith(fontFamily: 'monospace'),
-                decoration: InputDecoration(
-                  hintText: '{\n  "version": "lift.v1",\n  ...\n}',
-                  filled: true,
-                  fillColor: AppTheme.colors.surface,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.sizing.cardRadius),
-                    borderSide: BorderSide.none,
+        child: asyncImporter.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('Error initializing importer: $err')),
+          data: (_) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Paste the JSON output from your LLM below. The app will build the workout cards for you.',
+                style: AppTheme.typography.body,
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: TextField(
+                  controller: _textController,
+                  expands: true,
+                  maxLines: null,
+                  minLines: null,
+                  style: AppTheme.typography.body.copyWith(fontFamily: 'monospace'),
+                  decoration: InputDecoration(
+                    hintText: '{\n  "version": "lift.v1",\n  ...\n}',
+                    filled: true,
+                    fillColor: AppTheme.colors.surface,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppTheme.sizing.cardRadius),
+                      borderSide: BorderSide.none,
+                    ),
+                    errorText: importState.whenOrNull(error: (e, s) => e.toString()),
                   ),
-                  errorText: importState.whenOrNull(error: (e, s) => e.toString()),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: importState.isLoading ? null : _handleImport,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: importState.isLoading ? null : _handleImport,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: importState.isLoading
+                    ? const SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Preview & Build Workout'),
               ),
-              child: importState.isLoading
-                  ? const SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Preview & Build Workout'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -1,19 +1,11 @@
 // lib/src/features/workout/domain/session_item.dart
 
-// -----------------------------------------------------------------------------
-// --- IMPORTS -----------------------------------------------------------------
-// -----------------------------------------------------------------------------
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:fairware_lift/src/features/dxg/domain/warmup_item.dart';
 import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 import 'package:fairware_lift/src/features/workout_import/domain/lift_dsl.dart';
 
 part 'session_item.freezed.dart';
-
-// -----------------------------------------------------------------------------
-// --- SESSION ITEM DATA MODEL -------------------------------------------------
-// -----------------------------------------------------------------------------
 
 @freezed
 sealed class SessionItem with _$SessionItem {
@@ -24,6 +16,7 @@ sealed class SessionItem with _$SessionItem {
     required String displayName,
     required Prescription prescription,
     required Map<String, dynamic> variation,
+    Info? info, // NEW
     @Default([]) List<LoggedSet> loggedSets,
     @Default(false) bool isCurrent,
     @Default(false) bool unmapped,

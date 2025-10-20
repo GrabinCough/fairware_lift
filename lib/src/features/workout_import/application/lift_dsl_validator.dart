@@ -1,22 +1,12 @@
-  // lib/src/features/workout_import/application/lift_dsl_validator.dart
-
-// -----------------------------------------------------------------------------
-// --- IMPORTS -----------------------------------------------------------------
-// -----------------------------------------------------------------------------
+// lib/src/features/workout_import/application/lift_dsl_validator.dart
 
 import 'dart:convert';
 import 'package:fairware_lift/src/features/workout_import/domain/lift_dsl.dart';
 
-// -----------------------------------------------------------------------------
-// --- VALIDATION RESULT & SERVICE ---------------------------------------------
-// -----------------------------------------------------------------------------
-
 class ValidationResult {
   final LiftWorkout? workout;
   final String? error;
-
   ValidationResult({this.workout, this.error});
-
   bool get isValid => workout != null && error == null;
 }
 
@@ -42,29 +32,15 @@ class LiftDslValidator {
   }
 
   Workout _parseWorkout(Map<String, dynamic> data) {
-    if (data['title'] == null || data['title'] is! String) {
-      throw const FormatException('Workout missing required "title".');
-    }
-    if (data['blocks'] == null || data['blocks'] is! List) {
-      throw const FormatException('Workout missing required "blocks" array.');
-    }
-
+    if (data['title'] == null || data['title'] is! String) throw const FormatException('Workout missing required "title".');
+    if (data['blocks'] == null || data['blocks'] is! List) throw const FormatException('Workout missing required "blocks" array.');
     final blocks = (data['blocks'] as List).map((b) => _parseBlock(b as Map<String, dynamic>)).toList();
-
-    return Workout(
-      title: data['title'],
-      notes: data['notes'] as String?,
-      blocks: blocks,
-    );
+    return Workout(title: data['title'], notes: data['notes'] as String?, blocks: blocks);
   }
 
   Block _parseBlock(Map<String, dynamic> data) {
-    if (data['type'] == null || data['exercises'] == null) {
-      throw const FormatException('Block is missing "type" or "exercises".');
-    }
-    
+    if (data['type'] == null || data['exercises'] == null) throw const FormatException('Block is missing "type" or "exercises".');
     final exercises = (data['exercises'] as List).map((e) => _parseExercise(e as Map<String, dynamic>)).toList();
-    
     return Block(
       type: BlockType.values.firstWhere((e) => e.name == data['type']),
       label: data['label'] as String?,
@@ -74,14 +50,13 @@ class LiftDslValidator {
   }
 
   Exercise _parseExercise(Map<String, dynamic> data) {
-    if (data['name'] == null) {
-      throw const FormatException('Exercise is missing required "name".');
-    }
+    if (data['name'] == null) throw const FormatException('Exercise is missing required "name".');
     return Exercise(
       name: data['name'],
       variation: data['variation'] as Map<String, dynamic>?,
       prescription: data['prescription'] != null ? _parsePrescription(data['prescription']) : null,
       metadata: data['metadata'] != null ? _parseExerciseMeta(data['metadata']) : null,
+      info: data['info'] != null ? _parseInfo(data['info']) : null, // NEW
     );
   }
 
@@ -97,8 +72,9 @@ class LiftDslValidator {
   }
 
   Intensity _parseIntensity(Map<String, dynamic> data) {
+    final typeString = data['type'].toString().toLowerCase().replaceAll('_', '');
     return Intensity(
-      type: IntensityType.values.firstWhere((e) => e.name.toLowerCase().replaceAll('_', '') == data['type'].toString().toLowerCase().replaceAll('_', '')),
+      type: IntensityType.values.firstWhere((e) => e.name.replaceAll('_', '') == typeString),
       target: (data['target'] as num?)?.toDouble(),
       value: (data['value'] as num?)?.toDouble(),
       kg: (data['kg'] as num?)?.toDouble(),
@@ -112,6 +88,22 @@ class LiftDslValidator {
       aliases: (data['aliases'] as List?)?.map((e) => e.toString()).toList(),
       equipment: (data['equipment'] as List?)?.map((e) => e.toString()).toList(),
       primaryMuscles: (data['primary_muscles'] as List?)?.map((e) => e.toString()).toList(),
+    );
+  }
+
+  // --- NEW ---
+  Info _parseInfo(Map<String, dynamic> data) {
+    return Info(
+      howTo: data['how_to'] as String?,
+      coachingCues: (data['coaching_cues'] as List?)?.map((e) => e.toString()).toList(),
+      commonErrors: (data['common_errors'] as List?)?.map((e) => e.toString()).toList(),
+      safetyNotes: data['safety_notes'] as String?,
+      videoSearchQuery: data['video_search_query'] as String?,
+      webSearchQuery: data['web_search_query'] as String?,
+      regression: data['regression'] as String?,
+      progression: data['progression'] as String?,
+      muscles: (data['muscles'] as List?)?.map((e) => e.toString()).toList(),
+      equipmentNotes: data['equipment_notes'] as String?,
     );
   }
 }
