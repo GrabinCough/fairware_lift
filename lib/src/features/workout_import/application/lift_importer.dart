@@ -1,0 +1,129 @@
+// lib/src/features/workout_import/application/lift_importer.dart
+
+// -----------------------------------------------------------------------------
+// --- IMPORTS -----------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
+
+import 'package:fairware_lift/src/features/workout_import/domain/lift_dsl.dart';
+import 'package:fairware_lift/src/features/workout_import/application/lift_dsl_validator.dart';
+import 'package:fairware_lift/src/features/workout_import/application/lift_normalizer.dart';
+import 'package:fairware_lift/src/features/workout_import/application/lift_matcher.dart';
+import 'package:fairware_lift/src/features/workout_import/application/lift_hash.dart';
+import 'package:fairware_lift/src/features/workout/domain/session_item.dart';
+
+// -----------------------------------------------------------------------------
+// --- DATA MODELS FOR IMPORTER ------------------------------------------------
+// -----------------------------------------------------------------------------
+
+class LowConfidenceIssue {
+  final String rawName;
+  LowConfidenceIssue({required this.rawName});
+}
+
+class LiftImporterOutput {
+  final List<SessionItem> sessionItems;
+  final List<LowConfidenceIssue> issues;
+  final String? error;
+
+  LiftImporterOutput({
+    this.sessionItems = const [],
+    this.issues = const [],
+    this.error,
+  });
+
+  bool get hasIssues => issues.isNotEmpty;
+  bool get hasError => error != null;
+}
+
+// -----------------------------------------------------------------------------
+// --- LIFT IMPORTER SERVICE ---------------------------------------------------
+// -----------------------------------------------------------------------------
+
+class LiftImporter {
+  final LiftDslValidator _validator;
+  final LiftNormalizer _normalizer;
+  final LiftMatcher _matcher;
+  final LiftHash _hasher;
+  final Uuid _uuid = const Uuid();
+
+  LiftImporter(this._validator, this._normalizer, this._matcher, this._hasher);
+
+  Future<LiftImporterOutput> importFromJson(String jsonString) async {
+    try {
+      final validationResult = _validator.parseAndValidate(jsonString);
+      if (!validationResult.isValid) {
+        return LiftImporterOutput(error: validationResult.error);
+      }
+
+      final normalizedWorkout = _normalizer.normalize(validationResult.workout!);
+
+      final sessionItems = <SessionItem>[];
+      final issues = <LowConfidenceIssue>[];
+
+      for (final block in normalizedWorkout.workout.blocks) {
+        if (block.type == BlockType.straight || block.type == BlockType.warmup || block.type == BlockType.finisher) {
+          for (final exercise in block.exercises) {
+            final sessionExercise = await _buildSessionExercise(exercise, issues);
+            sessionItems.add(sessionExercise);
+          }
+        } else if (block.type == BlockType.superset || block.type == BlockType.triset) {
+          final supersetExercises = <SessionExercise>[];
+          for (final exercise in block.exercises) {
+            final sessionExercise = await _buildSessionExercise(exercise, issues);
+            supersetExercises.add(sessionExercise);
+          }
+          sessionItems.add(SessionSuperset(id: _uuid.v4(), exercises: supersetExercises));
+        }
+      }
+
+      return LiftImporterOutput(sessionItems: sessionItems, issues: issues);
+    } catch (e) {
+      return LiftImporterOutput(error: 'An unexpected error occurred during import: ${e.toString()}');
+    }
+  }
+
+  Future<SessionExercise> _buildSessionExercise(Exercise exercise, List<LowConfidenceIssue> issues) async {
+    final matchResult = await _matcher.match(
+      rawName: exercise.name,
+      aliases: exercise.metadata?.aliases,
+      variation: exercise.variation,
+    );
+
+    if (matchResult.confidence < 0.6) {
+      issues.add(LowConfidenceIssue(rawName: exercise.name));
+    }
+
+    final exerciseHash = _hasher.exerciseHash(exercise.name, exercise.variation);
+
+    return SessionExercise(
+      id: _uuid.v4(),
+      slug: matchResult.canonicalSlug,
+      exerciseHash: exerciseHash,
+      displayName: exercise.name,
+      prescription: exercise.prescription!,
+      variation: exercise.variation ?? {},
+      unmapped: matchResult.unmapped,
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+// --- PROVIDERS ---------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+final liftDslValidatorProvider = Provider((_) => LiftDslValidator());
+final liftNormalizerProvider = Provider((_) => LiftNormalizer());
+final liftHashProvider = Provider((_) => LiftHash());
+final liftMatcherProvider = Provider<LiftMatcher>((_) => StubLiftMatcher());
+
+final liftImporterProvider = Provider((ref) {
+  return LiftImporter(
+    ref.watch(liftDslValidatorProvider),
+    ref.watch(liftNormalizerProvider),
+    ref.watch(liftMatcherProvider),
+    ref.watch(liftHashProvider),
+  );
+});

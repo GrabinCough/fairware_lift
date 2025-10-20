@@ -1,4 +1,3 @@
-// ----- lib/src/features/workout/presentation/session_screen.dart -----
 // lib/src/features/workout/presentation/session_screen.dart
 
 // -----------------------------------------------------------------------------
@@ -8,24 +7,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
-import 'package:fairware_lift/src/features/dxg/application/dxg_state.dart';
 import 'package:fairware_lift/src/features/dxg/domain/warmup_item.dart';
-import 'package:fairware_lift/src/features/dxg/presentation/dxg_exercise_picker_screen.dart';
 import 'package:fairware_lift/src/features/workout/application/session_state.dart';
-// --- NEW IMPORT ---
 import 'package:fairware_lift/src/features/workout/application/timer_state.dart';
 import 'package:fairware_lift/src/features/workout/domain/session_item.dart';
 import 'package:fairware_lift/src/features/workout/presentation/widgets/exercise_list_item.dart';
 import 'package:fairware_lift/src/features/workout/presentation/widgets/warmup_list_item.dart';
 import 'package:fairware_lift/src/features/workout/presentation/widgets/workout_dock.dart';
 import 'package:fairware_lift/src/features/workout/presentation/workout_summary_screen.dart';
+import 'package:fairware_lift/src/features/workout_import/presentation/paste_workout_screen.dart';
 
 // -----------------------------------------------------------------------------
 // --- SESSION SCREEN WIDGET ---------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// --- REFACTORED to ConsumerStatefulWidget ---
-// This allows us to use initState and dispose to manage the workout timer.
 class SessionScreen extends ConsumerStatefulWidget {
   const SessionScreen({super.key});
 
@@ -37,8 +32,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   @override
   void initState() {
     super.initState();
-    // --- NEW ---
-    // Start the workout timer as soon as the screen is initialized.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(workoutMetricsProvider.notifier).startWorkout();
     });
@@ -46,9 +39,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
 
   @override
   void dispose() {
-    // --- NEW ---
-    // Stop the workout timer when the screen is disposed.
-    // This is a safeguard, the main stop is in the Finish button.
     ref.read(workoutMetricsProvider.notifier).stopWorkout();
     super.dispose();
   }
@@ -56,7 +46,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
   void _showExerciseInfo(
     BuildContext context, {
     required String displayName,
-    required Map<String, String> discriminators,
+    required Map<String, dynamic> variation,
   }) {
     String _formatTitle(String key) =>
         '${key[0].toUpperCase()}${key.substring(1)}'.replaceAll('_', ' ');
@@ -70,7 +60,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: discriminators.entries.map((entry) {
+            children: variation.entries.map((entry) {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4.0),
                 child: RichText(
@@ -81,7 +71,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                         text: '${_formatTitle(entry.key)}: ',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      TextSpan(text: entry.value),
+                      TextSpan(text: entry.value.toString()),
                     ],
                   ),
                 ),
@@ -107,12 +97,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
       appBar: AppBar(
         backgroundColor: AppTheme.colors.background,
         elevation: 0,
-        title: const Text('Quick Workout'),
+        title: const Text('Workout'),
         actions: [
           TextButton(
             onPressed: () {
-              // --- NEW ---
-              // Stop the workout timer before navigating to the summary.
               ref.read(workoutMetricsProvider.notifier).stopWorkout();
               final completedWorkout = ref.read(sessionStateProvider);
               Navigator.of(context).push(
@@ -129,10 +117,10 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
       ),
       bottomNavigationBar: const WorkoutDock(),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 80),
+        padding: const EdgeInsets.fromLTRB(8, 8, 8, 100), // Added more bottom padding
         children: [
           if (sessionItems.isEmpty)
-            _buildEmptyState()
+            _buildEmptyState(context)
           else
             ReorderableListView(
               shrinkWrap: true,
@@ -151,12 +139,12 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                       background: _buildDismissBackground(),
                       child: ExerciseListItem(
                         displayName: e.displayName,
-                        discriminators: e.discriminators,
-                        target: e.target,
+                        prescription: e.prescription,
+                        variation: e.variation,
                         loggedSets: e.loggedSets,
                         isCurrent: e.isCurrent,
                         onCardTap: () => ref.read(sessionStateProvider.notifier).setCurrentItem(itemId: e.id),
-                        onInfoTap: () => _showExerciseInfo(context, displayName: e.displayName, discriminators: e.discriminators),
+                        onInfoTap: () => _showExerciseInfo(context, displayName: e.displayName, variation: e.variation),
                       ),
                     ),
                   SessionWarmupItem w => Dismissible(
@@ -174,43 +162,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                 };
               }).toList(),
             ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: TextButton.icon(
-                  onPressed: () async {
-                    final result = await Navigator.of(context).push<dynamic>(
-                      MaterialPageRoute(
-                        fullscreenDialog: true,
-                        builder: (context) => const DXGExercisePickerScreen(),
-                      ),
-                    );
-
-                    if (result is GeneratedExerciseResult) {
-                      ref.read(sessionStateProvider.notifier).addDxgExercise(result);
-                    } else if (result is Map) {
-                      final item = result['item'] as WarmupItem;
-                      final params = result['params'] as Map<String, String>;
-                      ref.read(sessionStateProvider.notifier).addWarmupItem(item, params);
-                    }
-                  },
-                  icon: const Icon(Icons.add_circle_outline_rounded),
-                  label: const Text('Add Exercise'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextButton.icon(
-                  onPressed: () {
-                    ref.read(sessionStateProvider.notifier).addSuperset();
-                  },
-                  icon: const Icon(Icons.link_rounded),
-                  label: const Text('Add Superset'),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -226,14 +177,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 64.0),
+        padding: const EdgeInsets.symmetric(vertical: 64.0, horizontal: 16.0),
         child: Column(
           children: [
             Icon(
-              Icons.fitness_center_rounded,
+              Icons.directions_run_rounded,
               size: 64,
               color: AppTheme.colors.textMuted,
             ),
@@ -244,8 +195,22 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Tap "Add Exercise" to get started.',
+              'Import a workout to get started.',
               style: AppTheme.typography.body,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    fullscreenDialog: true,
+                    builder: (context) => const PasteWorkoutScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.paste_rounded),
+              label: const Text('Import from Text'),
             ),
           ],
         ),
@@ -256,7 +221,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
 
 class _SupersetListItem extends ConsumerWidget {
   final SessionSuperset superset;
-  final void Function(BuildContext, {required String displayName, required Map<String, String> discriminators}) onInfoTap;
+  final void Function(BuildContext, {required String displayName, required Map<String, dynamic> variation}) onInfoTap;
 
   const _SupersetListItem({super.key, required this.superset, required this.onInfoTap});
 
@@ -298,30 +263,15 @@ class _SupersetListItem extends ConsumerWidget {
                 ),
                 child: ExerciseListItem(
                   displayName: exercise.displayName,
-                  discriminators: exercise.discriminators,
-                  target: exercise.target,
+                  prescription: exercise.prescription,
+                  variation: exercise.variation,
                   loggedSets: exercise.loggedSets,
                   isCurrent: exercise.isCurrent,
                   onCardTap: () => ref.read(sessionStateProvider.notifier).setCurrentItem(itemId: exercise.id),
-                  onInfoTap: () => onInfoTap(context, displayName: exercise.displayName, discriminators: exercise.discriminators),
+                  onInfoTap: () => onInfoTap(context, displayName: exercise.displayName, variation: exercise.variation),
                 ),
               );
             }).toList(),
-            TextButton.icon(
-              onPressed: () async {
-                final result = await Navigator.of(context).push<dynamic>(
-                  MaterialPageRoute(
-                    fullscreenDialog: true,
-                    builder: (context) => const DXGExercisePickerScreen(),
-                  ),
-                );
-                if (result is GeneratedExerciseResult) {
-                  ref.read(sessionStateProvider.notifier).addExerciseToSuperset(supersetId: superset.id, result: result);
-                }
-              },
-              icon: const Icon(Icons.add_circle_outline_rounded),
-              label: const Text('Add Exercise to Superset'),
-            ),
           ],
         ),
       ),

@@ -1,27 +1,20 @@
+// lib/src/features/workout/presentation/start_workout_options_screen.dart
+
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// Core Flutter material design library.
 import 'package:flutter/material.dart';
-
-// Riverpod for state management.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// The application's design system for consistent styling.
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
-
-// The session state provider, so we can invalidate it.
-import '../application/session_state.dart';
-
-// Import the session screen to navigate to it.
-import 'session_screen.dart';
+import 'package:fairware_lift/src/features/workout/application/session_state.dart';
+import 'package:fairware_lift/src/features/workout/presentation/session_screen.dart';
+import 'package:fairware_lift/src/features/workout_import/presentation/paste_workout_screen.dart';
 
 // -----------------------------------------------------------------------------
 // --- START WORKOUT OPTIONS SCREEN WIDGET -------------------------------------
 // -----------------------------------------------------------------------------
 
-/// This is now a ConsumerWidget so it can interact with providers.
 class StartWorkoutOptionsScreen extends ConsumerWidget {
   const StartWorkoutOptionsScreen({super.key});
 
@@ -41,18 +34,14 @@ class StartWorkoutOptionsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
                 _buildOptionCard(
                   context: context,
                   icon: Icons.play_circle_outline_rounded,
                   title: 'Quick Workout',
                   subtitle: 'Start an empty session',
                   onTap: () {
-                    // --- STATE MANAGEMENT ---
-                    // Invalidate the provider to reset the session to a fresh,
-                    // empty state before navigating.
                     ref.invalidate(sessionStateProvider);
-
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         fullscreenDialog: true,
@@ -64,11 +53,25 @@ class StartWorkoutOptionsScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 _buildOptionCard(
                   context: context,
+                  icon: Icons.paste_rounded,
+                  title: 'Import from Text',
+                  subtitle: 'Paste a workout from an LLM',
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        fullscreenDialog: true,
+                        builder: (context) => const PasteWorkoutScreen(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                _buildOptionCard(
+                  context: context,
                   icon: Icons.list_alt_rounded,
                   title: 'Choose from Program',
                   subtitle: 'Select a planned day',
                   onTap: () {
-                    // TODO: Implement logic for starting a programmed workout.
                     print('Choose from Program selected');
                   },
                 ),

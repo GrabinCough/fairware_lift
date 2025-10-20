@@ -1,4 +1,3 @@
-// ----- lib/src/features/workout/presentation/workout_summary_screen.dart -----
 // lib/src/features/workout/presentation/workout_summary_screen.dart
 
 // -----------------------------------------------------------------------------
@@ -63,7 +62,7 @@ class WorkoutSummaryScreen extends ConsumerWidget {
 
     for (final item in completedItems) {
       switch (item) {
-        case SessionExercise e when e.loggedSets.isNotEmpty:
+        case SessionExercise e when e.loggedSets.isNotEmpty && !e.unmapped:
           _processExerciseForSaving(e, sessionId, now, exerciseInstancesToSave, setEntriesCompanion);
         case SessionWarmupItem w:
           savedWarmupsCompanion.add(
@@ -78,7 +77,7 @@ class WorkoutSummaryScreen extends ConsumerWidget {
           );
         case SessionSuperset s:
           for (final exerciseInSuperset in s.exercises) {
-            if (exerciseInSuperset.loggedSets.isNotEmpty) {
+            if (exerciseInSuperset.loggedSets.isNotEmpty && !exerciseInSuperset.unmapped) {
               _processExerciseForSaving(exerciseInSuperset, sessionId, now, exerciseInstancesToSave, setEntriesCompanion);
             }
           }
@@ -88,7 +87,7 @@ class WorkoutSummaryScreen extends ConsumerWidget {
 
     if (setEntriesCompanion.isEmpty && savedWarmupsCompanion.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Empty workout discarded.')),
+        const SnackBar(content: Text('Empty or unmapped workout discarded.')),
       );
       Navigator.of(context).popUntil((route) => route.isFirst);
       return;
@@ -130,13 +129,19 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     List<ExerciseInstancesCompanion> exerciseInstancesToSave,
     List<SetEntriesCompanion> setEntriesCompanion,
   ) {
+    // Guard against unmapped exercises which will have a null slug.
+    if (e.slug == null) return;
+
     const uuid = Uuid();
+    final familyId = e.slug!.split('.').first;
+    final discriminators = e.variation.map((key, value) => MapEntry(key, value.toString()));
+
     exerciseInstancesToSave.add(
       ExerciseInstancesCompanion(
-        slug: drift.Value(e.slug),
-        familyId: drift.Value(e.discriminators['family_id'] ?? ''),
+        slug: drift.Value(e.slug!),
+        familyId: drift.Value(familyId),
         displayName: drift.Value(e.displayName),
-        discriminators: drift.Value(e.discriminators),
+        discriminators: drift.Value(discriminators),
         firstSeenAt: drift.Value(now),
       ),
     );
@@ -146,7 +151,7 @@ class WorkoutSummaryScreen extends ConsumerWidget {
         SetEntriesCompanion(
           id: drift.Value(uuid.v4()),
           sessionId: drift.Value(sessionId),
-          exerciseSlug: drift.Value(e.slug),
+          exerciseSlug: drift.Value(e.slug!),
           setOrder: drift.Value(i + 1),
           weight: drift.Value(set.weight),
           reps: drift.Value(set.reps),
@@ -190,8 +195,6 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     );
   }
 
-  /// --- REFACTORED ---
-  /// The metrics card now displays all three timing values.
   Widget _buildMetricsCard(WorkoutMetrics metrics) {
     return Card(
       color: AppTheme.colors.surface,
@@ -274,7 +277,7 @@ class WorkoutSummaryScreen extends ConsumerWidget {
   Widget _buildWarmupSummary(SessionWarmupItem warmup) {
     final subtitle = warmup.selectedParameters.entries
         .map((e) => '${e.key}: ${e.value}')
-        .join('  •  ');
+        .join('  ΓÇó  ');
 
     return Card(
       color: AppTheme.colors.surface,

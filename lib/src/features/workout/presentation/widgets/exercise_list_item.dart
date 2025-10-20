@@ -1,4 +1,3 @@
-// ----- lib/src/features/workout/presentation/widgets/exercise_list_item.dart -----
 // lib/src/features/workout/presentation/widgets/exercise_list_item.dart
 
 // -----------------------------------------------------------------------------
@@ -8,6 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
 import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
+import 'package:fairware_lift/src/features/workout_import/domain/lift_dsl.dart';
 
 // -----------------------------------------------------------------------------
 // --- EXERCISE LIST ITEM WIDGET -----------------------------------------------
@@ -15,8 +15,8 @@ import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 
 class ExerciseListItem extends StatelessWidget {
   final String displayName;
-  final Map<String, String> discriminators;
-  final String target;
+  final Prescription prescription;
+  final Map<String, dynamic> variation;
   final bool isCurrent;
   final List<LoggedSet> loggedSets;
   final VoidCallback onInfoTap;
@@ -25,8 +25,8 @@ class ExerciseListItem extends StatelessWidget {
   const ExerciseListItem({
     super.key,
     required this.displayName,
-    required this.discriminators,
-    required this.target,
+    required this.prescription,
+    required this.variation,
     required this.loggedSets,
     required this.onInfoTap,
     required this.onCardTap,
@@ -35,6 +35,10 @@ class ExerciseListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final reps = prescription.reps?.toString() ?? '';
+    final sets = prescription.sets?.toString() ?? '';
+    final targetString = (sets.isNotEmpty && reps.isNotEmpty) ? '$sets x $reps' : reps;
+
     return Card(
       color: isCurrent ? AppTheme.colors.surfaceAlt : AppTheme.colors.surface,
       elevation: 0,
@@ -69,7 +73,7 @@ class ExerciseListItem extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        target,
+                        targetString,
                         style: AppTheme.typography.body,
                       ),
                       const SizedBox(width: 4),

@@ -21,12 +21,14 @@ mixin _$SessionItem {
   TResult when<TResult extends Object?>({
     required TResult Function(
             String id,
-            String slug,
+            String? slug,
+            String exerciseHash,
             String displayName,
-            Map<String, String> discriminators,
-            String target,
+            Prescription prescription,
+            Map<String, dynamic> variation,
             List<LoggedSet> loggedSets,
-            bool isCurrent)
+            bool isCurrent,
+            bool unmapped)
         exercise,
     required TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)
@@ -39,12 +41,14 @@ mixin _$SessionItem {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(
             String id,
-            String slug,
+            String? slug,
+            String exerciseHash,
             String displayName,
-            Map<String, String> discriminators,
-            String target,
+            Prescription prescription,
+            Map<String, dynamic> variation,
             List<LoggedSet> loggedSets,
-            bool isCurrent)?
+            bool isCurrent,
+            bool unmapped)?
         exercise,
     TResult? Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
@@ -56,12 +60,14 @@ mixin _$SessionItem {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(
             String id,
-            String slug,
+            String? slug,
+            String exerciseHash,
             String displayName,
-            Map<String, String> discriminators,
-            String target,
+            Prescription prescription,
+            Map<String, dynamic> variation,
             List<LoggedSet> loggedSets,
-            bool isCurrent)?
+            bool isCurrent,
+            bool unmapped)?
         exercise,
     TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
@@ -145,12 +151,14 @@ abstract class _$$SessionExerciseImplCopyWith<$Res>
   @useResult
   $Res call(
       {String id,
-      String slug,
+      String? slug,
+      String exerciseHash,
       String displayName,
-      Map<String, String> discriminators,
-      String target,
+      Prescription prescription,
+      Map<String, dynamic> variation,
       List<LoggedSet> loggedSets,
-      bool isCurrent});
+      bool isCurrent,
+      bool unmapped});
 }
 
 /// @nodoc
@@ -167,34 +175,40 @@ class __$$SessionExerciseImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? slug = null,
+    Object? slug = freezed,
+    Object? exerciseHash = null,
     Object? displayName = null,
-    Object? discriminators = null,
-    Object? target = null,
+    Object? prescription = null,
+    Object? variation = null,
     Object? loggedSets = null,
     Object? isCurrent = null,
+    Object? unmapped = null,
   }) {
     return _then(_$SessionExerciseImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
-      slug: null == slug
+      slug: freezed == slug
           ? _value.slug
           : slug // ignore: cast_nullable_to_non_nullable
+              as String?,
+      exerciseHash: null == exerciseHash
+          ? _value.exerciseHash
+          : exerciseHash // ignore: cast_nullable_to_non_nullable
               as String,
       displayName: null == displayName
           ? _value.displayName
           : displayName // ignore: cast_nullable_to_non_nullable
               as String,
-      discriminators: null == discriminators
-          ? _value._discriminators
-          : discriminators // ignore: cast_nullable_to_non_nullable
-              as Map<String, String>,
-      target: null == target
-          ? _value.target
-          : target // ignore: cast_nullable_to_non_nullable
-              as String,
+      prescription: null == prescription
+          ? _value.prescription
+          : prescription // ignore: cast_nullable_to_non_nullable
+              as Prescription,
+      variation: null == variation
+          ? _value._variation
+          : variation // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
       loggedSets: null == loggedSets
           ? _value._loggedSets
           : loggedSets // ignore: cast_nullable_to_non_nullable
@@ -202,6 +216,10 @@ class __$$SessionExerciseImplCopyWithImpl<$Res>
       isCurrent: null == isCurrent
           ? _value.isCurrent
           : isCurrent // ignore: cast_nullable_to_non_nullable
+              as bool,
+      unmapped: null == unmapped
+          ? _value.unmapped
+          : unmapped // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }
@@ -212,31 +230,35 @@ class __$$SessionExerciseImplCopyWithImpl<$Res>
 class _$SessionExerciseImpl implements SessionExercise {
   const _$SessionExerciseImpl(
       {required this.id,
-      required this.slug,
+      this.slug,
+      required this.exerciseHash,
       required this.displayName,
-      required final Map<String, String> discriminators,
-      required this.target,
+      required this.prescription,
+      required final Map<String, dynamic> variation,
       final List<LoggedSet> loggedSets = const [],
-      this.isCurrent = false})
-      : _discriminators = discriminators,
+      this.isCurrent = false,
+      this.unmapped = false})
+      : _variation = variation,
         _loggedSets = loggedSets;
 
   @override
   final String id;
   @override
-  final String slug;
+  final String? slug;
+  @override
+  final String exerciseHash;
   @override
   final String displayName;
-  final Map<String, String> _discriminators;
   @override
-  Map<String, String> get discriminators {
-    if (_discriminators is EqualUnmodifiableMapView) return _discriminators;
+  final Prescription prescription;
+  final Map<String, dynamic> _variation;
+  @override
+  Map<String, dynamic> get variation {
+    if (_variation is EqualUnmodifiableMapView) return _variation;
     // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(_discriminators);
+    return EqualUnmodifiableMapView(_variation);
   }
 
-  @override
-  final String target;
   final List<LoggedSet> _loggedSets;
   @override
   @JsonKey()
@@ -249,10 +271,13 @@ class _$SessionExerciseImpl implements SessionExercise {
   @override
   @JsonKey()
   final bool isCurrent;
+  @override
+  @JsonKey()
+  final bool unmapped;
 
   @override
   String toString() {
-    return 'SessionItem.exercise(id: $id, slug: $slug, displayName: $displayName, discriminators: $discriminators, target: $target, loggedSets: $loggedSets, isCurrent: $isCurrent)';
+    return 'SessionItem.exercise(id: $id, slug: $slug, exerciseHash: $exerciseHash, displayName: $displayName, prescription: $prescription, variation: $variation, loggedSets: $loggedSets, isCurrent: $isCurrent, unmapped: $unmapped)';
   }
 
   @override
@@ -262,15 +287,20 @@ class _$SessionExerciseImpl implements SessionExercise {
             other is _$SessionExerciseImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.slug, slug) || other.slug == slug) &&
+            (identical(other.exerciseHash, exerciseHash) ||
+                other.exerciseHash == exerciseHash) &&
             (identical(other.displayName, displayName) ||
                 other.displayName == displayName) &&
+            (identical(other.prescription, prescription) ||
+                other.prescription == prescription) &&
             const DeepCollectionEquality()
-                .equals(other._discriminators, _discriminators) &&
-            (identical(other.target, target) || other.target == target) &&
+                .equals(other._variation, _variation) &&
             const DeepCollectionEquality()
                 .equals(other._loggedSets, _loggedSets) &&
             (identical(other.isCurrent, isCurrent) ||
-                other.isCurrent == isCurrent));
+                other.isCurrent == isCurrent) &&
+            (identical(other.unmapped, unmapped) ||
+                other.unmapped == unmapped));
   }
 
   @override
@@ -278,11 +308,13 @@ class _$SessionExerciseImpl implements SessionExercise {
       runtimeType,
       id,
       slug,
+      exerciseHash,
       displayName,
-      const DeepCollectionEquality().hash(_discriminators),
-      target,
+      prescription,
+      const DeepCollectionEquality().hash(_variation),
       const DeepCollectionEquality().hash(_loggedSets),
-      isCurrent);
+      isCurrent,
+      unmapped);
 
   /// Create a copy of SessionItem
   /// with the given fields replaced by the non-null parameter values.
@@ -298,12 +330,14 @@ class _$SessionExerciseImpl implements SessionExercise {
   TResult when<TResult extends Object?>({
     required TResult Function(
             String id,
-            String slug,
+            String? slug,
+            String exerciseHash,
             String displayName,
-            Map<String, String> discriminators,
-            String target,
+            Prescription prescription,
+            Map<String, dynamic> variation,
             List<LoggedSet> loggedSets,
-            bool isCurrent)
+            bool isCurrent,
+            bool unmapped)
         exercise,
     required TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)
@@ -311,8 +345,8 @@ class _$SessionExerciseImpl implements SessionExercise {
     required TResult Function(String id, List<SessionExercise> exercises)
         superset,
   }) {
-    return exercise(
-        id, slug, displayName, discriminators, target, loggedSets, isCurrent);
+    return exercise(id, slug, exerciseHash, displayName, prescription,
+        variation, loggedSets, isCurrent, unmapped);
   }
 
   @override
@@ -320,20 +354,22 @@ class _$SessionExerciseImpl implements SessionExercise {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(
             String id,
-            String slug,
+            String? slug,
+            String exerciseHash,
             String displayName,
-            Map<String, String> discriminators,
-            String target,
+            Prescription prescription,
+            Map<String, dynamic> variation,
             List<LoggedSet> loggedSets,
-            bool isCurrent)?
+            bool isCurrent,
+            bool unmapped)?
         exercise,
     TResult? Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
         warmup,
     TResult? Function(String id, List<SessionExercise> exercises)? superset,
   }) {
-    return exercise?.call(
-        id, slug, displayName, discriminators, target, loggedSets, isCurrent);
+    return exercise?.call(id, slug, exerciseHash, displayName, prescription,
+        variation, loggedSets, isCurrent, unmapped);
   }
 
   @override
@@ -341,12 +377,14 @@ class _$SessionExerciseImpl implements SessionExercise {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(
             String id,
-            String slug,
+            String? slug,
+            String exerciseHash,
             String displayName,
-            Map<String, String> discriminators,
-            String target,
+            Prescription prescription,
+            Map<String, dynamic> variation,
             List<LoggedSet> loggedSets,
-            bool isCurrent)?
+            bool isCurrent,
+            bool unmapped)?
         exercise,
     TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
@@ -355,8 +393,8 @@ class _$SessionExerciseImpl implements SessionExercise {
     required TResult orElse(),
   }) {
     if (exercise != null) {
-      return exercise(
-          id, slug, displayName, discriminators, target, loggedSets, isCurrent);
+      return exercise(id, slug, exerciseHash, displayName, prescription,
+          variation, loggedSets, isCurrent, unmapped);
     }
     return orElse();
   }
@@ -399,21 +437,25 @@ class _$SessionExerciseImpl implements SessionExercise {
 abstract class SessionExercise implements SessionItem {
   const factory SessionExercise(
       {required final String id,
-      required final String slug,
+      final String? slug,
+      required final String exerciseHash,
       required final String displayName,
-      required final Map<String, String> discriminators,
-      required final String target,
+      required final Prescription prescription,
+      required final Map<String, dynamic> variation,
       final List<LoggedSet> loggedSets,
-      final bool isCurrent}) = _$SessionExerciseImpl;
+      final bool isCurrent,
+      final bool unmapped}) = _$SessionExerciseImpl;
 
   @override
   String get id;
-  String get slug;
+  String? get slug;
+  String get exerciseHash;
   String get displayName;
-  Map<String, String> get discriminators;
-  String get target;
+  Prescription get prescription;
+  Map<String, dynamic> get variation;
   List<LoggedSet> get loggedSets;
   bool get isCurrent;
+  bool get unmapped;
 
   /// Create a copy of SessionItem
   /// with the given fields replaced by the non-null parameter values.
@@ -537,12 +579,14 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
   TResult when<TResult extends Object?>({
     required TResult Function(
             String id,
-            String slug,
+            String? slug,
+            String exerciseHash,
             String displayName,
-            Map<String, String> discriminators,
-            String target,
+            Prescription prescription,
+            Map<String, dynamic> variation,
             List<LoggedSet> loggedSets,
-            bool isCurrent)
+            bool isCurrent,
+            bool unmapped)
         exercise,
     required TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)
@@ -558,12 +602,14 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(
             String id,
-            String slug,
+            String? slug,
+            String exerciseHash,
             String displayName,
-            Map<String, String> discriminators,
-            String target,
+            Prescription prescription,
+            Map<String, dynamic> variation,
             List<LoggedSet> loggedSets,
-            bool isCurrent)?
+            bool isCurrent,
+            bool unmapped)?
         exercise,
     TResult? Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
@@ -578,12 +624,14 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(
             String id,
-            String slug,
+            String? slug,
+            String exerciseHash,
             String displayName,
-            Map<String, String> discriminators,
-            String target,
+            Prescription prescription,
+            Map<String, dynamic> variation,
             List<LoggedSet> loggedSets,
-            bool isCurrent)?
+            bool isCurrent,
+            bool unmapped)?
         exercise,
     TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
@@ -743,12 +791,14 @@ class _$SessionSupersetImpl implements SessionSuperset {
   TResult when<TResult extends Object?>({
     required TResult Function(
             String id,
-            String slug,
+            String? slug,
+            String exerciseHash,
             String displayName,
-            Map<String, String> discriminators,
-            String target,
+            Prescription prescription,
+            Map<String, dynamic> variation,
             List<LoggedSet> loggedSets,
-            bool isCurrent)
+            bool isCurrent,
+            bool unmapped)
         exercise,
     required TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)
@@ -764,12 +814,14 @@ class _$SessionSupersetImpl implements SessionSuperset {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(
             String id,
-            String slug,
+            String? slug,
+            String exerciseHash,
             String displayName,
-            Map<String, String> discriminators,
-            String target,
+            Prescription prescription,
+            Map<String, dynamic> variation,
             List<LoggedSet> loggedSets,
-            bool isCurrent)?
+            bool isCurrent,
+            bool unmapped)?
         exercise,
     TResult? Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
@@ -784,12 +836,14 @@ class _$SessionSupersetImpl implements SessionSuperset {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(
             String id,
-            String slug,
+            String? slug,
+            String exerciseHash,
             String displayName,
-            Map<String, String> discriminators,
-            String target,
+            Prescription prescription,
+            Map<String, dynamic> variation,
             List<LoggedSet> loggedSets,
-            bool isCurrent)?
+            bool isCurrent,
+            bool unmapped)?
         exercise,
     TResult Function(
             String id, WarmupItem item, Map<String, String> selectedParameters)?
