@@ -1,4 +1,4 @@
- // lib/src/features/llm_prompting/presentation/llm_intake_screen.dart
+// lib/src/features/llm_prompting/presentation/llm_intake_screen.dart
 
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
@@ -30,16 +30,13 @@ class _LlmIntakeScreenState extends ConsumerState<LlmIntakeScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize with an empty profile, or load the existing one.
     _profile = ref.read(userProfileProvider).value ?? const UserProfile();
   }
 
   void _generatePrompt() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      // Save the profile for next time.
       ref.read(userProfileProvider.notifier).save(_profile);
-      // Generate the prompt string.
       final prompt = ref.read(promptGenerationServiceProvider).createOnboardingPrompt(_profile);
       _showPromptDialog(prompt);
     }
@@ -112,9 +109,9 @@ class _LlmIntakeScreenState extends ConsumerState<LlmIntakeScreen> {
             const SizedBox(height: 24),
             _buildSectionHeader('Experience & Goals'),
             _buildTextFormField(
-              label: 'Experience Level (e.g., Beginner, Intermediate)',
-              initialValue: _profile.experienceLevel,
-              onSaved: (value) => _profile = _profile.copyWith(experienceLevel: value),
+              label: 'Training Age (e.g., Novice, Intermediate)',
+              initialValue: _profile.trainingAge,
+              onSaved: (value) => _profile = _profile.copyWith(trainingAge: value),
             ),
             _buildTextFormField(
               label: 'Primary Goals (comma separated)',
@@ -129,13 +126,46 @@ class _LlmIntakeScreenState extends ConsumerState<LlmIntakeScreen> {
               onSaved: (value) => _profile = _profile.copyWith(equipmentAvailable: value?.split(',').map((e) => e.trim()).toList()),
               maxLines: 3,
             ),
-            const SizedBox(height: 24),
-            _buildSectionHeader('Health & History'),
             _buildTextFormField(
-              label: 'Injury History & Considerations',
-              initialValue: _profile.injuryHistory,
-              onSaved: (value) => _profile = _profile.copyWith(injuryHistory: value),
+              label: 'Typical Session Length (minutes)',
+              initialValue: _profile.timePerSessionMinutes?.toString(),
+              keyboardType: TextInputType.number,
+              onSaved: (value) => _profile = _profile.copyWith(timePerSessionMinutes: int.tryParse(value ?? '')),
+            ),
+            const SizedBox(height: 24),
+            _buildSectionHeader('Health & Performance'),
+            _buildTextFormField(
+              label: 'Constraints & Injury History',
+              initialValue: _profile.constraints,
+              onSaved: (value) => _profile = _profile.copyWith(constraints: value),
               maxLines: 4,
+            ),
+            _buildTextFormField(
+              label: 'Known 1RMs (JSON format, e.g., {"squat": 315})',
+              initialValue: _profile.json1RMs,
+              onSaved: (value) => _profile = _profile.copyWith(json1RMs: value),
+              maxLines: 3,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildTextFormField(
+                    label: 'Zone 2 HR (Low)',
+                    initialValue: _profile.z2LowBpm?.toString(),
+                    keyboardType: TextInputType.number,
+                    onSaved: (value) => _profile = _profile.copyWith(z2LowBpm: int.tryParse(value ?? '')),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildTextFormField(
+                    label: 'Zone 2 HR (High)',
+                    initialValue: _profile.z2HighBpm?.toString(),
+                    keyboardType: TextInputType.number,
+                    onSaved: (value) => _profile = _profile.copyWith(z2HighBpm: int.tryParse(value ?? '')),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

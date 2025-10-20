@@ -27,18 +27,23 @@ mixin _$UserProfile {
   int? get heightInches => throw _privateConstructorUsedError;
   double? get weightLbs =>
       throw _privateConstructorUsedError; // Experience & Goals
-  String? get experienceLevel =>
-      throw _privateConstructorUsedError; // e.g., Beginner, Intermediate, Advanced
-  List<String>? get primaryGoals =>
-      throw _privateConstructorUsedError; // e.g., ['Build Muscle', 'Lose Fat']
+  String? get trainingAge =>
+      throw _privateConstructorUsedError; // Renamed from experienceLevel
+  List<String>? get primaryGoals => throw _privateConstructorUsedError;
   String? get goalDetails =>
       throw _privateConstructorUsedError; // Schedule & Equipment
   int? get daysPerWeek => throw _privateConstructorUsedError;
   int? get timePerSessionMinutes => throw _privateConstructorUsedError;
   List<String>? get equipmentAvailable =>
       throw _privateConstructorUsedError; // Health & History
-  String? get injuryHistory => throw _privateConstructorUsedError;
-  String? get currentStatus => throw _privateConstructorUsedError;
+  String? get constraints =>
+      throw _privateConstructorUsedError; // Renamed from injuryHistory
+  String? get currentStatus =>
+      throw _privateConstructorUsedError; // --- NEW FIELDS ---
+  String? get json1RMs =>
+      throw _privateConstructorUsedError; // To hold the JSON string for 1RMs
+  int? get z2LowBpm => throw _privateConstructorUsedError;
+  int? get z2HighBpm => throw _privateConstructorUsedError;
 
   /// Serializes this UserProfile to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -62,14 +67,17 @@ abstract class $UserProfileCopyWith<$Res> {
       String? gender,
       int? heightInches,
       double? weightLbs,
-      String? experienceLevel,
+      String? trainingAge,
       List<String>? primaryGoals,
       String? goalDetails,
       int? daysPerWeek,
       int? timePerSessionMinutes,
       List<String>? equipmentAvailable,
-      String? injuryHistory,
-      String? currentStatus});
+      String? constraints,
+      String? currentStatus,
+      String? json1RMs,
+      int? z2LowBpm,
+      int? z2HighBpm});
 }
 
 /// @nodoc
@@ -92,14 +100,17 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
     Object? gender = freezed,
     Object? heightInches = freezed,
     Object? weightLbs = freezed,
-    Object? experienceLevel = freezed,
+    Object? trainingAge = freezed,
     Object? primaryGoals = freezed,
     Object? goalDetails = freezed,
     Object? daysPerWeek = freezed,
     Object? timePerSessionMinutes = freezed,
     Object? equipmentAvailable = freezed,
-    Object? injuryHistory = freezed,
+    Object? constraints = freezed,
     Object? currentStatus = freezed,
+    Object? json1RMs = freezed,
+    Object? z2LowBpm = freezed,
+    Object? z2HighBpm = freezed,
   }) {
     return _then(_value.copyWith(
       name: freezed == name
@@ -122,9 +133,9 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
           ? _value.weightLbs
           : weightLbs // ignore: cast_nullable_to_non_nullable
               as double?,
-      experienceLevel: freezed == experienceLevel
-          ? _value.experienceLevel
-          : experienceLevel // ignore: cast_nullable_to_non_nullable
+      trainingAge: freezed == trainingAge
+          ? _value.trainingAge
+          : trainingAge // ignore: cast_nullable_to_non_nullable
               as String?,
       primaryGoals: freezed == primaryGoals
           ? _value.primaryGoals
@@ -146,14 +157,26 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
           ? _value.equipmentAvailable
           : equipmentAvailable // ignore: cast_nullable_to_non_nullable
               as List<String>?,
-      injuryHistory: freezed == injuryHistory
-          ? _value.injuryHistory
-          : injuryHistory // ignore: cast_nullable_to_non_nullable
+      constraints: freezed == constraints
+          ? _value.constraints
+          : constraints // ignore: cast_nullable_to_non_nullable
               as String?,
       currentStatus: freezed == currentStatus
           ? _value.currentStatus
           : currentStatus // ignore: cast_nullable_to_non_nullable
               as String?,
+      json1RMs: freezed == json1RMs
+          ? _value.json1RMs
+          : json1RMs // ignore: cast_nullable_to_non_nullable
+              as String?,
+      z2LowBpm: freezed == z2LowBpm
+          ? _value.z2LowBpm
+          : z2LowBpm // ignore: cast_nullable_to_non_nullable
+              as int?,
+      z2HighBpm: freezed == z2HighBpm
+          ? _value.z2HighBpm
+          : z2HighBpm // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 }
@@ -172,14 +195,17 @@ abstract class _$$UserProfileImplCopyWith<$Res>
       String? gender,
       int? heightInches,
       double? weightLbs,
-      String? experienceLevel,
+      String? trainingAge,
       List<String>? primaryGoals,
       String? goalDetails,
       int? daysPerWeek,
       int? timePerSessionMinutes,
       List<String>? equipmentAvailable,
-      String? injuryHistory,
-      String? currentStatus});
+      String? constraints,
+      String? currentStatus,
+      String? json1RMs,
+      int? z2LowBpm,
+      int? z2HighBpm});
 }
 
 /// @nodoc
@@ -200,14 +226,17 @@ class __$$UserProfileImplCopyWithImpl<$Res>
     Object? gender = freezed,
     Object? heightInches = freezed,
     Object? weightLbs = freezed,
-    Object? experienceLevel = freezed,
+    Object? trainingAge = freezed,
     Object? primaryGoals = freezed,
     Object? goalDetails = freezed,
     Object? daysPerWeek = freezed,
     Object? timePerSessionMinutes = freezed,
     Object? equipmentAvailable = freezed,
-    Object? injuryHistory = freezed,
+    Object? constraints = freezed,
     Object? currentStatus = freezed,
+    Object? json1RMs = freezed,
+    Object? z2LowBpm = freezed,
+    Object? z2HighBpm = freezed,
   }) {
     return _then(_$UserProfileImpl(
       name: freezed == name
@@ -230,9 +259,9 @@ class __$$UserProfileImplCopyWithImpl<$Res>
           ? _value.weightLbs
           : weightLbs // ignore: cast_nullable_to_non_nullable
               as double?,
-      experienceLevel: freezed == experienceLevel
-          ? _value.experienceLevel
-          : experienceLevel // ignore: cast_nullable_to_non_nullable
+      trainingAge: freezed == trainingAge
+          ? _value.trainingAge
+          : trainingAge // ignore: cast_nullable_to_non_nullable
               as String?,
       primaryGoals: freezed == primaryGoals
           ? _value._primaryGoals
@@ -254,14 +283,26 @@ class __$$UserProfileImplCopyWithImpl<$Res>
           ? _value._equipmentAvailable
           : equipmentAvailable // ignore: cast_nullable_to_non_nullable
               as List<String>?,
-      injuryHistory: freezed == injuryHistory
-          ? _value.injuryHistory
-          : injuryHistory // ignore: cast_nullable_to_non_nullable
+      constraints: freezed == constraints
+          ? _value.constraints
+          : constraints // ignore: cast_nullable_to_non_nullable
               as String?,
       currentStatus: freezed == currentStatus
           ? _value.currentStatus
           : currentStatus // ignore: cast_nullable_to_non_nullable
               as String?,
+      json1RMs: freezed == json1RMs
+          ? _value.json1RMs
+          : json1RMs // ignore: cast_nullable_to_non_nullable
+              as String?,
+      z2LowBpm: freezed == z2LowBpm
+          ? _value.z2LowBpm
+          : z2LowBpm // ignore: cast_nullable_to_non_nullable
+              as int?,
+      z2HighBpm: freezed == z2HighBpm
+          ? _value.z2HighBpm
+          : z2HighBpm // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -275,14 +316,17 @@ class _$UserProfileImpl implements _UserProfile {
       this.gender,
       this.heightInches,
       this.weightLbs,
-      this.experienceLevel,
+      this.trainingAge,
       final List<String>? primaryGoals,
       this.goalDetails,
       this.daysPerWeek,
       this.timePerSessionMinutes,
       final List<String>? equipmentAvailable,
-      this.injuryHistory,
-      this.currentStatus})
+      this.constraints,
+      this.currentStatus,
+      this.json1RMs,
+      this.z2LowBpm,
+      this.z2HighBpm})
       : _primaryGoals = primaryGoals,
         _equipmentAvailable = equipmentAvailable;
 
@@ -302,10 +346,10 @@ class _$UserProfileImpl implements _UserProfile {
   final double? weightLbs;
 // Experience & Goals
   @override
-  final String? experienceLevel;
-// e.g., Beginner, Intermediate, Advanced
+  final String? trainingAge;
+// Renamed from experienceLevel
   final List<String>? _primaryGoals;
-// e.g., Beginner, Intermediate, Advanced
+// Renamed from experienceLevel
   @override
   List<String>? get primaryGoals {
     final value = _primaryGoals;
@@ -315,7 +359,6 @@ class _$UserProfileImpl implements _UserProfile {
     return EqualUnmodifiableListView(value);
   }
 
-// e.g., ['Build Muscle', 'Lose Fat']
   @override
   final String? goalDetails;
 // Schedule & Equipment
@@ -336,13 +379,22 @@ class _$UserProfileImpl implements _UserProfile {
 
 // Health & History
   @override
-  final String? injuryHistory;
+  final String? constraints;
+// Renamed from injuryHistory
   @override
   final String? currentStatus;
+// --- NEW FIELDS ---
+  @override
+  final String? json1RMs;
+// To hold the JSON string for 1RMs
+  @override
+  final int? z2LowBpm;
+  @override
+  final int? z2HighBpm;
 
   @override
   String toString() {
-    return 'UserProfile(name: $name, age: $age, gender: $gender, heightInches: $heightInches, weightLbs: $weightLbs, experienceLevel: $experienceLevel, primaryGoals: $primaryGoals, goalDetails: $goalDetails, daysPerWeek: $daysPerWeek, timePerSessionMinutes: $timePerSessionMinutes, equipmentAvailable: $equipmentAvailable, injuryHistory: $injuryHistory, currentStatus: $currentStatus)';
+    return 'UserProfile(name: $name, age: $age, gender: $gender, heightInches: $heightInches, weightLbs: $weightLbs, trainingAge: $trainingAge, primaryGoals: $primaryGoals, goalDetails: $goalDetails, daysPerWeek: $daysPerWeek, timePerSessionMinutes: $timePerSessionMinutes, equipmentAvailable: $equipmentAvailable, constraints: $constraints, currentStatus: $currentStatus, json1RMs: $json1RMs, z2LowBpm: $z2LowBpm, z2HighBpm: $z2HighBpm)';
   }
 
   @override
@@ -357,8 +409,8 @@ class _$UserProfileImpl implements _UserProfile {
                 other.heightInches == heightInches) &&
             (identical(other.weightLbs, weightLbs) ||
                 other.weightLbs == weightLbs) &&
-            (identical(other.experienceLevel, experienceLevel) ||
-                other.experienceLevel == experienceLevel) &&
+            (identical(other.trainingAge, trainingAge) ||
+                other.trainingAge == trainingAge) &&
             const DeepCollectionEquality()
                 .equals(other._primaryGoals, _primaryGoals) &&
             (identical(other.goalDetails, goalDetails) ||
@@ -369,10 +421,16 @@ class _$UserProfileImpl implements _UserProfile {
                 other.timePerSessionMinutes == timePerSessionMinutes) &&
             const DeepCollectionEquality()
                 .equals(other._equipmentAvailable, _equipmentAvailable) &&
-            (identical(other.injuryHistory, injuryHistory) ||
-                other.injuryHistory == injuryHistory) &&
+            (identical(other.constraints, constraints) ||
+                other.constraints == constraints) &&
             (identical(other.currentStatus, currentStatus) ||
-                other.currentStatus == currentStatus));
+                other.currentStatus == currentStatus) &&
+            (identical(other.json1RMs, json1RMs) ||
+                other.json1RMs == json1RMs) &&
+            (identical(other.z2LowBpm, z2LowBpm) ||
+                other.z2LowBpm == z2LowBpm) &&
+            (identical(other.z2HighBpm, z2HighBpm) ||
+                other.z2HighBpm == z2HighBpm));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -384,14 +442,17 @@ class _$UserProfileImpl implements _UserProfile {
       gender,
       heightInches,
       weightLbs,
-      experienceLevel,
+      trainingAge,
       const DeepCollectionEquality().hash(_primaryGoals),
       goalDetails,
       daysPerWeek,
       timePerSessionMinutes,
       const DeepCollectionEquality().hash(_equipmentAvailable),
-      injuryHistory,
-      currentStatus);
+      constraints,
+      currentStatus,
+      json1RMs,
+      z2LowBpm,
+      z2HighBpm);
 
   /// Create a copy of UserProfile
   /// with the given fields replaced by the non-null parameter values.
@@ -416,14 +477,17 @@ abstract class _UserProfile implements UserProfile {
       final String? gender,
       final int? heightInches,
       final double? weightLbs,
-      final String? experienceLevel,
+      final String? trainingAge,
       final List<String>? primaryGoals,
       final String? goalDetails,
       final int? daysPerWeek,
       final int? timePerSessionMinutes,
       final List<String>? equipmentAvailable,
-      final String? injuryHistory,
-      final String? currentStatus}) = _$UserProfileImpl;
+      final String? constraints,
+      final String? currentStatus,
+      final String? json1RMs,
+      final int? z2LowBpm,
+      final int? z2HighBpm}) = _$UserProfileImpl;
 
   factory _UserProfile.fromJson(Map<String, dynamic> json) =
       _$UserProfileImpl.fromJson;
@@ -440,9 +504,9 @@ abstract class _UserProfile implements UserProfile {
   @override
   double? get weightLbs; // Experience & Goals
   @override
-  String? get experienceLevel; // e.g., Beginner, Intermediate, Advanced
+  String? get trainingAge; // Renamed from experienceLevel
   @override
-  List<String>? get primaryGoals; // e.g., ['Build Muscle', 'Lose Fat']
+  List<String>? get primaryGoals;
   @override
   String? get goalDetails; // Schedule & Equipment
   @override
@@ -452,9 +516,15 @@ abstract class _UserProfile implements UserProfile {
   @override
   List<String>? get equipmentAvailable; // Health & History
   @override
-  String? get injuryHistory;
+  String? get constraints; // Renamed from injuryHistory
   @override
-  String? get currentStatus;
+  String? get currentStatus; // --- NEW FIELDS ---
+  @override
+  String? get json1RMs; // To hold the JSON string for 1RMs
+  @override
+  int? get z2LowBpm;
+  @override
+  int? get z2HighBpm;
 
   /// Create a copy of UserProfile
   /// with the given fields replaced by the non-null parameter values.

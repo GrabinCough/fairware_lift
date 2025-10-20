@@ -13,7 +13,7 @@ _$UserProfileImpl _$$UserProfileImplFromJson(Map<String, dynamic> json) =>
       gender: json['gender'] as String?,
       heightInches: (json['heightInches'] as num?)?.toInt(),
       weightLbs: (json['weightLbs'] as num?)?.toDouble(),
-      experienceLevel: json['experienceLevel'] as String?,
+      trainingAge: json['trainingAge'] as String?,
       primaryGoals: (json['primaryGoals'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
@@ -23,8 +23,11 @@ _$UserProfileImpl _$$UserProfileImplFromJson(Map<String, dynamic> json) =>
       equipmentAvailable: (json['equipmentAvailable'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      injuryHistory: json['injuryHistory'] as String?,
+      constraints: json['constraints'] as String?,
       currentStatus: json['currentStatus'] as String?,
+      json1RMs: json['json1RMs'] as String?,
+      z2LowBpm: (json['z2LowBpm'] as num?)?.toInt(),
+      z2HighBpm: (json['z2HighBpm'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$UserProfileImplToJson(_$UserProfileImpl instance) =>
@@ -34,12 +37,15 @@ Map<String, dynamic> _$$UserProfileImplToJson(_$UserProfileImpl instance) =>
       'gender': instance.gender,
       'heightInches': instance.heightInches,
       'weightLbs': instance.weightLbs,
-      'experienceLevel': instance.experienceLevel,
+      'trainingAge': instance.trainingAge,
       'primaryGoals': instance.primaryGoals,
       'goalDetails': instance.goalDetails,
       'daysPerWeek': instance.daysPerWeek,
       'timePerSessionMinutes': instance.timePerSessionMinutes,
       'equipmentAvailable': instance.equipmentAvailable,
-      'injuryHistory': instance.injuryHistory,
+      'constraints': instance.constraints,
       'currentStatus': instance.currentStatus,
+      'json1RMs': instance.json1RMs,
+      'z2LowBpm': instance.z2LowBpm,
+      'z2HighBpm': instance.z2HighBpm,
     };

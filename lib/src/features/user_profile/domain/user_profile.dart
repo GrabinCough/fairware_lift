@@ -1,4 +1,4 @@
- // lib/src/features/user_profile/domain/user_profile.dart
+// lib/src/features/user_profile/domain/user_profile.dart
 
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
@@ -13,8 +13,9 @@ part 'user_profile.g.dart';
 // --- USER PROFILE DATA MODEL -------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// An immutable data model representing the user's fitness profile.
-/// This data is collected in the LLM intake form and persisted locally.
+/// --- UPDATED ---
+/// The data model now includes fields that map directly to the LLM prompt's
+/// USER CONTEXT block for more accurate prompt generation.
 @freezed
 class UserProfile with _$UserProfile {
   const factory UserProfile({
@@ -26,8 +27,8 @@ class UserProfile with _$UserProfile {
     double? weightLbs,
 
     // Experience & Goals
-    String? experienceLevel, // e.g., Beginner, Intermediate, Advanced
-    List<String>? primaryGoals, // e.g., ['Build Muscle', 'Lose Fat']
+    String? trainingAge, // Renamed from experienceLevel
+    List<String>? primaryGoals,
     String? goalDetails,
 
     // Schedule & Equipment
@@ -36,8 +37,13 @@ class UserProfile with _$UserProfile {
     List<String>? equipmentAvailable,
 
     // Health & History
-    String? injuryHistory,
+    String? constraints, // Renamed from injuryHistory
     String? currentStatus,
+
+    // --- NEW FIELDS ---
+    String? json1RMs, // To hold the JSON string for 1RMs
+    int? z2LowBpm,
+    int? z2HighBpm,
   }) = _UserProfile;
 
   factory UserProfile.fromJson(Map<String, dynamic> json) =>
