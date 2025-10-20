@@ -11,16 +11,13 @@ import 'package:fairware_lift/src/core/theme/data/local/database.dart';
 // --- STATE NOTIFIER ----------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// An AsyncNotifier responsible for fetching and providing the state for the
-/// "Today" screen, starting with the list of recently performed exercises.
-class TodayStateNotifier extends AsyncNotifier<List<RecentExercise>> {
-  /// The `build` method is called to provide the initial state. It fetches
-  /// the recent exercises from the database.
+/// --- REFACTORED ---
+/// This notifier now fetches the single most recent `FullWorkoutSession`.
+class LastWorkoutNotifier extends AsyncNotifier<FullWorkoutSession?> {
   @override
-  Future<List<RecentExercise>> build() async {
+  Future<FullWorkoutSession?> build() async {
     final db = ref.watch(databaseProvider);
-    // Fetch the 5 most recently used exercises.
-    return db.getRecentExercises(limit: 5);
+    return db.getLatestWorkout();
   }
 }
 
@@ -28,9 +25,9 @@ class TodayStateNotifier extends AsyncNotifier<List<RecentExercise>> {
 // --- PROVIDER ----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// A provider that exposes the list of recent exercises. The UI will watch this
-/// provider to dynamically display the user's recent activity.
-final recentExercisesProvider =
-    AsyncNotifierProvider<TodayStateNotifier, List<RecentExercise>>(
-  TodayStateNotifier.new,
+/// --- REFACTORED ---
+/// A provider that exposes the last workout session for the Today screen preview.
+final lastWorkoutProvider =
+    AsyncNotifierProvider<LastWorkoutNotifier, FullWorkoutSession?>(
+  LastWorkoutNotifier.new,
 );

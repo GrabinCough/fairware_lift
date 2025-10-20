@@ -39,13 +39,7 @@ class SetEntryWithExercise {
   SetEntryWithExercise({required this.set, required this.exercise});
 }
 
-class RecentExercise {
-  final ExerciseInstance exercise;
-  final SetEntry lastSet;
-
-  RecentExercise({required this.exercise, required this.lastSet});
-}
-
+// --- REMOVED: The RecentExercise class is no longer needed. ---
 
 // -----------------------------------------------------------------------------
 // --- TABLE DEFINITIONS -------------------------------------------------------
@@ -61,7 +55,7 @@ class Sessions extends Table {
       integer().named('total_activity_seconds').nullable()();
   IntColumn get totalRestSeconds =>
       integer().named('total_rest_seconds').nullable()();
-  TextColumn get notes => text().nullable()();
+  TextColumn get notes => text().named('notes').nullable()(); // Added name for clarity
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   @override
@@ -139,47 +133,39 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  /// --- REWRITTEN METHOD ---
-  /// Fetches the most recently performed exercises using a simpler approach.
-  Future<List<RecentExercise>> getRecentExercises({int limit = 5}) async {
-    // 1. Fetch all sets, ordered from newest to oldest.
-    final allSetsQuery = select(setEntries).join([
-      innerJoin(
-          exerciseInstances, exerciseInstances.slug.equalsExp(setEntries.exerciseSlug)),
-    ])
-      ..orderBy([OrderingTerm.desc(setEntries.createdAt)]);
+  /// --- NEW METHOD ---
+  /// Fetches the single most recent workout session.
+  Future<FullWorkoutSession?> getLatestWorkout() async {
+    final latestSessionQuery = select(sessions)
+      ..orderBy([(t) => OrderingTerm.desc(t.sessionDateTime)])
+      ..limit(1);
 
-    final allSetsResult = await allSetsQuery.get();
+    final sessionResult = await latestSessionQuery.getSingleOrNull();
 
-    // 2. Process the results in Dart to find the most recent unique exercises.
-    final recentExercises = <RecentExercise>[];
-    final seenSlugs = <String>{};
-
-    for (final row in allSetsResult) {
-      final exercise = row.readTable(exerciseInstances);
-      if (!seenSlugs.contains(exercise.slug)) {
-        recentExercises.add(RecentExercise(
-          exercise: exercise,
-          lastSet: row.readTable(setEntries),
-        ));
-        seenSlugs.add(exercise.slug);
-      }
-      // 3. Stop once we have reached the desired limit.
-      if (recentExercises.length >= limit) {
-        break;
-      }
+    if (sessionResult == null) {
+      return null;
     }
 
-    return recentExercises;
+    // Use the existing getWorkoutHistory logic but for a single session
+    final history = await getWorkoutHistory(limit: 1);
+    return history.isNotEmpty ? history.first : null;
   }
 
-  Future<List<FullWorkoutSession>> getWorkoutHistory() async {
-    final sessionsResult = await (select(sessions)
-          ..orderBy([(t) => OrderingTerm.desc(t.sessionDateTime)]))
-        .get();
+
+  /// --- UPDATED METHOD ---
+  /// Now accepts an optional limit for optimized queries.
+  Future<List<FullWorkoutSession>> getWorkoutHistory({int? limit}) async {
+    final query = select(sessions)
+      ..orderBy([(t) => OrderingTerm.desc(t.sessionDateTime)]);
+
+    if (limit != null) {
+      query.limit(limit);
+    }
+
+    final sessionsResult = await query.get();
+    if (sessionsResult.isEmpty) return [];
 
     final sessionIds = sessionsResult.map((s) => s.id).toList();
-    if (sessionIds.isEmpty) return [];
 
     final setsQuery = select(setEntries).join([
       innerJoin(exerciseInstances,
