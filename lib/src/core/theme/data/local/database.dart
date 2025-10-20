@@ -1,4 +1,3 @@
-// ----- lib/src/core/theme/data/local/database.dart -----
 // lib/src/core/theme/data/local/database.dart
 
 // -----------------------------------------------------------------------------
@@ -7,7 +6,7 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'package:collection/collection.dart'; // For groupBy
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:fairware_lift/src/features/dxg/domain/exercise_instance.dart';
@@ -18,7 +17,7 @@ import 'package:path_provider/path_provider.dart';
 part 'database.g.dart';
 
 // -----------------------------------------------------------------------------
-// --- DATA CLASS FOR HISTORY --------------------------------------------------
+// --- DATA CLASSES FOR QUERIES ------------------------------------------------
 // -----------------------------------------------------------------------------
 
 class FullWorkoutSession {
@@ -40,6 +39,14 @@ class SetEntryWithExercise {
   SetEntryWithExercise({required this.set, required this.exercise});
 }
 
+class RecentExercise {
+  final ExerciseInstance exercise;
+  final SetEntry lastSet;
+
+  RecentExercise({required this.exercise, required this.lastSet});
+}
+
+
 // -----------------------------------------------------------------------------
 // --- TABLE DEFINITIONS -------------------------------------------------------
 // -----------------------------------------------------------------------------
@@ -50,7 +57,6 @@ class Sessions extends Table {
   DateTimeColumn get sessionDateTime => dateTime().named('date_time')();
   IntColumn get totalDurationSeconds =>
       integer().named('total_duration_seconds').nullable()();
-  // --- NEW COLUMN ---
   IntColumn get totalActivitySeconds =>
       integer().named('total_activity_seconds').nullable()();
   IntColumn get totalRestSeconds =>
@@ -133,6 +139,40 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
+  /// --- REWRITTEN METHOD ---
+  /// Fetches the most recently performed exercises using a simpler approach.
+  Future<List<RecentExercise>> getRecentExercises({int limit = 5}) async {
+    // 1. Fetch all sets, ordered from newest to oldest.
+    final allSetsQuery = select(setEntries).join([
+      innerJoin(
+          exerciseInstances, exerciseInstances.slug.equalsExp(setEntries.exerciseSlug)),
+    ])
+      ..orderBy([OrderingTerm.desc(setEntries.createdAt)]);
+
+    final allSetsResult = await allSetsQuery.get();
+
+    // 2. Process the results in Dart to find the most recent unique exercises.
+    final recentExercises = <RecentExercise>[];
+    final seenSlugs = <String>{};
+
+    for (final row in allSetsResult) {
+      final exercise = row.readTable(exerciseInstances);
+      if (!seenSlugs.contains(exercise.slug)) {
+        recentExercises.add(RecentExercise(
+          exercise: exercise,
+          lastSet: row.readTable(setEntries),
+        ));
+        seenSlugs.add(exercise.slug);
+      }
+      // 3. Stop once we have reached the desired limit.
+      if (recentExercises.length >= limit) {
+        break;
+      }
+    }
+
+    return recentExercises;
+  }
+
   Future<List<FullWorkoutSession>> getWorkoutHistory() async {
     final sessionsResult = await (select(sessions)
           ..orderBy([(t) => OrderingTerm.desc(t.sessionDateTime)]))
@@ -201,5 +241,7 @@ LazyDatabase _openConnection() {
 // -----------------------------------------------------------------------------
 
 final databaseProvider = Provider<AppDatabase>((ref) {
-  return AppDatabase();
+  final db = AppDatabase();
+  ref.onDispose(() => db.close());
+  return db;
 });

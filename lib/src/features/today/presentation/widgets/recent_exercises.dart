@@ -1,11 +1,15 @@
+// lib/src/features/today/presentation/widgets/recent_exercises.dart
+
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-// Core Flutter material design library.
 import 'package:flutter/material.dart';
+// --- NEW IMPORTS ---
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fairware_lift/src/core/theme/data/local/database.dart';
+import 'package:fairware_lift/src/features/today/application/today_state.dart';
 
-// The application's design system for consistent styling.
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
 
 // -----------------------------------------------------------------------------
@@ -13,20 +17,20 @@ import 'package:fairware_lift/src/core/theme/app_theme.dart';
 // -----------------------------------------------------------------------------
 
 /// A widget to display a list or carousel of recently performed exercises.
-///
-/// As per SSOT Section 5.3, this component provides users with a quick look at
-/// their recent activity. This static placeholder uses a horizontal ListView
-/// to create a scrollable carousel of exercise cards.
-class RecentExercises extends StatelessWidget {
+/// This widget is now dynamic and fetches data from the `recentExercisesProvider`.
+// --- REFACTORED ---
+// Converted to a ConsumerWidget to watch the new provider.
+class RecentExercises extends ConsumerWidget {
   const RecentExercises({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // A Column is used to structure the section with a title and the carousel.
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch the provider that fetches recent exercises.
+    final asyncRecentExercises = ref.watch(recentExercisesProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // --- SECTION HEADER ---
         Padding(
           padding: const EdgeInsets.only(bottom: 12.0),
           child: Text(
@@ -34,33 +38,35 @@ class RecentExercises extends StatelessWidget {
             style: AppTheme.typography.title,
           ),
         ),
-
-        // --- HORIZONTAL CAROUSEL ---
-        // A SizedBox constrains the height of the horizontal ListView.
         SizedBox(
-          height: 120, // This height can be adjusted as needed.
-          child: ListView(
-            // Enables horizontal scrolling.
-            scrollDirection: Axis.horizontal,
-            // Placeholder data for the carousel items.
-            children: const [
-              _ExerciseCard(
-                name: 'Squat',
-                lastSet: '225 lb x 5',
-              ),
-              _ExerciseCard(
-                name: 'Deadlift',
-                lastSet: '315 lb x 3',
-              ),
-              _ExerciseCard(
-                name: 'Pull Up',
-                lastSet: 'BW x 8',
-              ),
-              _ExerciseCard(
-                name: 'Leg Press',
-                lastSet: '450 lb x 10',
-              ),
-            ],
+          height: 120,
+          // Use the .when() method to handle loading, error, and data states.
+          child: asyncRecentExercises.when(
+            // --- LOADING STATE ---
+            loading: () => const Center(child: CircularProgressIndicator()),
+            // --- ERROR STATE ---
+            error: (error, stackTrace) => Center(child: Text('Error: $error')),
+            // --- DATA STATE ---
+            data: (exercises) {
+              if (exercises.isEmpty) {
+                return const Center(
+                  child: Text('No recent exercises yet.'),
+                );
+              }
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: exercises.length,
+                itemBuilder: (context, index) {
+                  final recentExercise = exercises[index];
+                  return _ExerciseCard(
+                    // Pass the dynamic data to the card widget.
+                    name: recentExercise.exercise.displayName,
+                    lastSet:
+                        '${recentExercise.lastSet.weight} lb x ${recentExercise.lastSet.reps}',
+                  );
+                },
+              );
+            },
           ),
         ),
       ],
@@ -72,8 +78,8 @@ class RecentExercises extends StatelessWidget {
 // --- PRIVATE EXERCISE CARD WIDGET --------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// A private helper widget to define the appearance of a single exercise card
-/// within the horizontal carousel.
+/// A private helper widget to define the appearance of a single exercise card.
+/// This widget remains stateless as it just displays the data passed to it.
 class _ExerciseCard extends StatelessWidget {
   final String name;
   final String lastSet;
@@ -85,9 +91,8 @@ class _ExerciseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // A SizedBox defines the width of each card in the carousel.
     return SizedBox(
-      width: 150, // This width can be adjusted as needed.
+      width: 150,
       child: Card(
         color: AppTheme.colors.surface,
         shape: RoundedRectangleBorder(
@@ -100,19 +105,16 @@ class _ExerciseCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Exercise Name
               Text(
                 name,
                 style: AppTheme.typography.body.copyWith(
                   color: AppTheme.colors.textPrimary,
                   fontWeight: FontWeight.bold,
                 ),
-                // Handles text that is too long to fit.
                 overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+                maxLines: 2, // Allow up to 2 lines for longer names
               ),
               const Spacer(),
-              // Last Set Details
               Text(
                 'Last Set:',
                 style: AppTheme.typography.caption,
