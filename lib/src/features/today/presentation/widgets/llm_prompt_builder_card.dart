@@ -1,4 +1,4 @@
- // lib/src/features/today/presentation/widgets/llm_prompt_builder_card.dart
+// lib/src/features/today/presentation/widgets/llm_prompt_builder_card.dart
 
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
@@ -6,6 +6,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
+// --- NEW IMPORT ---
+import 'package:fairware_lift/src/features/llm_prompting/presentation/llm_intake_screen.dart';
 
 // -----------------------------------------------------------------------------
 // --- LLM PROMPT BUILDER CARD WIDGET ------------------------------------------
@@ -38,31 +40,36 @@ class LlmPromptBuilderCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _buildOption(
+                  context: context, // Pass context
                   icon: Icons.person_add_alt_1_rounded,
                   title: 'Onboard New LLM',
                   subtitle: 'Create a profile to introduce yourself to a new AI coach.',
                   onTap: () {
-                    // TODO: Navigate to the intake form screen.
-                    print('Onboard New LLM tapped');
+                    // --- UPDATED: Navigate to the new screen ---
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const LlmIntakeScreen(),
+                      ),
+                    );
                   },
                 ),
                 const Divider(height: 24),
                 _buildOption(
+                  context: context,
                   icon: Icons.model_training_rounded,
                   title: "Get Today's Workout",
                   subtitle: 'Generate a prompt for a single workout session.',
                   onTap: () {
-                    // TODO: Navigate to the daily prompt builder.
                     print("Get Today's Workout tapped");
                   },
                 ),
                 const Divider(height: 24),
                 _buildOption(
+                  context: context,
                   icon: Icons.calendar_view_week_rounded,
                   title: 'Plan My Week',
                   subtitle: 'Generate a prompt for a full weekly program.',
                   onTap: () {
-                    // TODO: Navigate to the weekly prompt builder.
                     print('Plan My Week tapped');
                   },
                 ),
@@ -75,6 +82,7 @@ class LlmPromptBuilderCard extends StatelessWidget {
   }
 
   Widget _buildOption({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String subtitle,
