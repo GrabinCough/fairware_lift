@@ -28,10 +28,26 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+
+    <!--
+      This <queries> block is required for url_launcher to work on Android 11+
+      It declares the app's intention to interact with other apps that can handle
+      these intents (in this case, web browsers).
+    -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- For url_launcher: Allows opening https URLs -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <!-- For url_launcher: Allows opening http URLs -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
         </intent>
     </queries>
 </manifest>
