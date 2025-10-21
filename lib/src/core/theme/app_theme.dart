@@ -1,31 +1,21 @@
+// lib/src/core/theme/app_theme.dart
+
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/material.dart';
 
-/// This class holds all the design tokens for the Fairware Lift application,
-/// directly translated from the Single Source of Truth (SSOT) document.
-///
-/// Using a class with static constants provides a single, authoritative source
-/// for all UI constants, ensuring consistency and ease of maintenance.
-///
-/// Example Usage:
-/// ```dart
-/// Container(
-///   color: AppTheme.colors.background,
-///   child: Text('Hello', style: AppTheme.typography.body),
-/// )
-/// ```
+/// This class holds all the design tokens for the Fairware Lift application.
 class AppTheme {
   // Private constructor to prevent instantiation.
   AppTheme._();
 
   // ---------------------------------------------------------------------------
-  // --- COLOR PALETTE (from SSOT 12.2) ----------------------------------------
+  // --- COLOR PALETTE ---------------------------------------------------------
   // ---------------------------------------------------------------------------
   static const _colors = _AppColors(
-    background: Color(0xFF121216),
+    background: Color(0xFF0f0f0f), // Updated to match design
     surface: Color(0xFF1E1E24),
-    surfaceAlt: Color(0xFF18181C),
+    surfaceAlt: Color(0xFF181818),
     textPrimary: Color(0xFFEEF0F3),
     textSecondary: Color(0xFFB9BEC8),
     textMuted: Color(0xFF8C919B),
@@ -35,45 +25,49 @@ class AppTheme {
     warning: Color(0xFFFFC857),
     danger: Color(0xFFF06272),
     infoBlue: Color(0xFF2AA1E9),
+
+    // --- NEW: Prompt Studio Accent Colors ---
+    accentRust: Color(0xFFD26B35),
+    accentTeal: Color(0xFF00BFFF), // Placeholder
+    accentSilver: Color(0xFFC0C0C0), // Placeholder
   );
 
   // ---------------------------------------------------------------------------
-  // --- TYPOGRAPHY (from SSOT 12.3) -------------------------------------------
+  // --- TYPOGRAPHY ------------------------------------------------------------
   // ---------------------------------------------------------------------------
   static final _typography = _AppTypography(
     display: TextStyle(
       fontSize: 34,
-      fontWeight: FontWeight.w600, // Semibold
+      fontWeight: FontWeight.w600,
       color: _colors.textPrimary,
     ),
     title: TextStyle(
       fontSize: 22,
-      fontWeight: FontWeight.w500, // Medium
+      fontWeight: FontWeight.w500,
       color: _colors.textPrimary,
     ),
     body: TextStyle(
       fontSize: 16,
-      fontWeight: FontWeight.w400, // Regular
+      fontWeight: FontWeight.w400,
       color: _colors.textSecondary,
     ),
     caption: TextStyle(
       fontSize: 12,
-      fontWeight: FontWeight.w400, // Regular
+      fontWeight: FontWeight.w400,
       color: _colors.textMuted,
     ),
-    // Specialty style for large numbers like weights, reps, timers.
     number: TextStyle(
-      fontSize: 34, // Using a value between 28-40
-      fontWeight: FontWeight.w600, // Semibold
+      fontSize: 34,
+      fontWeight: FontWeight.w600,
       color: _colors.textPrimary,
     ),
   );
 
   // ---------------------------------------------------------------------------
-  // --- COMPONENTS & SIZING (from SSOT 12.4 & 12.7) ---------------------------
+  // --- COMPONENTS & SIZING ---------------------------------------------------
   // ---------------------------------------------------------------------------
   static const _sizing = _AppSizing(
-    cardRadius: 16.0,
+    cardRadius: 20.0, // Updated to match design (radius.lg)
     buttonRadius: 20.0,
     chipRadius: 14.0,
     touchTargetMinimum: 44.0,
@@ -84,7 +78,6 @@ class AppTheme {
   // ---------------------------------------------------------------------------
   // --- PUBLIC ACCESSORS ------------------------------------------------------
   // ---------------------------------------------------------------------------
-  // These are the public getters that the rest of the app will use.
   static _AppColors get colors => _colors;
   static _AppTypography get typography => _typography;
   static _AppSizing get sizing => _sizing;
@@ -106,6 +99,9 @@ class _AppColors {
     required this.warning,
     required this.danger,
     required this.infoBlue,
+    required this.accentRust,
+    required this.accentTeal,
+    required this.accentSilver,
   });
 
   // Backgrounds
@@ -118,9 +114,14 @@ class _AppColors {
   final Color textSecondary;
   final Color textMuted;
 
-  // Accent
+  // Main Accent
   final Color accent;
   final Color accentPressed;
+
+  // Prompt Studio Accents
+  final Color accentRust;
+  final Color accentTeal;
+  final Color accentSilver;
 
   // Components
   final Color chipInfo;

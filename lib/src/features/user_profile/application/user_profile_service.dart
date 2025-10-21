@@ -1,4 +1,4 @@
- // lib/src/features/user_profile/application/user_profile_service.dart
+// lib/src/features/user_profile/application/user_profile_service.dart
 
 // -----------------------------------------------------------------------------
 // --- IMPORTS -----------------------------------------------------------------
@@ -28,7 +28,8 @@ class UserProfileService {
     if (jsonString != null) {
       return UserProfile.fromJson(json.decode(jsonString));
     }
-    return null;
+    // --- MODIFICATION: Return a const empty profile if none exists ---
+    return const UserProfile();
   }
 
   /// Saves the user profile to local storage.
@@ -42,28 +43,23 @@ class UserProfileService {
 // --- PROVIDERS ---------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// Provider for the SharedPreferences instance.
 final _sharedPreferencesProvider =
     FutureProvider<SharedPreferences>((ref) => SharedPreferences.getInstance());
 
-/// Provider for the UserProfileService.
 final userProfileServiceProvider = Provider<UserProfileService>((ref) {
   final prefs = ref.watch(_sharedPreferencesProvider).value;
   if (prefs == null) {
-    // This should not happen in a real scenario after the app has loaded.
     throw Exception('SharedPreferences not initialized');
   }
   return UserProfileService(prefs);
 });
 
-/// An AsyncNotifier that manages the state of the UserProfile.
 class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
   @override
   Future<UserProfile?> build() async {
     return ref.watch(userProfileServiceProvider).loadProfile();
   }
 
-  /// Saves the profile and updates the state.
   Future<void> save(UserProfile profile) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
@@ -73,7 +69,6 @@ class UserProfileNotifier extends AsyncNotifier<UserProfile?> {
   }
 }
 
-/// The main provider for accessing the user's profile data from the UI.
 final userProfileProvider =
     AsyncNotifierProvider<UserProfileNotifier, UserProfile?>(
   UserProfileNotifier.new,

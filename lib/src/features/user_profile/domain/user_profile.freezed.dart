@@ -27,21 +27,19 @@ mixin _$UserProfile {
   int? get heightInches => throw _privateConstructorUsedError;
   double? get weightLbs =>
       throw _privateConstructorUsedError; // Experience & Goals
-  String? get trainingAge =>
-      throw _privateConstructorUsedError; // Renamed from experienceLevel
+  String? get trainingAge => throw _privateConstructorUsedError;
   List<String>? get primaryGoals => throw _privateConstructorUsedError;
   String? get goalDetails =>
+      throw _privateConstructorUsedError; // --- NEW FIELD ---
+  String? get motivationStyle =>
       throw _privateConstructorUsedError; // Schedule & Equipment
   int? get daysPerWeek => throw _privateConstructorUsedError;
   int? get timePerSessionMinutes => throw _privateConstructorUsedError;
   List<String>? get equipmentAvailable =>
       throw _privateConstructorUsedError; // Health & History
-  String? get constraints =>
-      throw _privateConstructorUsedError; // Renamed from injuryHistory
-  String? get currentStatus =>
-      throw _privateConstructorUsedError; // --- NEW FIELDS ---
-  String? get json1RMs =>
-      throw _privateConstructorUsedError; // To hold the JSON string for 1RMs
+  String? get constraints => throw _privateConstructorUsedError;
+  String? get currentStatus => throw _privateConstructorUsedError;
+  String? get json1RMs => throw _privateConstructorUsedError;
   int? get z2LowBpm => throw _privateConstructorUsedError;
   int? get z2HighBpm => throw _privateConstructorUsedError;
 
@@ -70,6 +68,7 @@ abstract class $UserProfileCopyWith<$Res> {
       String? trainingAge,
       List<String>? primaryGoals,
       String? goalDetails,
+      String? motivationStyle,
       int? daysPerWeek,
       int? timePerSessionMinutes,
       List<String>? equipmentAvailable,
@@ -103,6 +102,7 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
     Object? trainingAge = freezed,
     Object? primaryGoals = freezed,
     Object? goalDetails = freezed,
+    Object? motivationStyle = freezed,
     Object? daysPerWeek = freezed,
     Object? timePerSessionMinutes = freezed,
     Object? equipmentAvailable = freezed,
@@ -144,6 +144,10 @@ class _$UserProfileCopyWithImpl<$Res, $Val extends UserProfile>
       goalDetails: freezed == goalDetails
           ? _value.goalDetails
           : goalDetails // ignore: cast_nullable_to_non_nullable
+              as String?,
+      motivationStyle: freezed == motivationStyle
+          ? _value.motivationStyle
+          : motivationStyle // ignore: cast_nullable_to_non_nullable
               as String?,
       daysPerWeek: freezed == daysPerWeek
           ? _value.daysPerWeek
@@ -198,6 +202,7 @@ abstract class _$$UserProfileImplCopyWith<$Res>
       String? trainingAge,
       List<String>? primaryGoals,
       String? goalDetails,
+      String? motivationStyle,
       int? daysPerWeek,
       int? timePerSessionMinutes,
       List<String>? equipmentAvailable,
@@ -229,6 +234,7 @@ class __$$UserProfileImplCopyWithImpl<$Res>
     Object? trainingAge = freezed,
     Object? primaryGoals = freezed,
     Object? goalDetails = freezed,
+    Object? motivationStyle = freezed,
     Object? daysPerWeek = freezed,
     Object? timePerSessionMinutes = freezed,
     Object? equipmentAvailable = freezed,
@@ -270,6 +276,10 @@ class __$$UserProfileImplCopyWithImpl<$Res>
       goalDetails: freezed == goalDetails
           ? _value.goalDetails
           : goalDetails // ignore: cast_nullable_to_non_nullable
+              as String?,
+      motivationStyle: freezed == motivationStyle
+          ? _value.motivationStyle
+          : motivationStyle // ignore: cast_nullable_to_non_nullable
               as String?,
       daysPerWeek: freezed == daysPerWeek
           ? _value.daysPerWeek
@@ -319,6 +329,7 @@ class _$UserProfileImpl implements _UserProfile {
       this.trainingAge,
       final List<String>? primaryGoals,
       this.goalDetails,
+      this.motivationStyle,
       this.daysPerWeek,
       this.timePerSessionMinutes,
       final List<String>? equipmentAvailable,
@@ -347,9 +358,7 @@ class _$UserProfileImpl implements _UserProfile {
 // Experience & Goals
   @override
   final String? trainingAge;
-// Renamed from experienceLevel
   final List<String>? _primaryGoals;
-// Renamed from experienceLevel
   @override
   List<String>? get primaryGoals {
     final value = _primaryGoals;
@@ -361,6 +370,9 @@ class _$UserProfileImpl implements _UserProfile {
 
   @override
   final String? goalDetails;
+// --- NEW FIELD ---
+  @override
+  final String? motivationStyle;
 // Schedule & Equipment
   @override
   final int? daysPerWeek;
@@ -380,13 +392,10 @@ class _$UserProfileImpl implements _UserProfile {
 // Health & History
   @override
   final String? constraints;
-// Renamed from injuryHistory
   @override
   final String? currentStatus;
-// --- NEW FIELDS ---
   @override
   final String? json1RMs;
-// To hold the JSON string for 1RMs
   @override
   final int? z2LowBpm;
   @override
@@ -394,7 +403,7 @@ class _$UserProfileImpl implements _UserProfile {
 
   @override
   String toString() {
-    return 'UserProfile(name: $name, age: $age, gender: $gender, heightInches: $heightInches, weightLbs: $weightLbs, trainingAge: $trainingAge, primaryGoals: $primaryGoals, goalDetails: $goalDetails, daysPerWeek: $daysPerWeek, timePerSessionMinutes: $timePerSessionMinutes, equipmentAvailable: $equipmentAvailable, constraints: $constraints, currentStatus: $currentStatus, json1RMs: $json1RMs, z2LowBpm: $z2LowBpm, z2HighBpm: $z2HighBpm)';
+    return 'UserProfile(name: $name, age: $age, gender: $gender, heightInches: $heightInches, weightLbs: $weightLbs, trainingAge: $trainingAge, primaryGoals: $primaryGoals, goalDetails: $goalDetails, motivationStyle: $motivationStyle, daysPerWeek: $daysPerWeek, timePerSessionMinutes: $timePerSessionMinutes, equipmentAvailable: $equipmentAvailable, constraints: $constraints, currentStatus: $currentStatus, json1RMs: $json1RMs, z2LowBpm: $z2LowBpm, z2HighBpm: $z2HighBpm)';
   }
 
   @override
@@ -415,6 +424,8 @@ class _$UserProfileImpl implements _UserProfile {
                 .equals(other._primaryGoals, _primaryGoals) &&
             (identical(other.goalDetails, goalDetails) ||
                 other.goalDetails == goalDetails) &&
+            (identical(other.motivationStyle, motivationStyle) ||
+                other.motivationStyle == motivationStyle) &&
             (identical(other.daysPerWeek, daysPerWeek) ||
                 other.daysPerWeek == daysPerWeek) &&
             (identical(other.timePerSessionMinutes, timePerSessionMinutes) ||
@@ -445,6 +456,7 @@ class _$UserProfileImpl implements _UserProfile {
       trainingAge,
       const DeepCollectionEquality().hash(_primaryGoals),
       goalDetails,
+      motivationStyle,
       daysPerWeek,
       timePerSessionMinutes,
       const DeepCollectionEquality().hash(_equipmentAvailable),
@@ -480,6 +492,7 @@ abstract class _UserProfile implements UserProfile {
       final String? trainingAge,
       final List<String>? primaryGoals,
       final String? goalDetails,
+      final String? motivationStyle,
       final int? daysPerWeek,
       final int? timePerSessionMinutes,
       final List<String>? equipmentAvailable,
@@ -504,11 +517,13 @@ abstract class _UserProfile implements UserProfile {
   @override
   double? get weightLbs; // Experience & Goals
   @override
-  String? get trainingAge; // Renamed from experienceLevel
+  String? get trainingAge;
   @override
   List<String>? get primaryGoals;
   @override
-  String? get goalDetails; // Schedule & Equipment
+  String? get goalDetails; // --- NEW FIELD ---
+  @override
+  String? get motivationStyle; // Schedule & Equipment
   @override
   int? get daysPerWeek;
   @override
@@ -516,11 +531,11 @@ abstract class _UserProfile implements UserProfile {
   @override
   List<String>? get equipmentAvailable; // Health & History
   @override
-  String? get constraints; // Renamed from injuryHistory
+  String? get constraints;
   @override
-  String? get currentStatus; // --- NEW FIELDS ---
+  String? get currentStatus;
   @override
-  String? get json1RMs; // To hold the JSON string for 1RMs
+  String? get json1RMs;
   @override
   int? get z2LowBpm;
   @override

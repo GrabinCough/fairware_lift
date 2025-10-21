@@ -18,6 +18,7 @@ _$UserProfileImpl _$$UserProfileImplFromJson(Map<String, dynamic> json) =>
           ?.map((e) => e as String)
           .toList(),
       goalDetails: json['goalDetails'] as String?,
+      motivationStyle: json['motivationStyle'] as String?,
       daysPerWeek: (json['daysPerWeek'] as num?)?.toInt(),
       timePerSessionMinutes: (json['timePerSessionMinutes'] as num?)?.toInt(),
       equipmentAvailable: (json['equipmentAvailable'] as List<dynamic>?)
@@ -40,6 +41,7 @@ Map<String, dynamic> _$$UserProfileImplToJson(_$UserProfileImpl instance) =>
       'trainingAge': instance.trainingAge,
       'primaryGoals': instance.primaryGoals,
       'goalDetails': instance.goalDetails,
+      'motivationStyle': instance.motivationStyle,
       'daysPerWeek': instance.daysPerWeek,
       'timePerSessionMinutes': instance.timePerSessionMinutes,
       'equipmentAvailable': instance.equipmentAvailable,

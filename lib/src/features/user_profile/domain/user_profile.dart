@@ -13,9 +13,6 @@ part 'user_profile.g.dart';
 // --- USER PROFILE DATA MODEL -------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// --- UPDATED ---
-/// The data model now includes fields that map directly to the LLM prompt's
-/// USER CONTEXT block for more accurate prompt generation.
 @freezed
 class UserProfile with _$UserProfile {
   const factory UserProfile({
@@ -27,9 +24,12 @@ class UserProfile with _$UserProfile {
     double? weightLbs,
 
     // Experience & Goals
-    String? trainingAge, // Renamed from experienceLevel
+    String? trainingAge,
     List<String>? primaryGoals,
     String? goalDetails,
+
+    // --- NEW FIELD ---
+    String? motivationStyle,
 
     // Schedule & Equipment
     int? daysPerWeek,
@@ -37,11 +37,9 @@ class UserProfile with _$UserProfile {
     List<String>? equipmentAvailable,
 
     // Health & History
-    String? constraints, // Renamed from injuryHistory
+    String? constraints,
     String? currentStatus,
-
-    // --- NEW FIELDS ---
-    String? json1RMs, // To hold the JSON string for 1RMs
+    String? json1RMs,
     int? z2LowBpm,
     int? z2HighBpm,
   }) = _UserProfile;
