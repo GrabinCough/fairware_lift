@@ -42,17 +42,17 @@ class MeasurementsRepository {
 final _sharedPreferencesProvider =
     FutureProvider<SharedPreferences>((ref) => SharedPreferences.getInstance());
 
+/// --- MODIFIED: Now a FutureProvider to handle async initialization ---
 /// Provider for the MeasurementsRepository.
-final measurementsRepositoryProvider = Provider<MeasurementsRepository>((ref) {
-  final prefs = ref.watch(_sharedPreferencesProvider).value;
-  if (prefs == null) {
-    throw Exception('SharedPreferences not initialized for MeasurementsRepository');
-  }
+final measurementsRepositoryProvider = FutureProvider<MeasurementsRepository>((ref) async {
+  // Asynchronously watch the SharedPreferences provider.
+  final prefs = await ref.watch(_sharedPreferencesProvider.future);
   return MeasurementsRepository(prefs);
 });
 
 /// A simple StateProvider to hold the latest bodyweight, allowing the UI to
 /// reactively update when a new measurement is saved.
 final latestBodyweightProvider = StateProvider<double?>((ref) {
-  return ref.watch(measurementsRepositoryProvider).getLatestBodyweight();
+  // This will now rebuild correctly when the repository provider re-evaluates.
+  return ref.watch(measurementsRepositoryProvider).value?.getLatestBodyweight();
 });

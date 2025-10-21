@@ -31,8 +31,7 @@ class _RepsOnlySetSheetState extends ConsumerState<RepsOnlySetSheet> {
 
   void _onLogSet() {
     final reps = int.tryParse(_repsController.text) ?? 0;
-    // --- FIX ---
-    // Read the bodyweight from the new MeasurementsRepository provider.
+    // --- MODIFIED: Read from the correct provider ---
     final bodyweight = ref.read(latestBodyweightProvider) ?? 0.0;
 
     if (mounted) {
@@ -42,6 +41,9 @@ class _RepsOnlySetSheetState extends ConsumerState<RepsOnlySetSheet> {
 
   @override
   Widget build(BuildContext context) {
+    // --- MODIFIED: Handle async loading of the repository ---
+    final asyncRepo = ref.watch(measurementsRepositoryProvider);
+
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -50,23 +52,27 @@ class _RepsOnlySetSheetState extends ConsumerState<RepsOnlySetSheet> {
           right: 16,
           top: 16,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildTextField(
-              controller: _repsController,
-              label: 'Reps',
-              autofocus: true,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _onLogSet,
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
+        child: asyncRepo.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(child: Text('Error: $err')),
+          data: (_) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildTextField(
+                controller: _repsController,
+                label: 'Reps',
+                autofocus: true,
               ),
-              child: const Text('Save & Start Rest'),
-            ),
-          ],
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _onLogSet,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: const Text('Save & Start Rest'),
+              ),
+            ],
+          ),
         ),
       ),
     );

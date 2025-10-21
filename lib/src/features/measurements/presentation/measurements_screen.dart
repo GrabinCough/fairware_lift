@@ -28,7 +28,8 @@ class MeasurementsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final latestWeight = ref.watch(latestBodyweightProvider);
+    // --- MODIFIED: Watch the async provider to handle loading state ---
+    final asyncRepo = ref.watch(measurementsRepositoryProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -36,48 +37,55 @@ class MeasurementsScreen extends ConsumerWidget {
         backgroundColor: AppTheme.colors.background,
         elevation: 0,
       ),
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: AppTheme.sizing.baseGrid * 4, // 32pt
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.monitor_weight_rounded,
-                size: 80,
-                color: AppTheme.colors.textMuted,
+      body: asyncRepo.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
+        data: (_) {
+          // Once the repo is ready, watch the latest weight.
+          final latestWeight = ref.watch(latestBodyweightProvider);
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppTheme.sizing.baseGrid * 4, // 32pt
               ),
-              const SizedBox(height: 24),
-              // --- MODIFIED: Conditional UI ---
-              if (latestWeight == null)
-                Text(
-                  'No measurements yet.',
-                  style: AppTheme.typography.title.copyWith(
-                    color: AppTheme.colors.textSecondary,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.monitor_weight_rounded,
+                    size: 80,
+                    color: AppTheme.colors.textMuted,
                   ),
-                  textAlign: TextAlign.center,
-                )
-              else
-                Text(
-                  'Latest Weight: ${latestWeight.toStringAsFixed(1)} lbs',
-                  style: AppTheme.typography.title.copyWith(
-                    color: AppTheme.colors.textSecondary,
+                  const SizedBox(height: 24),
+                  if (latestWeight == null)
+                    Text(
+                      'No measurements yet.',
+                      style: AppTheme.typography.title.copyWith(
+                        color: AppTheme.colors.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    )
+                  else
+                    Text(
+                      'Latest Weight: ${latestWeight.toStringAsFixed(1)} lbs',
+                      style: AppTheme.typography.title.copyWith(
+                        color: AppTheme.colors.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: () => _showAddMeasurementSheet(context),
+                    icon: const Icon(Icons.add_circle_outline_rounded),
+                    label: Text(latestWeight == null
+                        ? 'Add Measurement'
+                        : 'Update Measurement'),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: () => _showAddMeasurementSheet(context),
-                icon: const Icon(Icons.add_circle_outline_rounded),
-                label: Text(latestWeight == null
-                    ? 'Add Measurement'
-                    : 'Update Measurement'),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

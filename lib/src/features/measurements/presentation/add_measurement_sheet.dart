@@ -48,7 +48,13 @@ class _AddMeasurementSheetState extends ConsumerState<AddMeasurementSheet> {
     }
 
     // Use the repository to save the data
-    final repo = ref.read(measurementsRepositoryProvider);
+    final repo = ref.read(measurementsRepositoryProvider).value;
+    if (repo == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: Repository not ready.')),
+      );
+      return;
+    }
     await repo.saveLatestBodyweight(weight);
 
     // Update the state provider to trigger a UI rebuild
