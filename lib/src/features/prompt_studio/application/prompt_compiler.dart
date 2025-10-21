@@ -54,7 +54,6 @@ USER CONTEXT
 - Motivation style: ${profile.motivationStyle ?? 'Science-y'}
 """;
 
-    // --- MODIFIED: Added setType to prescription object ---
     const contractSection = """
 CONTRACT (exact shape)
 {
@@ -106,15 +105,16 @@ CONTRACT (exact shape)
 }
 """;
 
-    // --- MODIFIED: Added instructions for using setType ---
+    // --- MODIFIED: More forceful instructions for setType ---
     const behaviorSection = """
 REQUIRED BEHAVIOR
 - Use only available equipment; respect the minutes cap.
 - Fill sets, reps, intensity, and rest so the workout is runnable now.
-- **Crucially, for each exercise, set the `prescription.setType` field:**
-  - Use `"weight_reps"` for standard lifting exercises (barbells, dumbbells, machines).
-  - Use `"timed"` for cardio (treadmill, bike, rower), planks, or loaded carries.
-  - Use `"reps_only"` for bodyweight exercises like push-ups or pull-ups where only reps are tracked.
+- **THIS IS A CRITICAL, NON-NEGOTIABLE RULE: For each exercise, you MUST set the `prescription.setType` field.**
+  - Use `"weight_reps"` for any exercise where the user lifts an external weight (e.g., Barbell Bench Press, DB Curl, Leg Press).
+  - Use `"timed"` for cardio (Treadmill, Bike, Rower), planks, or loaded carries (Farmer's Walk).
+  - Use `"reps_only"` for any bodyweight exercise where only reps are tracked (e.g., Push-Up, Pull-Up, Bodyweight Squat, Dips).
+- For `"reps_only"` or `"timed"` exercises, **DO NOT** include a `load`, `kg`, or `lb` key in the `intensity` object.
 - If 1RMs unknown, prefer RPE/RIR over percent_1RM.
 - For unilateral work, use reps like "10/side".
 - Use simple, common exercise names for the `name` field. Use the `metadata.aliases` field for variations like "BB Bench Press".

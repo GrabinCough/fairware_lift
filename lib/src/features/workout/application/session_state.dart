@@ -58,8 +58,6 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
       slug: exercise.name.toLowerCase().replaceAll(' ', '-'),
       exerciseHash: 'library_${exercise.name}',
       displayName: exercise.name,
-      // --- FIX ---
-      // The defaultSetType from the library exercise is now passed through.
       defaultSetType: exercise.defaultSetType,
       prescription: const Prescription(
         sets: 3,
@@ -173,6 +171,13 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
   void logTimed({required int durationSeconds, Map<String, dynamic> metrics = const {}}) {
     final id = _uuid.v4();
     logSet(LoggedSet.timed(id: id, durationSeconds: durationSeconds, metrics: metrics));
+  }
+  
+  // --- MODIFIED METHOD ---
+  void logRepsOnlySet({required int reps, required double bodyweight, double? rpe}) {
+    final id = _uuid.v4();
+    // Log as a weight_reps set type to reuse volume calculation and display logic.
+    logSet(LoggedSet.weightReps(id: id, weight: bodyweight, reps: reps, rpe: rpe));
   }
 
   void deleteItem(String itemId) {

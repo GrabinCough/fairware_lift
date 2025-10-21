@@ -286,6 +286,7 @@ class WorkoutSummaryScreen extends ConsumerWidget {
               final set = entry.value;
               final details = switch (set.setType) {
                 'timed' => '${_mmss(set.durationSeconds)}${_fmtMetrics(set.metrics)}',
+                'reps_only' => '${set.reps} reps',
                 _ => '${set.weight} lb x ${set.reps} reps',
               };
               return Padding(
@@ -376,6 +377,7 @@ class WorkoutSummaryScreen extends ConsumerWidget {
                       final set = entry.value;
                       final details = switch (set.setType) {
                         'timed' => '${_mmss(set.durationSeconds)}${_fmtMetrics(set.metrics)}',
+                        'reps_only' => '${set.reps} reps',
                          _ => '${set.weight} lb x ${set.reps} reps',
                       };
                       return Padding(

@@ -12,6 +12,7 @@ import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 import 'package:fairware_lift/src/features/workout_import/domain/lift_dsl.dart';
 import 'package:fairware_lift/src/features/workout/presentation/widgets/set_sheet.dart';
 import 'package:fairware_lift/src/features/workout/presentation/widgets/timed_set_sheet.dart';
+import 'package:fairware_lift/src/features/workout/presentation/widgets/reps_only_set_sheet.dart';
 
 // -----------------------------------------------------------------------------
 // --- EXERCISE LIST ITEM WIDGET -----------------------------------------------
@@ -25,7 +26,7 @@ class ExerciseListItem extends ConsumerWidget {
   final List<LoggedSet> loggedSets;
   final VoidCallback onInfoTap;
   final VoidCallback onCardTap;
-  final String? setType; // NEW: To determine which sheet to open.
+  final String? setType;
 
   const ExerciseListItem({
     super.key,
@@ -36,7 +37,7 @@ class ExerciseListItem extends ConsumerWidget {
     required this.onInfoTap,
     required this.onCardTap,
     this.isCurrent = false,
-    this.setType, // NEW
+    this.setType,
   });
 
   String _mmss(int? secs) {
@@ -56,7 +57,6 @@ class ExerciseListItem extends ConsumerWidget {
   }
 
   void _showSetSheet(BuildContext context, WidgetRef ref) async {
-    // Logic to decide which sheet to show
     if (setType == 'timed') {
       final result = await showModalBottomSheet<Map<String, dynamic>>(
         context: context,
@@ -68,6 +68,22 @@ class ExerciseListItem extends ConsumerWidget {
         ref.read(sessionStateProvider.notifier).logTimed(
               durationSeconds: result['durationSeconds'] as int,
               metrics: result['metrics'] as Map<String, dynamic>,
+            );
+      }
+    } else if (setType == 'reps_only') {
+      final result = await showModalBottomSheet<Map<String, num>>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: AppTheme.colors.surface,
+        builder: (context) => const RepsOnlySetSheet(),
+      );
+      if (result != null) {
+        // --- FIX ---
+        // Now passing both `reps` and the returned `weight` (bodyweight)
+        // to the newly updated `logRepsOnlySet` method.
+        ref.read(sessionStateProvider.notifier).logRepsOnlySet(
+              reps: result['reps']!.toInt(),
+              bodyweight: result['weight']!.toDouble(),
             );
       }
     } else {
@@ -148,6 +164,7 @@ class ExerciseListItem extends ConsumerWidget {
                 final set = entry.value;
                 final details = switch (set.setType) {
                   'timed' => '${_mmss(set.durationSeconds)}${_fmtMetrics(set.metrics)}',
+                  'reps_only' => '${set.reps} reps',
                   _ => '${set.weight} lb x ${set.reps} reps',
                 };
                 return _buildSetRow(
@@ -155,7 +172,6 @@ class ExerciseListItem extends ConsumerWidget {
                   details: details,
                 );
               }),
-              // --- NEW "ADD SET" BUTTON ---
               if (isCurrent) ...[
                 const SizedBox(height: 16),
                 SizedBox(

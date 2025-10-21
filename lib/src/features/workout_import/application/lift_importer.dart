@@ -74,9 +74,9 @@ class LiftImporter {
       canonicalSlug = _nameAndSlugService.toSlug(familyId: matchResult.familyId!, discriminators: discriminators);
     }
 
-    // --- NEW LOGIC: Prioritize explicit setType from the JSON ---
+    // --- MODIFIED LOGIC: Prioritize explicit setType, then fallback. ---
     String? setType = exercise.prescription?.setType;
-    // Fallback for timed keywords if setType is not provided.
+    
     if (setType == null) {
         final lowerCaseName = exercise.name.toLowerCase();
         if (lowerCaseName.contains('walk') || lowerCaseName.contains('run') || lowerCaseName.contains('row') || lowerCaseName.contains('bike') || lowerCaseName.contains('plank') || lowerCaseName.contains('carry')) {
@@ -93,8 +93,7 @@ class LiftImporter {
       variation: exercise.variation ?? {},
       info: exercise.info,
       unmapped: matchResult.unmapped,
-      // Pass the determined setType to the session item.
-      defaultSetType: setType, 
+      defaultSetType: setType,
     );
   }
 }
