@@ -4,6 +4,7 @@
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:drift/drift.dart' as drift;
@@ -13,6 +14,7 @@ import 'package:fairware_lift/src/core/theme/data/local/database.dart';
 import 'package:fairware_lift/src/features/workout/application/session_state.dart';
 import 'package:fairware_lift/src/features/workout/application/timer_state.dart';
 import 'package:fairware_lift/src/features/workout/domain/session_item.dart';
+import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 
 // -----------------------------------------------------------------------------
 // --- WORKOUT SUMMARY SCREEN WIDGET -------------------------------------------
@@ -129,7 +131,6 @@ class WorkoutSummaryScreen extends ConsumerWidget {
     List<ExerciseInstancesCompanion> exerciseInstancesToSave,
     List<SetEntriesCompanion> setEntriesCompanion,
   ) {
-    // Guard against unmapped exercises which will have a null slug.
     if (e.slug == null) return;
 
     const uuid = Uuid();
@@ -145,21 +146,44 @@ class WorkoutSummaryScreen extends ConsumerWidget {
         firstSeenAt: drift.Value(now),
       ),
     );
+
     for (int i = 0; i < e.loggedSets.length; i++) {
       final set = e.loggedSets[i];
-      setEntriesCompanion.add(
-        SetEntriesCompanion(
-          id: drift.Value(uuid.v4()),
-          sessionId: drift.Value(sessionId),
-          exerciseSlug: drift.Value(e.slug!),
-          setOrder: drift.Value(i + 1),
-          weight: drift.Value(set.weight),
-          reps: drift.Value(set.reps),
-          createdAt: drift.Value(now),
-          updatedAt: drift.Value(now),
-        ),
+      final companion = SetEntriesCompanion(
+        id: drift.Value(uuid.v4()),
+        sessionId: drift.Value(sessionId),
+        exerciseSlug: drift.Value(e.slug!),
+        setOrder: drift.Value(i + 1),
+        weight: drift.Value(set.weight ?? 0),
+        reps: drift.Value(set.reps ?? 0),
+        setType: drift.Value(set.setType),
+        durationSeconds: drift.Value(set.durationSeconds),
+        distanceM: drift.Value(set.distanceM),
+        calories: drift.Value(set.calories),
+        rpe: drift.Value(set.rpe),
+        metricsJson: drift.Value(jsonEncode(set.metrics)),
+        prescriptionJson: drift.Value(set.prescriptionSnapshot == null ? null : jsonEncode(set.prescriptionSnapshot)),
+        createdAt: drift.Value(now),
+        updatedAt: drift.Value(now),
       );
+      setEntriesCompanion.add(companion);
     }
+  }
+
+  String _mmss(int? secs) {
+    final s = secs ?? 0;
+    final m = s ~/ 60;
+    final r = s % 60;
+    return '${m.toString().padLeft(1, '0')}:${r.toString().padLeft(2, '0')}';
+  }
+
+  String _fmtMetrics(Map<String, dynamic> m) {
+    final incline = m['incline'];
+    final speed = m['speed_mph'];
+    final bits = <String>[];
+    if (incline != null) bits.add('incline $incline');
+    if (speed != null) bits.add('$speed mph');
+    return bits.isEmpty ? '' : ' @ ${bits.join(' • ')}';
   }
 
   @override
@@ -260,10 +284,14 @@ class WorkoutSummaryScreen extends ConsumerWidget {
             ...exercise.loggedSets.asMap().entries.map((entry) {
               final setIndex = entry.key + 1;
               final set = entry.value;
+              final details = switch (set.setType) {
+                'timed' => '${_mmss(set.durationSeconds)}${_fmtMetrics(set.metrics)}',
+                _ => '${set.weight} lb x ${set.reps} reps',
+              };
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 2.0),
                 child: Text(
-                  'Set $setIndex: ${set.weight} lb x ${set.reps} reps',
+                  'Set $setIndex: $details',
                   style: AppTheme.typography.body,
                 ),
               );
@@ -277,7 +305,7 @@ class WorkoutSummaryScreen extends ConsumerWidget {
   Widget _buildWarmupSummary(SessionWarmupItem warmup) {
     final subtitle = warmup.selectedParameters.entries
         .map((e) => '${e.key}: ${e.value}')
-        .join('  ΓÇó  ');
+        .join('  •  ');
 
     return Card(
       color: AppTheme.colors.surface,
@@ -346,10 +374,14 @@ class WorkoutSummaryScreen extends ConsumerWidget {
                     ...exercise.loggedSets.asMap().entries.map((entry) {
                       final setIndex = entry.key + 1;
                       final set = entry.value;
+                      final details = switch (set.setType) {
+                        'timed' => '${_mmss(set.durationSeconds)}${_fmtMetrics(set.metrics)}',
+                         _ => '${set.weight} lb x ${set.reps} reps',
+                      };
                       return Padding(
                         padding: const EdgeInsets.only(left: 8.0, top: 2.0),
                         child: Text(
-                          'Set $setIndex: ${set.weight} lb x ${set.reps} reps',
+                          'Set $setIndex: $details',
                           style: AppTheme.typography.body,
                         ),
                       );

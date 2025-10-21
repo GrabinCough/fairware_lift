@@ -26,6 +26,7 @@ mixin _$SessionItem {
             String displayName,
             Prescription prescription,
             Map<String, dynamic> variation,
+            String? defaultSetType,
             Info? info,
             List<LoggedSet> loggedSets,
             bool isCurrent,
@@ -47,6 +48,7 @@ mixin _$SessionItem {
             String displayName,
             Prescription prescription,
             Map<String, dynamic> variation,
+            String? defaultSetType,
             Info? info,
             List<LoggedSet> loggedSets,
             bool isCurrent,
@@ -67,6 +69,7 @@ mixin _$SessionItem {
             String displayName,
             Prescription prescription,
             Map<String, dynamic> variation,
+            String? defaultSetType,
             Info? info,
             List<LoggedSet> loggedSets,
             bool isCurrent,
@@ -159,6 +162,7 @@ abstract class _$$SessionExerciseImplCopyWith<$Res>
       String displayName,
       Prescription prescription,
       Map<String, dynamic> variation,
+      String? defaultSetType,
       Info? info,
       List<LoggedSet> loggedSets,
       bool isCurrent,
@@ -184,6 +188,7 @@ class __$$SessionExerciseImplCopyWithImpl<$Res>
     Object? displayName = null,
     Object? prescription = null,
     Object? variation = null,
+    Object? defaultSetType = freezed,
     Object? info = freezed,
     Object? loggedSets = null,
     Object? isCurrent = null,
@@ -214,6 +219,10 @@ class __$$SessionExerciseImplCopyWithImpl<$Res>
           ? _value._variation
           : variation // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>,
+      defaultSetType: freezed == defaultSetType
+          ? _value.defaultSetType
+          : defaultSetType // ignore: cast_nullable_to_non_nullable
+              as String?,
       info: freezed == info
           ? _value.info
           : info // ignore: cast_nullable_to_non_nullable
@@ -244,6 +253,7 @@ class _$SessionExerciseImpl implements SessionExercise {
       required this.displayName,
       required this.prescription,
       required final Map<String, dynamic> variation,
+      this.defaultSetType,
       this.info,
       final List<LoggedSet> loggedSets = const [],
       this.isCurrent = false,
@@ -270,10 +280,11 @@ class _$SessionExerciseImpl implements SessionExercise {
   }
 
   @override
+  final String? defaultSetType;
+// NEW
+  @override
   final Info? info;
-// NEW
   final List<LoggedSet> _loggedSets;
-// NEW
   @override
   @JsonKey()
   List<LoggedSet> get loggedSets {
@@ -291,7 +302,7 @@ class _$SessionExerciseImpl implements SessionExercise {
 
   @override
   String toString() {
-    return 'SessionItem.exercise(id: $id, slug: $slug, exerciseHash: $exerciseHash, displayName: $displayName, prescription: $prescription, variation: $variation, info: $info, loggedSets: $loggedSets, isCurrent: $isCurrent, unmapped: $unmapped)';
+    return 'SessionItem.exercise(id: $id, slug: $slug, exerciseHash: $exerciseHash, displayName: $displayName, prescription: $prescription, variation: $variation, defaultSetType: $defaultSetType, info: $info, loggedSets: $loggedSets, isCurrent: $isCurrent, unmapped: $unmapped)';
   }
 
   @override
@@ -309,6 +320,8 @@ class _$SessionExerciseImpl implements SessionExercise {
                 other.prescription == prescription) &&
             const DeepCollectionEquality()
                 .equals(other._variation, _variation) &&
+            (identical(other.defaultSetType, defaultSetType) ||
+                other.defaultSetType == defaultSetType) &&
             (identical(other.info, info) || other.info == info) &&
             const DeepCollectionEquality()
                 .equals(other._loggedSets, _loggedSets) &&
@@ -327,6 +340,7 @@ class _$SessionExerciseImpl implements SessionExercise {
       displayName,
       prescription,
       const DeepCollectionEquality().hash(_variation),
+      defaultSetType,
       info,
       const DeepCollectionEquality().hash(_loggedSets),
       isCurrent,
@@ -351,6 +365,7 @@ class _$SessionExerciseImpl implements SessionExercise {
             String displayName,
             Prescription prescription,
             Map<String, dynamic> variation,
+            String? defaultSetType,
             Info? info,
             List<LoggedSet> loggedSets,
             bool isCurrent,
@@ -363,7 +378,7 @@ class _$SessionExerciseImpl implements SessionExercise {
         superset,
   }) {
     return exercise(id, slug, exerciseHash, displayName, prescription,
-        variation, info, loggedSets, isCurrent, unmapped);
+        variation, defaultSetType, info, loggedSets, isCurrent, unmapped);
   }
 
   @override
@@ -376,6 +391,7 @@ class _$SessionExerciseImpl implements SessionExercise {
             String displayName,
             Prescription prescription,
             Map<String, dynamic> variation,
+            String? defaultSetType,
             Info? info,
             List<LoggedSet> loggedSets,
             bool isCurrent,
@@ -387,7 +403,7 @@ class _$SessionExerciseImpl implements SessionExercise {
     TResult? Function(String id, List<SessionExercise> exercises)? superset,
   }) {
     return exercise?.call(id, slug, exerciseHash, displayName, prescription,
-        variation, info, loggedSets, isCurrent, unmapped);
+        variation, defaultSetType, info, loggedSets, isCurrent, unmapped);
   }
 
   @override
@@ -400,6 +416,7 @@ class _$SessionExerciseImpl implements SessionExercise {
             String displayName,
             Prescription prescription,
             Map<String, dynamic> variation,
+            String? defaultSetType,
             Info? info,
             List<LoggedSet> loggedSets,
             bool isCurrent,
@@ -413,7 +430,7 @@ class _$SessionExerciseImpl implements SessionExercise {
   }) {
     if (exercise != null) {
       return exercise(id, slug, exerciseHash, displayName, prescription,
-          variation, info, loggedSets, isCurrent, unmapped);
+          variation, defaultSetType, info, loggedSets, isCurrent, unmapped);
     }
     return orElse();
   }
@@ -461,6 +478,7 @@ abstract class SessionExercise implements SessionItem {
       required final String displayName,
       required final Prescription prescription,
       required final Map<String, dynamic> variation,
+      final String? defaultSetType,
       final Info? info,
       final List<LoggedSet> loggedSets,
       final bool isCurrent,
@@ -473,7 +491,8 @@ abstract class SessionExercise implements SessionItem {
   String get displayName;
   Prescription get prescription;
   Map<String, dynamic> get variation;
-  Info? get info; // NEW
+  String? get defaultSetType; // NEW
+  Info? get info;
   List<LoggedSet> get loggedSets;
   bool get isCurrent;
   bool get unmapped;
@@ -605,6 +624,7 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
             String displayName,
             Prescription prescription,
             Map<String, dynamic> variation,
+            String? defaultSetType,
             Info? info,
             List<LoggedSet> loggedSets,
             bool isCurrent,
@@ -629,6 +649,7 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
             String displayName,
             Prescription prescription,
             Map<String, dynamic> variation,
+            String? defaultSetType,
             Info? info,
             List<LoggedSet> loggedSets,
             bool isCurrent,
@@ -652,6 +673,7 @@ class _$SessionWarmupItemImpl implements SessionWarmupItem {
             String displayName,
             Prescription prescription,
             Map<String, dynamic> variation,
+            String? defaultSetType,
             Info? info,
             List<LoggedSet> loggedSets,
             bool isCurrent,
@@ -820,6 +842,7 @@ class _$SessionSupersetImpl implements SessionSuperset {
             String displayName,
             Prescription prescription,
             Map<String, dynamic> variation,
+            String? defaultSetType,
             Info? info,
             List<LoggedSet> loggedSets,
             bool isCurrent,
@@ -844,6 +867,7 @@ class _$SessionSupersetImpl implements SessionSuperset {
             String displayName,
             Prescription prescription,
             Map<String, dynamic> variation,
+            String? defaultSetType,
             Info? info,
             List<LoggedSet> loggedSets,
             bool isCurrent,
@@ -867,6 +891,7 @@ class _$SessionSupersetImpl implements SessionSuperset {
             String displayName,
             Prescription prescription,
             Map<String, dynamic> variation,
+            String? defaultSetType,
             Info? info,
             List<LoggedSet> loggedSets,
             bool isCurrent,

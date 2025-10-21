@@ -132,6 +132,9 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                         isCurrent: e.isCurrent,
                         onCardTap: () => ref.read(sessionStateProvider.notifier).setCurrentItem(itemId: e.id),
                         onInfoTap: () => _showExerciseInfoSheet(context, e),
+                        // --- FIX ---
+                        // Pass the setType to the list item.
+                        setType: e.defaultSetType,
                       ),
                     ),
                   SessionWarmupItem w => Dismissible(
@@ -223,6 +226,9 @@ class _SupersetListItem extends ConsumerWidget {
                 isCurrent: exercise.isCurrent,
                 onCardTap: () => ref.read(sessionStateProvider.notifier).setCurrentItem(itemId: exercise.id),
                 onInfoTap: () => onInfoTap(exercise),
+                // --- FIX ---
+                // Pass the setType to the list item within the superset.
+                setType: exercise.defaultSetType,
               ),
             )),
           ],
@@ -241,8 +247,6 @@ class _ExerciseInfoSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // --- FIX ---
-    // The entire content of the bottom sheet is now wrapped in a SafeArea.
     return SafeArea(
       child: ListView(
         controller: controller,

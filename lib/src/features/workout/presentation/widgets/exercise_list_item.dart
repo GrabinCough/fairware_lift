@@ -5,15 +5,19 @@
 // -----------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
+import 'package:fairware_lift/src/features/workout/application/session_state.dart';
 import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 import 'package:fairware_lift/src/features/workout_import/domain/lift_dsl.dart';
+import 'package:fairware_lift/src/features/workout/presentation/widgets/set_sheet.dart';
+import 'package:fairware_lift/src/features/workout/presentation/widgets/timed_set_sheet.dart';
 
 // -----------------------------------------------------------------------------
 // --- EXERCISE LIST ITEM WIDGET -----------------------------------------------
 // -----------------------------------------------------------------------------
 
-class ExerciseListItem extends StatelessWidget {
+class ExerciseListItem extends ConsumerWidget {
   final String displayName;
   final Prescription prescription;
   final Map<String, dynamic> variation;
@@ -21,6 +25,7 @@ class ExerciseListItem extends StatelessWidget {
   final List<LoggedSet> loggedSets;
   final VoidCallback onInfoTap;
   final VoidCallback onCardTap;
+  final String? setType; // NEW: To determine which sheet to open.
 
   const ExerciseListItem({
     super.key,
@@ -31,10 +36,59 @@ class ExerciseListItem extends StatelessWidget {
     required this.onInfoTap,
     required this.onCardTap,
     this.isCurrent = false,
+    this.setType, // NEW
   });
 
+  String _mmss(int? secs) {
+    final s = secs ?? 0;
+    final m = s ~/ 60;
+    final r = s % 60;
+    return '${m.toString().padLeft(1, '0')}:${r.toString().padLeft(2, '0')}';
+  }
+
+  String _fmtMetrics(Map<String, dynamic> m) {
+    final incline = m['incline'];
+    final speed = m['speed_mph'];
+    final bits = <String>[];
+    if (incline != null) bits.add('incline $incline');
+    if (speed != null) bits.add('$speed mph');
+    return bits.isEmpty ? '' : ' @ ${bits.join(' • ')}';
+  }
+
+  void _showSetSheet(BuildContext context, WidgetRef ref) async {
+    // Logic to decide which sheet to show
+    if (setType == 'timed') {
+      final result = await showModalBottomSheet<Map<String, dynamic>>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: AppTheme.colors.surface,
+        builder: (context) => const TimedSetSheet(),
+      );
+      if (result != null) {
+        ref.read(sessionStateProvider.notifier).logTimed(
+              durationSeconds: result['durationSeconds'] as int,
+              metrics: result['metrics'] as Map<String, dynamic>,
+            );
+      }
+    } else {
+      // Default to weight/reps
+      final result = await showModalBottomSheet<Map<String, num>>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: AppTheme.colors.surface,
+        builder: (context) => const SetSheet(),
+      );
+      if (result != null) {
+        ref.read(sessionStateProvider.notifier).logWeightReps(
+              weight: result['weight']!.toDouble(),
+              reps: result['reps']!.toInt(),
+            );
+      }
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final reps = prescription.reps?.toString() ?? '';
     final sets = prescription.sets?.toString() ?? '';
     final targetString = (sets.isNotEmpty && reps.isNotEmpty) ? '$sets x $reps' : reps;
@@ -92,11 +146,32 @@ class ExerciseListItem extends StatelessWidget {
               ...loggedSets.asMap().entries.map((entry) {
                 final index = entry.key;
                 final set = entry.value;
+                final details = switch (set.setType) {
+                  'timed' => '${_mmss(set.durationSeconds)}${_fmtMetrics(set.metrics)}',
+                  _ => '${set.weight} lb x ${set.reps} reps',
+                };
                 return _buildSetRow(
                   setNumber: index + 1,
-                  details: '${set.weight} lb x ${set.reps} reps',
+                  details: details,
                 );
               }),
+              // --- NEW "ADD SET" BUTTON ---
+              if (isCurrent) ...[
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showSetSheet(context, ref),
+                    icon: const Icon(Icons.add_rounded),
+                    label: const Text('Add Set'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.colors.accent.withOpacity(0.2),
+                      foregroundColor: AppTheme.colors.accent,
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

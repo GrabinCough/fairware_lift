@@ -31,7 +31,7 @@ class ExerciseRepository {
     final List<Exercise> exercises = [];
     for (int i = 1; i < rows.length; i++) {
       final row = rows[i];
-      if (row.length == 6 && row.any((cell) => cell.toString().trim().isNotEmpty)) {
+      if (row.length >= 6 && row.any((cell) => cell.toString().trim().isNotEmpty)) {
         try {
           exercises.add(Exercise.fromCsvRow(row));
         } catch (e) {

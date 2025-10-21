@@ -8,10 +8,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
-import 'package:fairware_lift/src/features/workout/application/session_state.dart';
 import 'package:fairware_lift/src/features/workout/application/timer_state.dart';
 import 'package:fairware_lift/src/features/settings/application/settings_provider.dart';
-import 'package:fairware_lift/src/features/workout/presentation/widgets/set_sheet.dart';
 import 'package:fairware_lift/src/features/workout/presentation/widgets/keypad_duration_picker.dart';
 
 // -----------------------------------------------------------------------------
@@ -53,7 +51,7 @@ class WorkoutDock extends ConsumerWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start, // Align timers to the left
           children: [
             // --- THREE QUICK-SELECT TIMERS ---
             settings.when(
@@ -72,29 +70,9 @@ class WorkoutDock extends ConsumerWidget {
               error: (err, stack) => const Text('Error'),
             ),
 
-            // --- ACTION BUTTON ---
-            ElevatedButton.icon(
-              onPressed: () async {
-                final result = await showModalBottomSheet<Map<String, num>>(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: AppTheme.colors.surface,
-                  builder: (context) => const SetSheet(),
-                );
-
-                if (result != null) {
-                  ref.read(sessionStateProvider.notifier).logSet(
-                        weight: result['weight']!.toDouble(),
-                        reps: result['reps']!.toInt(),
-                      );
-                }
-              },
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('Set'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-              ),
-            ),
+            // --- REMOVED "ADD SET" BUTTON ---
+            // The global "Add Set" button has been removed. This functionality
+            // is now handled by a contextual button on each ExerciseListItem.
           ],
         ),
       ),
@@ -117,9 +95,6 @@ class WorkoutDock extends ConsumerWidget {
         : 0.0;
 
     return GestureDetector(
-      // --- FIX ---
-      // The onTap behavior is now a toggle. If the tapped timer is already
-      // active, it stops it. Otherwise, it starts it.
       onTap: () {
         if (isThisTimerActive) {
           ref.read(timerStateProvider.notifier).stopTimer();

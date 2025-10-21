@@ -52,10 +52,6 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     }).toList();
   }
 
-  /// --- UPDATED METHOD (FIX) ---
-  /// Adds a custom exercise selected from the main exercise library.
-  /// The Prescription now includes default values for all rest timer fields
-  /// to ensure the timer is always triggered.
   void addExerciseFromLibrary(lib_exercise.Exercise exercise) {
     final newExercise = SessionItem.exercise(
       id: _uuid.v4(),
@@ -63,12 +59,13 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
       exerciseHash: 'library_${exercise.name}',
       displayName: exercise.name,
       // --- FIX ---
-      // Provide defaults for ALL rest-related fields.
+      // The defaultSetType from the library exercise is now passed through.
+      defaultSetType: exercise.defaultSetType,
       prescription: const Prescription(
         sets: 3,
         reps: '8-12',
         restSeconds: 90,
-        restSecondsAfter: 0, // Default for superset context
+        restSecondsAfter: 0,
       ),
       variation: {
         'equipment': exercise.equipment,
@@ -114,7 +111,7 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     }).toList();
   }
 
-  void logSet({required double weight, required int reps}) {
+  void logSet(LoggedSet set) {
     SessionSuperset? parentSuperset;
     SessionExercise? currentExercise;
     int currentExerciseIndex = -1;
@@ -137,8 +134,7 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
 
     if (currentExercise == null) return;
 
-    final newSet = LoggedSet(weight: weight, reps: reps, id: _uuid.v4());
-    final updatedExercise = currentExercise.copyWith(loggedSets: [...currentExercise.loggedSets, newSet]);
+    final updatedExercise = currentExercise.copyWith(loggedSets: [...currentExercise.loggedSets, set]);
 
     state = state.map((item) {
       if (item.id == currentExercise!.id) return updatedExercise;
@@ -151,6 +147,10 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
       }
       return item;
     }).toList();
+    
+    if (set.setType == 'timed' && set.durationSeconds != null) {
+      ref.read(workoutMetricsProvider.notifier).addActivityTime(seconds: set.durationSeconds!);
+    }
 
     int? restDuration;
     if (parentSuperset == null) {
@@ -163,6 +163,16 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     }
 
     ref.read(timerStateProvider.notifier).startTimer(duration: restDuration);
+  }
+
+  void logWeightReps({required double weight, required int reps, double? rpe}) {
+    final id = _uuid.v4();
+    logSet(LoggedSet.weightReps(id: id, weight: weight, reps: reps, rpe: rpe));
+  }
+
+  void logTimed({required int durationSeconds, Map<String, dynamic> metrics = const {}}) {
+    final id = _uuid.v4();
+    logSet(LoggedSet.timed(id: id, durationSeconds: durationSeconds, metrics: metrics));
   }
 
   void deleteItem(String itemId) {

@@ -16,7 +16,8 @@ sealed class SessionItem with _$SessionItem {
     required String displayName,
     required Prescription prescription,
     required Map<String, dynamic> variation,
-    Info? info, // NEW
+    String? defaultSetType, // NEW
+    Info? info,
     @Default([]) List<LoggedSet> loggedSets,
     @Default(false) bool isCurrent,
     @Default(false) bool unmapped,

@@ -830,6 +830,47 @@ class $SetEntriesTable extends SetEntries
   late final GeneratedColumn<int> reps = GeneratedColumn<int>(
       'reps', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _setTypeMeta =
+      const VerificationMeta('setType');
+  @override
+  late final GeneratedColumn<String> setType = GeneratedColumn<String>(
+      'set_type', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _durationSecondsMeta =
+      const VerificationMeta('durationSeconds');
+  @override
+  late final GeneratedColumn<int> durationSeconds = GeneratedColumn<int>(
+      'duration_seconds', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _distanceMMeta =
+      const VerificationMeta('distanceM');
+  @override
+  late final GeneratedColumn<int> distanceM = GeneratedColumn<int>(
+      'distance_m', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _caloriesMeta =
+      const VerificationMeta('calories');
+  @override
+  late final GeneratedColumn<int> calories = GeneratedColumn<int>(
+      'calories', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _rpeMeta = const VerificationMeta('rpe');
+  @override
+  late final GeneratedColumn<double> rpe = GeneratedColumn<double>(
+      'rpe', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _metricsJsonMeta =
+      const VerificationMeta('metricsJson');
+  @override
+  late final GeneratedColumn<String> metricsJson = GeneratedColumn<String>(
+      'metrics_json', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _prescriptionJsonMeta =
+      const VerificationMeta('prescriptionJson');
+  @override
+  late final GeneratedColumn<String> prescriptionJson = GeneratedColumn<String>(
+      'prescription_json', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -850,6 +891,13 @@ class $SetEntriesTable extends SetEntries
         setOrder,
         weight,
         reps,
+        setType,
+        durationSeconds,
+        distanceM,
+        calories,
+        rpe,
+        metricsJson,
+        prescriptionJson,
         createdAt,
         updatedAt
       ];
@@ -900,6 +948,40 @@ class $SetEntriesTable extends SetEntries
     } else if (isInserting) {
       context.missing(_repsMeta);
     }
+    if (data.containsKey('set_type')) {
+      context.handle(_setTypeMeta,
+          setType.isAcceptableOrUnknown(data['set_type']!, _setTypeMeta));
+    }
+    if (data.containsKey('duration_seconds')) {
+      context.handle(
+          _durationSecondsMeta,
+          durationSeconds.isAcceptableOrUnknown(
+              data['duration_seconds']!, _durationSecondsMeta));
+    }
+    if (data.containsKey('distance_m')) {
+      context.handle(_distanceMMeta,
+          distanceM.isAcceptableOrUnknown(data['distance_m']!, _distanceMMeta));
+    }
+    if (data.containsKey('calories')) {
+      context.handle(_caloriesMeta,
+          calories.isAcceptableOrUnknown(data['calories']!, _caloriesMeta));
+    }
+    if (data.containsKey('rpe')) {
+      context.handle(
+          _rpeMeta, rpe.isAcceptableOrUnknown(data['rpe']!, _rpeMeta));
+    }
+    if (data.containsKey('metrics_json')) {
+      context.handle(
+          _metricsJsonMeta,
+          metricsJson.isAcceptableOrUnknown(
+              data['metrics_json']!, _metricsJsonMeta));
+    }
+    if (data.containsKey('prescription_json')) {
+      context.handle(
+          _prescriptionJsonMeta,
+          prescriptionJson.isAcceptableOrUnknown(
+              data['prescription_json']!, _prescriptionJsonMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -933,6 +1015,20 @@ class $SetEntriesTable extends SetEntries
           .read(DriftSqlType.double, data['${effectivePrefix}weight'])!,
       reps: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}reps'])!,
+      setType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}set_type']),
+      durationSeconds: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}duration_seconds']),
+      distanceM: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}distance_m']),
+      calories: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}calories']),
+      rpe: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}rpe']),
+      metricsJson: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}metrics_json']),
+      prescriptionJson: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}prescription_json']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -953,6 +1049,13 @@ class SetEntry extends DataClass implements Insertable<SetEntry> {
   final int setOrder;
   final double weight;
   final int reps;
+  final String? setType;
+  final int? durationSeconds;
+  final int? distanceM;
+  final int? calories;
+  final double? rpe;
+  final String? metricsJson;
+  final String? prescriptionJson;
   final DateTime createdAt;
   final DateTime updatedAt;
   const SetEntry(
@@ -962,6 +1065,13 @@ class SetEntry extends DataClass implements Insertable<SetEntry> {
       required this.setOrder,
       required this.weight,
       required this.reps,
+      this.setType,
+      this.durationSeconds,
+      this.distanceM,
+      this.calories,
+      this.rpe,
+      this.metricsJson,
+      this.prescriptionJson,
       required this.createdAt,
       required this.updatedAt});
   @override
@@ -973,6 +1083,27 @@ class SetEntry extends DataClass implements Insertable<SetEntry> {
     map['set_order'] = Variable<int>(setOrder);
     map['weight'] = Variable<double>(weight);
     map['reps'] = Variable<int>(reps);
+    if (!nullToAbsent || setType != null) {
+      map['set_type'] = Variable<String>(setType);
+    }
+    if (!nullToAbsent || durationSeconds != null) {
+      map['duration_seconds'] = Variable<int>(durationSeconds);
+    }
+    if (!nullToAbsent || distanceM != null) {
+      map['distance_m'] = Variable<int>(distanceM);
+    }
+    if (!nullToAbsent || calories != null) {
+      map['calories'] = Variable<int>(calories);
+    }
+    if (!nullToAbsent || rpe != null) {
+      map['rpe'] = Variable<double>(rpe);
+    }
+    if (!nullToAbsent || metricsJson != null) {
+      map['metrics_json'] = Variable<String>(metricsJson);
+    }
+    if (!nullToAbsent || prescriptionJson != null) {
+      map['prescription_json'] = Variable<String>(prescriptionJson);
+    }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -986,6 +1117,25 @@ class SetEntry extends DataClass implements Insertable<SetEntry> {
       setOrder: Value(setOrder),
       weight: Value(weight),
       reps: Value(reps),
+      setType: setType == null && nullToAbsent
+          ? const Value.absent()
+          : Value(setType),
+      durationSeconds: durationSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(durationSeconds),
+      distanceM: distanceM == null && nullToAbsent
+          ? const Value.absent()
+          : Value(distanceM),
+      calories: calories == null && nullToAbsent
+          ? const Value.absent()
+          : Value(calories),
+      rpe: rpe == null && nullToAbsent ? const Value.absent() : Value(rpe),
+      metricsJson: metricsJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(metricsJson),
+      prescriptionJson: prescriptionJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(prescriptionJson),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -1001,6 +1151,13 @@ class SetEntry extends DataClass implements Insertable<SetEntry> {
       setOrder: serializer.fromJson<int>(json['setOrder']),
       weight: serializer.fromJson<double>(json['weight']),
       reps: serializer.fromJson<int>(json['reps']),
+      setType: serializer.fromJson<String?>(json['setType']),
+      durationSeconds: serializer.fromJson<int?>(json['durationSeconds']),
+      distanceM: serializer.fromJson<int?>(json['distanceM']),
+      calories: serializer.fromJson<int?>(json['calories']),
+      rpe: serializer.fromJson<double?>(json['rpe']),
+      metricsJson: serializer.fromJson<String?>(json['metricsJson']),
+      prescriptionJson: serializer.fromJson<String?>(json['prescriptionJson']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -1015,6 +1172,13 @@ class SetEntry extends DataClass implements Insertable<SetEntry> {
       'setOrder': serializer.toJson<int>(setOrder),
       'weight': serializer.toJson<double>(weight),
       'reps': serializer.toJson<int>(reps),
+      'setType': serializer.toJson<String?>(setType),
+      'durationSeconds': serializer.toJson<int?>(durationSeconds),
+      'distanceM': serializer.toJson<int?>(distanceM),
+      'calories': serializer.toJson<int?>(calories),
+      'rpe': serializer.toJson<double?>(rpe),
+      'metricsJson': serializer.toJson<String?>(metricsJson),
+      'prescriptionJson': serializer.toJson<String?>(prescriptionJson),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -1027,6 +1191,13 @@ class SetEntry extends DataClass implements Insertable<SetEntry> {
           int? setOrder,
           double? weight,
           int? reps,
+          Value<String?> setType = const Value.absent(),
+          Value<int?> durationSeconds = const Value.absent(),
+          Value<int?> distanceM = const Value.absent(),
+          Value<int?> calories = const Value.absent(),
+          Value<double?> rpe = const Value.absent(),
+          Value<String?> metricsJson = const Value.absent(),
+          Value<String?> prescriptionJson = const Value.absent(),
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       SetEntry(
@@ -1036,6 +1207,17 @@ class SetEntry extends DataClass implements Insertable<SetEntry> {
         setOrder: setOrder ?? this.setOrder,
         weight: weight ?? this.weight,
         reps: reps ?? this.reps,
+        setType: setType.present ? setType.value : this.setType,
+        durationSeconds: durationSeconds.present
+            ? durationSeconds.value
+            : this.durationSeconds,
+        distanceM: distanceM.present ? distanceM.value : this.distanceM,
+        calories: calories.present ? calories.value : this.calories,
+        rpe: rpe.present ? rpe.value : this.rpe,
+        metricsJson: metricsJson.present ? metricsJson.value : this.metricsJson,
+        prescriptionJson: prescriptionJson.present
+            ? prescriptionJson.value
+            : this.prescriptionJson,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
@@ -1049,6 +1231,18 @@ class SetEntry extends DataClass implements Insertable<SetEntry> {
       setOrder: data.setOrder.present ? data.setOrder.value : this.setOrder,
       weight: data.weight.present ? data.weight.value : this.weight,
       reps: data.reps.present ? data.reps.value : this.reps,
+      setType: data.setType.present ? data.setType.value : this.setType,
+      durationSeconds: data.durationSeconds.present
+          ? data.durationSeconds.value
+          : this.durationSeconds,
+      distanceM: data.distanceM.present ? data.distanceM.value : this.distanceM,
+      calories: data.calories.present ? data.calories.value : this.calories,
+      rpe: data.rpe.present ? data.rpe.value : this.rpe,
+      metricsJson:
+          data.metricsJson.present ? data.metricsJson.value : this.metricsJson,
+      prescriptionJson: data.prescriptionJson.present
+          ? data.prescriptionJson.value
+          : this.prescriptionJson,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -1063,6 +1257,13 @@ class SetEntry extends DataClass implements Insertable<SetEntry> {
           ..write('setOrder: $setOrder, ')
           ..write('weight: $weight, ')
           ..write('reps: $reps, ')
+          ..write('setType: $setType, ')
+          ..write('durationSeconds: $durationSeconds, ')
+          ..write('distanceM: $distanceM, ')
+          ..write('calories: $calories, ')
+          ..write('rpe: $rpe, ')
+          ..write('metricsJson: $metricsJson, ')
+          ..write('prescriptionJson: $prescriptionJson, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -1070,8 +1271,22 @@ class SetEntry extends DataClass implements Insertable<SetEntry> {
   }
 
   @override
-  int get hashCode => Object.hash(id, sessionId, exerciseSlug, setOrder, weight,
-      reps, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+      id,
+      sessionId,
+      exerciseSlug,
+      setOrder,
+      weight,
+      reps,
+      setType,
+      durationSeconds,
+      distanceM,
+      calories,
+      rpe,
+      metricsJson,
+      prescriptionJson,
+      createdAt,
+      updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1082,6 +1297,13 @@ class SetEntry extends DataClass implements Insertable<SetEntry> {
           other.setOrder == this.setOrder &&
           other.weight == this.weight &&
           other.reps == this.reps &&
+          other.setType == this.setType &&
+          other.durationSeconds == this.durationSeconds &&
+          other.distanceM == this.distanceM &&
+          other.calories == this.calories &&
+          other.rpe == this.rpe &&
+          other.metricsJson == this.metricsJson &&
+          other.prescriptionJson == this.prescriptionJson &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -1093,6 +1315,13 @@ class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
   final Value<int> setOrder;
   final Value<double> weight;
   final Value<int> reps;
+  final Value<String?> setType;
+  final Value<int?> durationSeconds;
+  final Value<int?> distanceM;
+  final Value<int?> calories;
+  final Value<double?> rpe;
+  final Value<String?> metricsJson;
+  final Value<String?> prescriptionJson;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
@@ -1103,6 +1332,13 @@ class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
     this.setOrder = const Value.absent(),
     this.weight = const Value.absent(),
     this.reps = const Value.absent(),
+    this.setType = const Value.absent(),
+    this.durationSeconds = const Value.absent(),
+    this.distanceM = const Value.absent(),
+    this.calories = const Value.absent(),
+    this.rpe = const Value.absent(),
+    this.metricsJson = const Value.absent(),
+    this.prescriptionJson = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1114,6 +1350,13 @@ class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
     required int setOrder,
     required double weight,
     required int reps,
+    this.setType = const Value.absent(),
+    this.durationSeconds = const Value.absent(),
+    this.distanceM = const Value.absent(),
+    this.calories = const Value.absent(),
+    this.rpe = const Value.absent(),
+    this.metricsJson = const Value.absent(),
+    this.prescriptionJson = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
@@ -1132,6 +1375,13 @@ class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
     Expression<int>? setOrder,
     Expression<double>? weight,
     Expression<int>? reps,
+    Expression<String>? setType,
+    Expression<int>? durationSeconds,
+    Expression<int>? distanceM,
+    Expression<int>? calories,
+    Expression<double>? rpe,
+    Expression<String>? metricsJson,
+    Expression<String>? prescriptionJson,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
@@ -1143,6 +1393,13 @@ class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
       if (setOrder != null) 'set_order': setOrder,
       if (weight != null) 'weight': weight,
       if (reps != null) 'reps': reps,
+      if (setType != null) 'set_type': setType,
+      if (durationSeconds != null) 'duration_seconds': durationSeconds,
+      if (distanceM != null) 'distance_m': distanceM,
+      if (calories != null) 'calories': calories,
+      if (rpe != null) 'rpe': rpe,
+      if (metricsJson != null) 'metrics_json': metricsJson,
+      if (prescriptionJson != null) 'prescription_json': prescriptionJson,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -1156,6 +1413,13 @@ class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
       Value<int>? setOrder,
       Value<double>? weight,
       Value<int>? reps,
+      Value<String?>? setType,
+      Value<int?>? durationSeconds,
+      Value<int?>? distanceM,
+      Value<int?>? calories,
+      Value<double?>? rpe,
+      Value<String?>? metricsJson,
+      Value<String?>? prescriptionJson,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
       Value<int>? rowid}) {
@@ -1166,6 +1430,13 @@ class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
       setOrder: setOrder ?? this.setOrder,
       weight: weight ?? this.weight,
       reps: reps ?? this.reps,
+      setType: setType ?? this.setType,
+      durationSeconds: durationSeconds ?? this.durationSeconds,
+      distanceM: distanceM ?? this.distanceM,
+      calories: calories ?? this.calories,
+      rpe: rpe ?? this.rpe,
+      metricsJson: metricsJson ?? this.metricsJson,
+      prescriptionJson: prescriptionJson ?? this.prescriptionJson,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -1193,6 +1464,27 @@ class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
     if (reps.present) {
       map['reps'] = Variable<int>(reps.value);
     }
+    if (setType.present) {
+      map['set_type'] = Variable<String>(setType.value);
+    }
+    if (durationSeconds.present) {
+      map['duration_seconds'] = Variable<int>(durationSeconds.value);
+    }
+    if (distanceM.present) {
+      map['distance_m'] = Variable<int>(distanceM.value);
+    }
+    if (calories.present) {
+      map['calories'] = Variable<int>(calories.value);
+    }
+    if (rpe.present) {
+      map['rpe'] = Variable<double>(rpe.value);
+    }
+    if (metricsJson.present) {
+      map['metrics_json'] = Variable<String>(metricsJson.value);
+    }
+    if (prescriptionJson.present) {
+      map['prescription_json'] = Variable<String>(prescriptionJson.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -1214,6 +1506,13 @@ class SetEntriesCompanion extends UpdateCompanion<SetEntry> {
           ..write('setOrder: $setOrder, ')
           ..write('weight: $weight, ')
           ..write('reps: $reps, ')
+          ..write('setType: $setType, ')
+          ..write('durationSeconds: $durationSeconds, ')
+          ..write('distanceM: $distanceM, ')
+          ..write('calories: $calories, ')
+          ..write('rpe: $rpe, ')
+          ..write('metricsJson: $metricsJson, ')
+          ..write('prescriptionJson: $prescriptionJson, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -2242,6 +2541,13 @@ typedef $$SetEntriesTableCreateCompanionBuilder = SetEntriesCompanion Function({
   required int setOrder,
   required double weight,
   required int reps,
+  Value<String?> setType,
+  Value<int?> durationSeconds,
+  Value<int?> distanceM,
+  Value<int?> calories,
+  Value<double?> rpe,
+  Value<String?> metricsJson,
+  Value<String?> prescriptionJson,
   required DateTime createdAt,
   required DateTime updatedAt,
   Value<int> rowid,
@@ -2253,6 +2559,13 @@ typedef $$SetEntriesTableUpdateCompanionBuilder = SetEntriesCompanion Function({
   Value<int> setOrder,
   Value<double> weight,
   Value<int> reps,
+  Value<String?> setType,
+  Value<int?> durationSeconds,
+  Value<int?> distanceM,
+  Value<int?> calories,
+  Value<double?> rpe,
+  Value<String?> metricsJson,
+  Value<String?> prescriptionJson,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<int> rowid,
@@ -2314,6 +2627,29 @@ class $$SetEntriesTableFilterComposer
 
   ColumnFilters<int> get reps => $composableBuilder(
       column: $table.reps, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get setType => $composableBuilder(
+      column: $table.setType, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get durationSeconds => $composableBuilder(
+      column: $table.durationSeconds,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get distanceM => $composableBuilder(
+      column: $table.distanceM, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get calories => $composableBuilder(
+      column: $table.calories, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get rpe => $composableBuilder(
+      column: $table.rpe, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get metricsJson => $composableBuilder(
+      column: $table.metricsJson, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get prescriptionJson => $composableBuilder(
+      column: $table.prescriptionJson,
+      builder: (column) => ColumnFilters(column));
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnFilters(column));
@@ -2383,6 +2719,29 @@ class $$SetEntriesTableOrderingComposer
   ColumnOrderings<int> get reps => $composableBuilder(
       column: $table.reps, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get setType => $composableBuilder(
+      column: $table.setType, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get durationSeconds => $composableBuilder(
+      column: $table.durationSeconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get distanceM => $composableBuilder(
+      column: $table.distanceM, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get calories => $composableBuilder(
+      column: $table.calories, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get rpe => $composableBuilder(
+      column: $table.rpe, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get metricsJson => $composableBuilder(
+      column: $table.metricsJson, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get prescriptionJson => $composableBuilder(
+      column: $table.prescriptionJson,
+      builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
       column: $table.createdAt, builder: (column) => ColumnOrderings(column));
 
@@ -2450,6 +2809,27 @@ class $$SetEntriesTableAnnotationComposer
 
   GeneratedColumn<int> get reps =>
       $composableBuilder(column: $table.reps, builder: (column) => column);
+
+  GeneratedColumn<String> get setType =>
+      $composableBuilder(column: $table.setType, builder: (column) => column);
+
+  GeneratedColumn<int> get durationSeconds => $composableBuilder(
+      column: $table.durationSeconds, builder: (column) => column);
+
+  GeneratedColumn<int> get distanceM =>
+      $composableBuilder(column: $table.distanceM, builder: (column) => column);
+
+  GeneratedColumn<int> get calories =>
+      $composableBuilder(column: $table.calories, builder: (column) => column);
+
+  GeneratedColumn<double> get rpe =>
+      $composableBuilder(column: $table.rpe, builder: (column) => column);
+
+  GeneratedColumn<String> get metricsJson => $composableBuilder(
+      column: $table.metricsJson, builder: (column) => column);
+
+  GeneratedColumn<String> get prescriptionJson => $composableBuilder(
+      column: $table.prescriptionJson, builder: (column) => column);
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -2528,6 +2908,13 @@ class $$SetEntriesTableTableManager extends RootTableManager<
             Value<int> setOrder = const Value.absent(),
             Value<double> weight = const Value.absent(),
             Value<int> reps = const Value.absent(),
+            Value<String?> setType = const Value.absent(),
+            Value<int?> durationSeconds = const Value.absent(),
+            Value<int?> distanceM = const Value.absent(),
+            Value<int?> calories = const Value.absent(),
+            Value<double?> rpe = const Value.absent(),
+            Value<String?> metricsJson = const Value.absent(),
+            Value<String?> prescriptionJson = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -2539,6 +2926,13 @@ class $$SetEntriesTableTableManager extends RootTableManager<
             setOrder: setOrder,
             weight: weight,
             reps: reps,
+            setType: setType,
+            durationSeconds: durationSeconds,
+            distanceM: distanceM,
+            calories: calories,
+            rpe: rpe,
+            metricsJson: metricsJson,
+            prescriptionJson: prescriptionJson,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,
@@ -2550,6 +2944,13 @@ class $$SetEntriesTableTableManager extends RootTableManager<
             required int setOrder,
             required double weight,
             required int reps,
+            Value<String?> setType = const Value.absent(),
+            Value<int?> durationSeconds = const Value.absent(),
+            Value<int?> distanceM = const Value.absent(),
+            Value<int?> calories = const Value.absent(),
+            Value<double?> rpe = const Value.absent(),
+            Value<String?> metricsJson = const Value.absent(),
+            Value<String?> prescriptionJson = const Value.absent(),
             required DateTime createdAt,
             required DateTime updatedAt,
             Value<int> rowid = const Value.absent(),
@@ -2561,6 +2962,13 @@ class $$SetEntriesTableTableManager extends RootTableManager<
             setOrder: setOrder,
             weight: weight,
             reps: reps,
+            setType: setType,
+            durationSeconds: durationSeconds,
+            distanceM: distanceM,
+            calories: calories,
+            rpe: rpe,
+            metricsJson: metricsJson,
+            prescriptionJson: prescriptionJson,
             createdAt: createdAt,
             updatedAt: updatedAt,
             rowid: rowid,

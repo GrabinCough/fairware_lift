@@ -22,6 +22,7 @@ class Exercise {
   final String primaryMuscles;
   final String secondaryMuscles;
   final String howTo;
+  final String? defaultSetType;
 
   const Exercise({
     required this.name,
@@ -30,6 +31,7 @@ class Exercise {
     required this.primaryMuscles,
     required this.secondaryMuscles,
     required this.howTo,
+    this.defaultSetType,
   });
 
   /// A factory constructor to create an Exercise instance from a CSV row (represented as a List<dynamic>).
@@ -41,6 +43,7 @@ class Exercise {
       primaryMuscles: row[3].toString(),
       secondaryMuscles: row[4].toString(),
       howTo: row[5].toString(),
+      defaultSetType: row.length > 6 ? row[6].toString().trim().isEmpty ? null : row[6].toString().trim() : null,
     );
   }
 

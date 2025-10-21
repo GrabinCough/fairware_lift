@@ -39,8 +39,6 @@ class SetEntryWithExercise {
   SetEntryWithExercise({required this.set, required this.exercise});
 }
 
-// --- REMOVED: The RecentExercise class is no longer needed. ---
-
 // -----------------------------------------------------------------------------
 // --- TABLE DEFINITIONS -------------------------------------------------------
 // -----------------------------------------------------------------------------
@@ -55,7 +53,7 @@ class Sessions extends Table {
       integer().named('total_activity_seconds').nullable()();
   IntColumn get totalRestSeconds =>
       integer().named('total_rest_seconds').nullable()();
-  TextColumn get notes => text().named('notes').nullable()(); // Added name for clarity
+  TextColumn get notes => text().named('notes').nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   @override
@@ -69,8 +67,20 @@ class SetEntries extends Table {
   TextColumn get exerciseSlug =>
       text().references(ExerciseInstances, #slug).named('exercise_slug')();
   IntColumn get setOrder => integer()();
+  
+  // Original weight/reps columns (kept for backward compatibility)
   RealColumn get weight => real()();
   IntColumn get reps => integer()();
+
+  // --- NEW HYBRID SCHEMA COLUMNS ---
+  TextColumn get setType => text().named('set_type').nullable()();
+  IntColumn get durationSeconds => integer().named('duration_seconds').nullable()();
+  IntColumn get distanceM => integer().named('distance_m').nullable()();
+  IntColumn get calories => integer().named('calories').nullable()();
+  RealColumn get rpe => real().named('rpe').nullable()();
+  TextColumn get metricsJson => text().named('metrics_json').nullable()();
+  TextColumn get prescriptionJson => text().named('prescription_json').nullable()();
+  
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   @override
@@ -115,7 +125,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration {
@@ -129,12 +139,24 @@ class AppDatabase extends _$AppDatabase {
         if (from < 6) {
           await migrator.addColumn(sessions, sessions.totalActivitySeconds);
         }
+        if (from < 7) {
+          await migrator.addColumn(setEntries, setEntries.setType);
+          await migrator.addColumn(setEntries, setEntries.durationSeconds);
+          await migrator.addColumn(setEntries, setEntries.distanceM);
+          await migrator.addColumn(setEntries, setEntries.calories);
+          await migrator.addColumn(setEntries, setEntries.rpe);
+          await migrator.addColumn(setEntries, setEntries.metricsJson);
+          await migrator.addColumn(setEntries, setEntries.prescriptionJson);
+          
+          await customStatement('CREATE INDEX IF NOT EXISTS idx_setentries_set_type ON set_entries(set_type);');
+          await customStatement('CREATE INDEX IF NOT EXISTS idx_setentries_duration_seconds ON set_entries(duration_seconds);');
+          await customStatement('CREATE INDEX IF NOT EXISTS idx_setentries_distance_m ON set_entries(distance_m);');
+          await customStatement('CREATE INDEX IF NOT EXISTS idx_setentries_calories ON set_entries(calories);');
+        }
       },
     );
   }
 
-  /// --- NEW METHOD ---
-  /// Fetches the single most recent workout session.
   Future<FullWorkoutSession?> getLatestWorkout() async {
     final latestSessionQuery = select(sessions)
       ..orderBy([(t) => OrderingTerm.desc(t.sessionDateTime)])
@@ -146,14 +168,10 @@ class AppDatabase extends _$AppDatabase {
       return null;
     }
 
-    // Use the existing getWorkoutHistory logic but for a single session
     final history = await getWorkoutHistory(limit: 1);
     return history.isNotEmpty ? history.first : null;
   }
 
-
-  /// --- UPDATED METHOD ---
-  /// Now accepts an optional limit for optimized queries.
   Future<List<FullWorkoutSession>> getWorkoutHistory({int? limit}) async {
     final query = select(sessions)
       ..orderBy([(t) => OrderingTerm.desc(t.sessionDateTime)]);
