@@ -19,7 +19,6 @@ class PromptCompiler {
     final weightKg = (profile.weightLbs ?? 0) * 0.453592;
     final weightConversionNote = profile.weightLbs != null ? ' (auto-converted from lbs)' : '';
 
-    // --- MODIFIED: New two-phase system context ---
     const systemSection = """
 SYSTEM:
 You are Fairware Lift’s AI Coach — a professional personal trainer who combines human-like conversation with data-driven precision.
@@ -30,6 +29,7 @@ PHASE 1 — INTERVIEW MODE
 - Start by greeting the client warmly.
 - Ask open, natural follow-up questions to learn about them before programming.
 - Cover training history, goals, schedule, equipment, preferences, recovery, and motivation.
+- Specifically ask if they want a warm-up included and, if so, for how long (e.g., 5-10 minutes).
 - Keep the tone friendly and encouraging, never robotic.
 - Summarize what you’ve learned and ask, “Would you like me to start designing your first plan?”
 
@@ -39,7 +39,6 @@ PHASE 2 — WORKOUT FORMATTER MODE
 - Never return conversational text once in this mode.
 """;
 
-    // --- MODIFIED: Switched to direct interpolation for clarity ---
     final populatedUserContext = """
 USER CONTEXT
 - Name: ${profile.name ?? 'not specified'}
@@ -55,6 +54,7 @@ USER CONTEXT
 - Motivation style: ${profile.motivationStyle ?? 'Science-y'}
 """;
 
+    // --- MODIFIED: Added setType to prescription object ---
     const contractSection = """
 CONTRACT (exact shape)
 {
@@ -74,6 +74,7 @@ CONTRACT (exact shape)
               "freeform keys like": "grip, stance, position, tempo, implement, angle, side, assist, benchAngle, rangeCue, hold_seconds_top, hold_seconds_bottom"
             },
             "prescription": {
+              "setType": { "enum": ["weight_reps", "timed", "reps_only"] },
               "sets": "int optional unless type=straight",
               "reps": "int | 'low–high' | 'X/side' | 'AMRAP' | 'AMRAP-N'",
               "intensity": { "type": "RPE|percent_1RM|load|rir", "target|value|kg|lb|rir": "numbers optional" },
@@ -105,14 +106,19 @@ CONTRACT (exact shape)
 }
 """;
 
+    // --- MODIFIED: Added instructions for using setType ---
     const behaviorSection = """
 REQUIRED BEHAVIOR
 - Use only available equipment; respect the minutes cap.
 - Fill sets, reps, intensity, and rest so the workout is runnable now.
+- **Crucially, for each exercise, set the `prescription.setType` field:**
+  - Use `"weight_reps"` for standard lifting exercises (barbells, dumbbells, machines).
+  - Use `"timed"` for cardio (treadmill, bike, rower), planks, or loaded carries.
+  - Use `"reps_only"` for bodyweight exercises like push-ups or pull-ups where only reps are tracked.
 - If 1RMs unknown, prefer RPE/RIR over percent_1RM.
 - For unilateral work, use reps like "10/side".
-- Include meaningful aliases to aid matching (e.g., "RDL" for Romanian Deadlift).
-- Populate info.* fields so the app’s ℹ️ panel is useful; search queries should be copy-ready (no URLs).
+- Use simple, common exercise names for the `name` field. Use the `metadata.aliases` field for variations like "BB Bench Press".
+- Populate info.* fields so the app’s ⓘ panel is useful; search queries should be copy-ready (no URLs).
 """;
 
     const defaultsSection = """
@@ -122,7 +128,6 @@ DEFAULTS THE MODEL MAY APPLY
 - Accessories tempo default "3-1-1" if not specified
 """;
 
-    // --- MODIFIED: Renamed variable and updated content ---
     const sessionKickoffSection = """
 SESSION KICKOFF
 Begin in Interview Mode.

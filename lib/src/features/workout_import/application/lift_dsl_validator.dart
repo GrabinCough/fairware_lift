@@ -56,12 +56,15 @@ class LiftDslValidator {
       variation: data['variation'] as Map<String, dynamic>?,
       prescription: data['prescription'] != null ? _parsePrescription(data['prescription']) : null,
       metadata: data['metadata'] != null ? _parseExerciseMeta(data['metadata']) : null,
-      info: data['info'] != null ? _parseInfo(data['info']) : null, // NEW
+      info: data['info'] != null ? _parseInfo(data['info']) : null,
     );
   }
 
   Prescription _parsePrescription(Map<String, dynamic> data) {
     return Prescription(
+      // --- FIX ---
+      // Now correctly parsing the new `setType` field from the JSON.
+      setType: data['setType'] as String?,
       sets: data['sets'] as int?,
       reps: data['reps'],
       intensity: data['intensity'] != null ? _parseIntensity(data['intensity']) : null,
@@ -91,7 +94,6 @@ class LiftDslValidator {
     );
   }
 
-  // --- NEW ---
   Info _parseInfo(Map<String, dynamic> data) {
     return Info(
       howTo: data['how_to'] as String?,

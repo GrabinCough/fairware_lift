@@ -40,13 +40,14 @@ class Exercise {
 
 @immutable
 class Prescription {
+  final String? setType; // NEW
   final int? sets;
   final dynamic reps;
   final Intensity? intensity;
   final int? restSeconds;
   final int? restSecondsAfter;
   final String? note;
-  const Prescription({this.sets, this.reps, this.intensity, this.restSeconds, this.restSecondsAfter, this.note});
+  const Prescription({this.setType, this.sets, this.reps, this.intensity, this.restSeconds, this.restSecondsAfter, this.note});
 }
 
 enum IntensityType { rpe, percent_1rm, load, rir }
