@@ -71,7 +71,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     );
   }
 
-  // --- NEW: Reusable confirmation dialog for deleting items ---
   Future<bool?> _showDeleteItemConfirmationDialog(BuildContext context, {String itemType = 'Item'}) {
     return showDialog<bool>(
       context: context,
@@ -98,6 +97,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     final sessionItems = ref.watch(sessionStateProvider);
@@ -118,22 +118,7 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final result = await Navigator.of(context).push<lib_exercise.Exercise>(
-            MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (context) => const ExercisePickerScreen(),
-            ),
-          );
-
-          if (result != null && mounted) {
-            ref.read(sessionStateProvider.notifier).addExerciseFromLibrary(result);
-          }
-        },
-        label: const Text('Add Exercise'),
-        icon: const Icon(Icons.add),
-      ),
+      // --- MODIFIED: Removed the FloatingActionButton ---
       bottomNavigationBar: const WorkoutDock(),
       body: SafeArea(
         child: ListView(
@@ -149,7 +134,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                   SessionExercise e => Dismissible(
                       key: ValueKey(item.id),
                       direction: DismissDirection.endToStart,
-                      // --- MODIFIED: Added confirmation dialog ---
                       confirmDismiss: (direction) => _showDeleteItemConfirmationDialog(context, itemType: 'Exercise'),
                       onDismissed: (_) => ref.read(sessionStateProvider.notifier).deleteItem(item.id),
                       background: _buildDismissBackground(),
@@ -167,7 +151,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                   SessionWarmupItem w => Dismissible(
                       key: ValueKey(item.id),
                       direction: DismissDirection.endToStart,
-                      // --- MODIFIED: Added confirmation dialog ---
                       confirmDismiss: (direction) => _showDeleteItemConfirmationDialog(context, itemType: 'Warmup'),
                       onDismissed: (_) => ref.read(sessionStateProvider.notifier).deleteItem(item.id),
                       background: _buildDismissBackground(),
@@ -177,7 +160,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                       key: ValueKey(item.id),
                       superset: s,
                       onInfoTap: (exercise) => _showExerciseInfoSheet(context, exercise),
-                      // --- MODIFIED: Pass the confirmation function down ---
                       onDeleteConfirm: _showDeleteItemConfirmationDialog,
                     ),
                 };
@@ -222,7 +204,6 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
 class _SupersetListItem extends ConsumerWidget {
   final SessionSuperset superset;
   final void Function(SessionExercise) onInfoTap;
-  // --- NEW: Function to show the confirmation dialog ---
   final Future<bool?> Function(BuildContext, {String itemType}) onDeleteConfirm;
 
   const _SupersetListItem({
@@ -255,7 +236,6 @@ class _SupersetListItem extends ConsumerWidget {
             ...superset.exercises.map((exercise) => Dismissible(
               key: ValueKey(exercise.id),
               direction: DismissDirection.endToStart,
-              // --- MODIFIED: Use the passed confirmation function ---
               confirmDismiss: (direction) => onDeleteConfirm(context, itemType: 'Exercise'),
               onDismissed: (_) => ref.read(sessionStateProvider.notifier).deleteExerciseFromSuperset(supersetId: superset.id, exerciseId: exercise.id),
               background: Container(color: AppTheme.colors.danger, alignment: Alignment.centerRight, padding: const EdgeInsets.symmetric(horizontal: 20.0), child: const Icon(Icons.delete_forever_rounded, color: Colors.white)),
