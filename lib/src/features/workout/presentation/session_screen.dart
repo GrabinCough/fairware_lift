@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/presentation/session_screen.dart -----
 // lib/src/features/workout/presentation/session_screen.dart
 
 import 'package:flutter/material.dart';
@@ -70,6 +71,32 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
     );
   }
 
+  // --- NEW: Reusable confirmation dialog for deleting items ---
+  Future<bool?> _showDeleteItemConfirmationDialog(BuildContext context, {String itemType = 'Item'}) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.colors.surface,
+          title: Text('Delete $itemType?'),
+          content: const Text('This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(
+                'Delete',
+                style: TextStyle(color: AppTheme.colors.danger),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +149,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                   SessionExercise e => Dismissible(
                       key: ValueKey(item.id),
                       direction: DismissDirection.endToStart,
+                      // --- MODIFIED: Added confirmation dialog ---
+                      confirmDismiss: (direction) => _showDeleteItemConfirmationDialog(context, itemType: 'Exercise'),
                       onDismissed: (_) => ref.read(sessionStateProvider.notifier).deleteItem(item.id),
                       background: _buildDismissBackground(),
                       child: ExerciseListItem(
@@ -132,14 +161,14 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                         isCurrent: e.isCurrent,
                         onCardTap: () => ref.read(sessionStateProvider.notifier).setCurrentItem(itemId: e.id),
                         onInfoTap: () => _showExerciseInfoSheet(context, e),
-                        // --- FIX ---
-                        // Pass the setType to the list item.
                         setType: e.defaultSetType,
                       ),
                     ),
                   SessionWarmupItem w => Dismissible(
                       key: ValueKey(item.id),
                       direction: DismissDirection.endToStart,
+                      // --- MODIFIED: Added confirmation dialog ---
+                      confirmDismiss: (direction) => _showDeleteItemConfirmationDialog(context, itemType: 'Warmup'),
                       onDismissed: (_) => ref.read(sessionStateProvider.notifier).deleteItem(item.id),
                       background: _buildDismissBackground(),
                       child: WarmupListItem(warmup: w),
@@ -148,6 +177,8 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
                       key: ValueKey(item.id),
                       superset: s,
                       onInfoTap: (exercise) => _showExerciseInfoSheet(context, exercise),
+                      // --- MODIFIED: Pass the confirmation function down ---
+                      onDeleteConfirm: _showDeleteItemConfirmationDialog,
                     ),
                 };
               }).toList(),
@@ -191,7 +222,15 @@ class _SessionScreenState extends ConsumerState<SessionScreen> {
 class _SupersetListItem extends ConsumerWidget {
   final SessionSuperset superset;
   final void Function(SessionExercise) onInfoTap;
-  const _SupersetListItem({super.key, required this.superset, required this.onInfoTap});
+  // --- NEW: Function to show the confirmation dialog ---
+  final Future<bool?> Function(BuildContext, {String itemType}) onDeleteConfirm;
+
+  const _SupersetListItem({
+    super.key, 
+    required this.superset, 
+    required this.onInfoTap,
+    required this.onDeleteConfirm,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -216,6 +255,8 @@ class _SupersetListItem extends ConsumerWidget {
             ...superset.exercises.map((exercise) => Dismissible(
               key: ValueKey(exercise.id),
               direction: DismissDirection.endToStart,
+              // --- MODIFIED: Use the passed confirmation function ---
+              confirmDismiss: (direction) => onDeleteConfirm(context, itemType: 'Exercise'),
               onDismissed: (_) => ref.read(sessionStateProvider.notifier).deleteExerciseFromSuperset(supersetId: superset.id, exerciseId: exercise.id),
               background: Container(color: AppTheme.colors.danger, alignment: Alignment.centerRight, padding: const EdgeInsets.symmetric(horizontal: 20.0), child: const Icon(Icons.delete_forever_rounded, color: Colors.white)),
               child: ExerciseListItem(
@@ -226,8 +267,6 @@ class _SupersetListItem extends ConsumerWidget {
                 isCurrent: exercise.isCurrent,
                 onCardTap: () => ref.read(sessionStateProvider.notifier).setCurrentItem(itemId: exercise.id),
                 onInfoTap: () => onInfoTap(exercise),
-                // --- FIX ---
-                // Pass the setType to the list item within the superset.
                 setType: exercise.defaultSetType,
               ),
             )),

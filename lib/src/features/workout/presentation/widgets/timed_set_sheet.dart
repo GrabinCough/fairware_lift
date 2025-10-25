@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/presentation/widgets/timed_set_sheet.dart -----
 // lib/src/features/workout/presentation/widgets/timed_set_sheet.dart
 
 // -----------------------------------------------------------------------------
@@ -6,14 +7,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
+import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 
 // -----------------------------------------------------------------------------
 // --- TIMED SET SHEET WIDGET --------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// A stateful bottom sheet for entering the details of a timed set.
 class TimedSetSheet extends StatefulWidget {
-  const TimedSetSheet({super.key});
+  // --- NEW: Accept an optional set to edit ---
+  final LoggedSet? set;
+
+  const TimedSetSheet({super.key, this.set});
 
   @override
   State<TimedSetSheet> createState() => _TimedSetSheetState();
@@ -24,6 +28,19 @@ class _TimedSetSheetState extends State<TimedSetSheet> {
   final _durationSecondsController = TextEditingController();
   final _inclineController = TextEditingController();
   final _speedController = TextEditingController();
+
+  // --- NEW: Pre-fill controllers if editing ---
+  @override
+  void initState() {
+    super.initState();
+    if (widget.set != null) {
+      final duration = Duration(seconds: widget.set!.durationSeconds ?? 0);
+      _durationMinutesController.text = duration.inMinutes.toString();
+      _durationSecondsController.text = (duration.inSeconds % 60).toString();
+      _inclineController.text = widget.set!.metrics['incline']?.toString() ?? '';
+      _speedController.text = widget.set!.metrics['speed_mph']?.toString() ?? '';
+    }
+  }
 
   @override
   void dispose() {
@@ -43,15 +60,13 @@ class _TimedSetSheetState extends State<TimedSetSheet> {
     final speed = double.tryParse(_speedController.text);
 
     final metrics = <String, dynamic>{};
-    if (incline != null) {
-      metrics['incline'] = incline;
-    }
-    if (speed != null) {
-      metrics['speed_mph'] = speed;
-    }
+    if (incline != null) metrics['incline'] = incline;
+    if (speed != null) metrics['speed_mph'] = speed;
 
     if (mounted) {
+      // --- MODIFIED: Return the ID if editing ---
       Navigator.of(context).pop({
+        'id': widget.set?.id,
         'durationSeconds': totalDurationSeconds,
         'metrics': metrics,
       });
@@ -113,7 +128,7 @@ class _TimedSetSheetState extends State<TimedSetSheet> {
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
-              child: const Text('Save & Start Rest'),
+              child: const Text('Save Set'),
             ),
           ],
         ),

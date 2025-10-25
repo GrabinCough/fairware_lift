@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/presentation/widgets/reps_only_set_sheet.dart -----
 // lib/src/features/workout/presentation/widgets/reps_only_set_sheet.dart
 
 // -----------------------------------------------------------------------------
@@ -8,13 +9,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
 import 'package:fairware_lift/src/features/measurements/data/measurements_repository.dart';
+import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 
 // -----------------------------------------------------------------------------
 // --- REPS ONLY SET SHEET WIDGET ----------------------------------------------
 // -----------------------------------------------------------------------------
 
 class RepsOnlySetSheet extends ConsumerStatefulWidget {
-  const RepsOnlySetSheet({super.key});
+  // --- NEW: Accept an optional set to edit ---
+  final LoggedSet? set;
+
+  const RepsOnlySetSheet({super.key, this.set});
 
   @override
   ConsumerState<RepsOnlySetSheet> createState() => _RepsOnlySetSheetState();
@@ -22,6 +27,15 @@ class RepsOnlySetSheet extends ConsumerStatefulWidget {
 
 class _RepsOnlySetSheetState extends ConsumerState<RepsOnlySetSheet> {
   final _repsController = TextEditingController();
+
+  // --- NEW: Pre-fill controller if editing ---
+  @override
+  void initState() {
+    super.initState();
+    if (widget.set != null) {
+      _repsController.text = widget.set!.reps?.toString() ?? '';
+    }
+  }
 
   @override
   void dispose() {
@@ -31,17 +45,22 @@ class _RepsOnlySetSheetState extends ConsumerState<RepsOnlySetSheet> {
 
   void _onLogSet() {
     final reps = int.tryParse(_repsController.text) ?? 0;
-    // --- MODIFIED: Read from the correct provider ---
-    final bodyweight = ref.read(latestBodyweightProvider) ?? 0.0;
 
     if (mounted) {
-      Navigator.of(context).pop({'reps': reps, 'weight': bodyweight});
+      // --- MODIFIED: Handle both add and edit cases ---
+      if (widget.set != null) {
+        // When editing, just return the ID and new reps.
+        Navigator.of(context).pop({'id': widget.set!.id, 'reps': reps});
+      } else {
+        // When adding, get the current bodyweight and return it.
+        final bodyweight = ref.read(latestBodyweightProvider) ?? 0.0;
+        Navigator.of(context).pop({'reps': reps, 'weight': bodyweight});
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // --- MODIFIED: Handle async loading of the repository ---
     final asyncRepo = ref.watch(measurementsRepositoryProvider);
 
     return SafeArea(
@@ -69,7 +88,7 @@ class _RepsOnlySetSheetState extends ConsumerState<RepsOnlySetSheet> {
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 50),
                 ),
-                child: const Text('Save & Start Rest'),
+                child: const Text('Save Set'),
               ),
             ],
           ),

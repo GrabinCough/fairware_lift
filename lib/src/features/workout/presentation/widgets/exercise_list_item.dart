@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/presentation/widgets/exercise_list_item.dart -----
 // lib/src/features/workout/presentation/widgets/exercise_list_item.dart
 
 // -----------------------------------------------------------------------------
@@ -56,51 +57,101 @@ class ExerciseListItem extends ConsumerWidget {
     return bits.isEmpty ? '' : ' @ ${bits.join(' • ')}';
   }
 
-  void _showSetSheet(BuildContext context, WidgetRef ref) async {
-    if (setType == 'timed') {
+  void _showSetSheet(BuildContext context, WidgetRef ref, {LoggedSet? setToEdit}) async {
+    final effectiveSetType = setToEdit?.setType ?? setType;
+
+    if (effectiveSetType == 'timed') {
       final result = await showModalBottomSheet<Map<String, dynamic>>(
         context: context,
         isScrollControlled: true,
         backgroundColor: AppTheme.colors.surface,
-        builder: (context) => const TimedSetSheet(),
+        builder: (context) => TimedSetSheet(set: setToEdit),
       );
       if (result != null) {
-        ref.read(sessionStateProvider.notifier).logTimed(
-              durationSeconds: result['durationSeconds'] as int,
-              metrics: result['metrics'] as Map<String, dynamic>,
-            );
+        final String? id = result['id'];
+        if (id != null && setToEdit != null) {
+          final updatedSet = setToEdit.copyWith(
+            durationSeconds: result['durationSeconds'] as int,
+            metrics: result['metrics'] as Map<String, dynamic>,
+          );
+          ref.read(sessionStateProvider.notifier).updateSet(updatedSet);
+        } else {
+          ref.read(sessionStateProvider.notifier).logTimed(
+                durationSeconds: result['durationSeconds'] as int,
+                metrics: result['metrics'] as Map<String, dynamic>,
+              );
+        }
       }
-    } else if (setType == 'reps_only') {
-      final result = await showModalBottomSheet<Map<String, num>>(
+    } else if (effectiveSetType == 'reps_only') {
+      final result = await showModalBottomSheet<Map<String, dynamic>>(
         context: context,
         isScrollControlled: true,
         backgroundColor: AppTheme.colors.surface,
-        builder: (context) => const RepsOnlySetSheet(),
+        builder: (context) => RepsOnlySetSheet(set: setToEdit),
       );
       if (result != null) {
-        // --- FIX ---
-        // Now passing both `reps` and the returned `weight` (bodyweight)
-        // to the newly updated `logRepsOnlySet` method.
-        ref.read(sessionStateProvider.notifier).logRepsOnlySet(
-              reps: result['reps']!.toInt(),
-              bodyweight: result['weight']!.toDouble(),
-            );
+        final String? id = result['id'];
+        final reps = result['reps'] as int;
+        if (id != null && setToEdit != null) {
+          final updatedSet = setToEdit.copyWith(reps: reps);
+          ref.read(sessionStateProvider.notifier).updateSet(updatedSet);
+        } else {
+          final bodyweight = result['weight'] as double;
+          ref.read(sessionStateProvider.notifier).logRepsOnlySet(
+                reps: reps,
+                bodyweight: bodyweight,
+              );
+        }
       }
-    } else {
-      // Default to weight/reps
-      final result = await showModalBottomSheet<Map<String, num>>(
+    } else { // Default to weight/reps
+      final result = await showModalBottomSheet<Map<String, dynamic>>(
         context: context,
         isScrollControlled: true,
         backgroundColor: AppTheme.colors.surface,
-        builder: (context) => const SetSheet(),
+        builder: (context) => SetSheet(set: setToEdit),
       );
       if (result != null) {
-        ref.read(sessionStateProvider.notifier).logWeightReps(
-              weight: result['weight']!.toDouble(),
-              reps: result['reps']!.toInt(),
-            );
+        final String? id = result['id'];
+        final weight = result['weight'] as double;
+        final reps = result['reps'] as int;
+        if (id != null && setToEdit != null) {
+          final updatedSet = setToEdit.copyWith(weight: weight, reps: reps);
+          ref.read(sessionStateProvider.notifier).updateSet(updatedSet);
+        } else {
+          ref.read(sessionStateProvider.notifier).logWeightReps(
+                weight: weight,
+                reps: reps,
+              );
+        }
       }
     }
+  }
+
+  // --- NEW: Confirmation dialog for deleting a set ---
+  Future<bool?> _showDeleteConfirmationDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.colors.surface,
+          title: const Text('Delete Set?'),
+          content: const Text('Are you sure you want to delete this set? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(
+                'Delete',
+                style: TextStyle(color: AppTheme.colors.danger),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -168,8 +219,12 @@ class ExerciseListItem extends ConsumerWidget {
                   _ => '${set.weight} lb x ${set.reps} reps',
                 };
                 return _buildSetRow(
+                  context: context,
+                  set: set,
                   setNumber: index + 1,
                   details: details,
+                  onTap: () => _showSetSheet(context, ref, setToEdit: set),
+                  onDismissed: () => ref.read(sessionStateProvider.notifier).deleteSet(setId: set.id),
                 );
               }),
               if (isCurrent) ...[
@@ -195,31 +250,70 @@ class ExerciseListItem extends ConsumerWidget {
     );
   }
 
-  Widget _buildSetRow({required int setNumber, required String details}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppTheme.colors.background,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(
-              setNumber.toString(),
-              style: AppTheme.typography.body.copyWith(
-                color: AppTheme.colors.textSecondary,
-                fontWeight: FontWeight.bold,
+  Widget _buildSetRow({
+    required BuildContext context,
+    required LoggedSet set,
+    required int setNumber,
+    required String details,
+    required VoidCallback onTap,
+    required VoidCallback onDismissed,
+  }) {
+    return Dismissible(
+      key: ValueKey(set.id),
+      direction: DismissDirection.endToStart,
+      // --- NEW: Added confirmation dialog ---
+      confirmDismiss: (direction) async {
+        return await _showDeleteConfirmationDialog(context);
+      },
+      onDismissed: (_) => onDismissed(),
+      background: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.colors.danger,
+          borderRadius: BorderRadius.circular(AppTheme.sizing.chipRadius),
+        ),
+        margin: const EdgeInsets.symmetric(vertical: 2.0),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: const Icon(Icons.delete_sweep_rounded, color: Colors.white),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.sizing.chipRadius),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppTheme.colors.background,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  setNumber.toString(),
+                  style: AppTheme.typography.body.copyWith(
+                    color: AppTheme.colors.textSecondary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  details,
+                  style: AppTheme.typography.body,
+                ),
+              ),
+              Icon(
+                Icons.edit_note_rounded,
+                color: AppTheme.colors.surface, // Hidden until hovered
+                size: 20,
+              ),
+            ],
           ),
-          const SizedBox(width: 16),
-          Text(
-            details,
-            style: AppTheme.typography.body,
-          ),
-        ],
+        ),
       ),
     );
   }

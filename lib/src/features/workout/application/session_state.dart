@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/application/session_state.dart -----
 // lib/src/features/workout/application/session_state.dart
 
 // -----------------------------------------------------------------------------
@@ -145,7 +146,7 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
       }
       return item;
     }).toList();
-    
+
     if (set.setType == 'timed' && set.durationSeconds != null) {
       ref.read(workoutMetricsProvider.notifier).addActivityTime(seconds: set.durationSeconds!);
     }
@@ -163,6 +164,64 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     ref.read(timerStateProvider.notifier).startTimer(duration: restDuration);
   }
 
+  // --- NEW: Method to update an existing set ---
+  void updateSet(LoggedSet updatedSet) {
+    state = state.map((item) {
+      // Handle standalone exercises
+      if (item is SessionExercise) {
+        final setIndex = item.loggedSets.indexWhere((s) => s.id == updatedSet.id);
+        if (setIndex != -1) {
+          final newSets = List<LoggedSet>.from(item.loggedSets);
+          newSets[setIndex] = updatedSet;
+          return item.copyWith(loggedSets: newSets);
+        }
+      } 
+      // Handle exercises within supersets
+      else if (item is SessionSuperset) {
+        return item.copyWith(
+          exercises: item.exercises.map((exercise) {
+            final setIndex = exercise.loggedSets.indexWhere((s) => s.id == updatedSet.id);
+            if (setIndex != -1) {
+              final newSets = List<LoggedSet>.from(exercise.loggedSets);
+              newSets[setIndex] = updatedSet;
+              return exercise.copyWith(loggedSets: newSets);
+            }
+            return exercise;
+          }).toList(),
+        );
+      }
+      return item;
+    }).toList();
+  }
+
+  // --- NEW: Method to delete a set by its unique ID ---
+  void deleteSet({required String setId}) {
+    state = state.map((item) {
+      // Handle standalone exercises
+      if (item is SessionExercise) {
+        if (item.loggedSets.any((s) => s.id == setId)) {
+          return item.copyWith(
+            loggedSets: item.loggedSets.where((s) => s.id != setId).toList(),
+          );
+        }
+      } 
+      // Handle exercises within supersets
+      else if (item is SessionSuperset) {
+        // Check if any exercise in the superset contains the set to be deleted
+        if (item.exercises.any((e) => e.loggedSets.any((s) => s.id == setId))) {
+          return item.copyWith(
+            exercises: item.exercises.map((exercise) {
+              return exercise.copyWith(
+                loggedSets: exercise.loggedSets.where((s) => s.id != setId).toList(),
+              );
+            }).toList(),
+          );
+        }
+      }
+      return item;
+    }).toList();
+  }
+
   void logWeightReps({required double weight, required int reps, double? rpe}) {
     final id = _uuid.v4();
     logSet(LoggedSet.weightReps(id: id, weight: weight, reps: reps, rpe: rpe));
@@ -172,11 +231,9 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     final id = _uuid.v4();
     logSet(LoggedSet.timed(id: id, durationSeconds: durationSeconds, metrics: metrics));
   }
-  
-  // --- MODIFIED METHOD ---
+
   void logRepsOnlySet({required int reps, required double bodyweight, double? rpe}) {
     final id = _uuid.v4();
-    // Log as a weight_reps set type to reuse volume calculation and display logic.
     logSet(LoggedSet.weightReps(id: id, weight: bodyweight, reps: reps, rpe: rpe));
   }
 

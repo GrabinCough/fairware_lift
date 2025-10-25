@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/domain/logged_set.dart -----
 // lib/src/features/workout/domain/logged_set.dart
 
 // -----------------------------------------------------------------------------
@@ -69,4 +70,31 @@ class LoggedSet {
         rpe: rpe,
         prescriptionSnapshot: prescriptionSnapshot,
       );
+
+  // --- NEW: copyWith method for immutable updates ---
+  LoggedSet copyWith({
+    String? id,
+    String? setType,
+    double? weight,
+    int? reps,
+    int? durationSeconds,
+    int? distanceM,
+    int? calories,
+    double? rpe,
+    Map<String, dynamic>? metrics,
+    Map<String, dynamic>? prescriptionSnapshot,
+  }) {
+    return LoggedSet(
+      id: id ?? this.id,
+      setType: setType ?? this.setType,
+      weight: weight ?? this.weight,
+      reps: reps ?? this.reps,
+      durationSeconds: durationSeconds ?? this.durationSeconds,
+      distanceM: distanceM ?? this.distanceM,
+      calories: calories ?? this.calories,
+      rpe: rpe ?? this.rpe,
+      metrics: metrics ?? this.metrics,
+      prescriptionSnapshot: prescriptionSnapshot ?? this.prescriptionSnapshot,
+    );
+  }
 }

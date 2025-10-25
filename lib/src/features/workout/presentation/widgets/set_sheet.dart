@@ -1,3 +1,4 @@
+// ----- lib/src/features/workout/presentation/widgets/set_sheet.dart -----
 // lib/src/features/workout/presentation/widgets/set_sheet.dart
 
 // -----------------------------------------------------------------------------
@@ -6,29 +7,36 @@
 
 import 'package:flutter/material.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
+import 'package:fairware_lift/src/features/workout/domain/logged_set.dart';
 
 // -----------------------------------------------------------------------------
 // --- SET SHEET WIDGET --------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-/// A stateful bottom sheet for entering the details of a single set.
+/// A stateful bottom sheet for entering or editing the details of a single set.
 class SetSheet extends StatefulWidget {
-  // --- FIX ---
-  // The constructor no longer accepts initial values.
-  const SetSheet({super.key});
+  // --- NEW: Accept an optional set to edit ---
+  final LoggedSet? set;
+
+  const SetSheet({super.key, this.set});
 
   @override
   State<SetSheet> createState() => _SetSheetState();
 }
 
 class _SetSheetState extends State<SetSheet> {
-  // Controllers are initialized directly.
   final _weightController = TextEditingController();
   final _repsController = TextEditingController();
 
-  // --- FIX ---
-  // The initState method is no longer needed as the controllers are
-  // initialized directly and will always start blank.
+  // --- NEW: Pre-fill controllers if editing an existing set ---
+  @override
+  void initState() {
+    super.initState();
+    if (widget.set != null) {
+      _weightController.text = widget.set!.weight?.toString() ?? '';
+      _repsController.text = widget.set!.reps?.toString() ?? '';
+    }
+  }
 
   @override
   void dispose() {
@@ -42,7 +50,12 @@ class _SetSheetState extends State<SetSheet> {
     final reps = int.tryParse(_repsController.text) ?? 0;
 
     if (mounted) {
-      Navigator.of(context).pop({'weight': weight, 'reps': reps});
+      // --- MODIFIED: Return the set's ID if it exists (for updates) ---
+      Navigator.of(context).pop({
+        'id': widget.set?.id,
+        'weight': weight,
+        'reps': reps,
+      });
     }
   }
 
@@ -65,7 +78,6 @@ class _SetSheetState extends State<SetSheet> {
                   child: _buildTextField(
                     controller: _weightController,
                     label: 'Weight (lb)',
-                    // Autofocus the first field for quick entry.
                     autofocus: true,
                   ),
                 ),
@@ -84,7 +96,8 @@ class _SetSheetState extends State<SetSheet> {
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
-              child: const Text('Save & Start Rest'),
+              // --- MODIFIED: More generic button text ---
+              child: const Text('Save Set'),
             ),
           ],
         ),
