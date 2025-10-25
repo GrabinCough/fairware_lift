@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    tools:context=".MainActivity">
+
+    <!-- The progress bar now fills the entire screen, right to the edges -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/timer_background_circle"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="100"
+        android:progressDrawable="@drawable/timer_progress_circle"
+        android:rotation="-90" />
+
+    <!-- This LinearLayout will be automatically centered in the safe area by the BoxInsetLayout -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/timer_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1:30"
+            android:textColor="@android:color/white"
+            android:textSize="48sp" />
+
+        <TextView
+            android:id="@+id/hr_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-- bpm"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+</androidx.wear.widget.BoxInsetLayout>
