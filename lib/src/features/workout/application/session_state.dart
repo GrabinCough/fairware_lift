@@ -5,7 +5,8 @@
 // --- IMPORTS -----------------------------------------------------------------
 // -----------------------------------------------------------------------------
 
-import 'package:fairware_lift/src/features/exercises/domain/exercise.dart' as lib_exercise;
+import 'package:fairware_lift/src/features/exercises/domain/exercise.dart'
+    as lib_exercise;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:fairware_lift/src/features/dxg/domain/warmup_item.dart';
@@ -31,9 +32,14 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
       final firstItem = importedItems.first;
       if (firstItem is SessionExercise) {
         importedItems[0] = firstItem.copyWith(isCurrent: true);
-      } else if (firstItem is SessionSuperset && firstItem.exercises.isNotEmpty) {
-        final firstExerciseInSuperset = firstItem.exercises.first.copyWith(isCurrent: true);
-        final updatedExercises = [firstExerciseInSuperset, ...firstItem.exercises.skip(1)];
+      } else if (firstItem is SessionSuperset &&
+          firstItem.exercises.isNotEmpty) {
+        final firstExerciseInSuperset =
+            firstItem.exercises.first.copyWith(isCurrent: true);
+        final updatedExercises = [
+          firstExerciseInSuperset,
+          ...firstItem.exercises.skip(1)
+        ];
         importedItems[0] = firstItem.copyWith(exercises: updatedExercises);
       }
     }
@@ -45,9 +51,8 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
       return switch (item) {
         SessionExercise e => e.copyWith(isCurrent: false),
         SessionSuperset s => s.copyWith(
-            exercises: s.exercises
-                .map((e) => e.copyWith(isCurrent: false))
-                .toList()),
+            exercises:
+                s.exercises.map((e) => e.copyWith(isCurrent: false)).toList()),
         _ => item,
       };
     }).toList();
@@ -88,7 +93,9 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     if (timeParam != null) {
       final minutes = int.tryParse(timeParam) ?? 0;
       if (minutes > 0) {
-        ref.read(workoutMetricsProvider.notifier).addActivityTime(seconds: minutes * 60);
+        ref
+            .read(workoutMetricsProvider.notifier)
+            .addActivityTime(seconds: minutes * 60);
       }
     }
 
@@ -133,7 +140,8 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
 
     if (currentExercise == null) return;
 
-    final updatedExercise = currentExercise.copyWith(loggedSets: [...currentExercise.loggedSets, set]);
+    final updatedExercise =
+        currentExercise.copyWith(loggedSets: [...currentExercise.loggedSets, set]);
 
     state = state.map((item) {
       if (item.id == currentExercise!.id) return updatedExercise;
@@ -148,20 +156,33 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     }).toList();
 
     if (set.setType == 'timed' && set.durationSeconds != null) {
-      ref.read(workoutMetricsProvider.notifier).addActivityTime(seconds: set.durationSeconds!);
+      ref
+          .read(workoutMetricsProvider.notifier)
+          .addActivityTime(seconds: set.durationSeconds!);
     }
 
+    // --- FIX: Conditional Timer Logic ---
+    // This block is now corrected to handle straight sets and supersets properly.
+    bool shouldStartTimer = false;
     int? restDuration;
+
     if (parentSuperset == null) {
+      // Case 1: This is a straight set, not in a superset.
+      shouldStartTimer = true;
       restDuration = currentExercise.prescription.restSeconds;
     } else {
-      restDuration = currentExercise.prescription.restSecondsAfter;
+      // Case 2: This is part of a superset.
+      // Only start the timer if it's the LAST exercise in the superset.
       if (currentExerciseIndex == parentSuperset.exercises.length - 1) {
-         restDuration = currentExercise.prescription.restSecondsAfter;
+        shouldStartTimer = true;
+        // Use restSecondsAfter for the rest period following a completed superset.
+        restDuration = currentExercise.prescription.restSecondsAfter;
       }
     }
 
-    ref.read(timerStateProvider.notifier).startTimer(duration: restDuration);
+    if (shouldStartTimer) {
+      ref.read(timerStateProvider.notifier).startTimer(duration: restDuration);
+    }
   }
 
   // --- NEW: Method to update an existing set ---
@@ -169,18 +190,20 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     state = state.map((item) {
       // Handle standalone exercises
       if (item is SessionExercise) {
-        final setIndex = item.loggedSets.indexWhere((s) => s.id == updatedSet.id);
+        final setIndex =
+            item.loggedSets.indexWhere((s) => s.id == updatedSet.id);
         if (setIndex != -1) {
           final newSets = List<LoggedSet>.from(item.loggedSets);
           newSets[setIndex] = updatedSet;
           return item.copyWith(loggedSets: newSets);
         }
-      } 
+      }
       // Handle exercises within supersets
       else if (item is SessionSuperset) {
         return item.copyWith(
           exercises: item.exercises.map((exercise) {
-            final setIndex = exercise.loggedSets.indexWhere((s) => s.id == updatedSet.id);
+            final setIndex =
+                exercise.loggedSets.indexWhere((s) => s.id == updatedSet.id);
             if (setIndex != -1) {
               final newSets = List<LoggedSet>.from(exercise.loggedSets);
               newSets[setIndex] = updatedSet;
@@ -204,7 +227,7 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
             loggedSets: item.loggedSets.where((s) => s.id != setId).toList(),
           );
         }
-      } 
+      }
       // Handle exercises within supersets
       else if (item is SessionSuperset) {
         // Check if any exercise in the superset contains the set to be deleted
@@ -212,7 +235,8 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
           return item.copyWith(
             exercises: item.exercises.map((exercise) {
               return exercise.copyWith(
-                loggedSets: exercise.loggedSets.where((s) => s.id != setId).toList(),
+                loggedSets:
+                    exercise.loggedSets.where((s) => s.id != setId).toList(),
               );
             }).toList(),
           );
@@ -227,14 +251,18 @@ class SessionStateNotifier extends Notifier<List<SessionItem>> {
     logSet(LoggedSet.weightReps(id: id, weight: weight, reps: reps, rpe: rpe));
   }
 
-  void logTimed({required int durationSeconds, Map<String, dynamic> metrics = const {}}) {
+  void logTimed(
+      {required int durationSeconds, Map<String, dynamic> metrics = const {}}) {
     final id = _uuid.v4();
-    logSet(LoggedSet.timed(id: id, durationSeconds: durationSeconds, metrics: metrics));
+    logSet(LoggedSet.timed(
+        id: id, durationSeconds: durationSeconds, metrics: metrics));
   }
 
-  void logRepsOnlySet({required int reps, required double bodyweight, double? rpe}) {
+  void logRepsOnlySet(
+      {required int reps, required double bodyweight, double? rpe}) {
     final id = _uuid.v4();
-    logSet(LoggedSet.weightReps(id: id, weight: bodyweight, reps: reps, rpe: rpe));
+    logSet(
+        LoggedSet.weightReps(id: id, weight: bodyweight, reps: reps, rpe: rpe));
   }
 
   void deleteItem(String itemId) {
