@@ -65,6 +65,11 @@ dev_dependencies:
   freezed: ^2.4.5
   json_serializable: ^6.7.1
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  image_path: assets/icons/app_icon.png
 
 flutter:
   uses-material-design: true
