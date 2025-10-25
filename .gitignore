@@ -71,3 +71,6 @@ Thumbs.db
 # --- PDFs, exports, mock images (optional—uncomment if these get large) ---
 # exports/
 # mockups/*.png
+
+# FVM Version Cache
+.fvm/

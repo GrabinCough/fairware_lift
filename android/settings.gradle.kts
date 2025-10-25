@@ -27,3 +27,8 @@ plugins {
 }
 
 include(":app")
+include(":wear")
+
+// CRITICAL FIX: Tell Gradle where to find the ":wear" module's source code.
+// It's in the project root, one level up from this "android" directory.
+project(":wear").projectDir = File(rootDir, "../wear")

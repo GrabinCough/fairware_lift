@@ -45,6 +45,8 @@ android {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    // --- NEW: Add the Wearable Data Layer dependency for phone-watch communication ---
+    implementation("com.google.android.gms:play-services-wearable:18.2.0")
 }
 
 flutter {
