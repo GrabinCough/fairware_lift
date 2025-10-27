@@ -14,7 +14,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # --- CORRECTED: Use the right package for communication ---
+  # --- CORRECTED: Use the right package AND version for communication ---
   watch_connectivity: ^0.2.3
 
   # Firebase - Unchanged

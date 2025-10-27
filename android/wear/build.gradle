@@ -18,7 +18,8 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.fairware.fairware_lift.wear"
+        // --- FIX: Application ID MUST match the phone app's ID ---
+        applicationId "com.fairware.fairware_lift"
         minSdk 30
         targetSdk 34
         versionCode 1
@@ -30,7 +31,6 @@ android {
     }
 
     composeOptions {
-        // --- FIX: Updated to a version compatible with Kotlin 1.8.20 ---
         kotlinCompilerExtensionVersion '1.4.6'
     }
 
