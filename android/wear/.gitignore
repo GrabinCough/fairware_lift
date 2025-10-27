@@ -1,0 +1,7 @@
+// ----- android\wear\.gitignore -----
+# IDE files
+.idea/
+*.iml
+
+# Build files
+build/

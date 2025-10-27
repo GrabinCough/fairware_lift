@@ -1,3 +1,4 @@
+// ----- lib\src\features\today\presentation\today_screen.dart -----
 // lib/src/features/today/presentation/today_screen.dart
 
 // -----------------------------------------------------------------------------
@@ -8,13 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fairware_lift/src/core/theme/app_theme.dart';
 import 'package:fairware_lift/src/features/today/application/today_state.dart';
+import 'package:watch_connectivity/watch_connectivity.dart';
 
 import 'widgets/today_header.dart';
 import 'widgets/start_continue_cta.dart';
 import 'widgets/prs_badge.dart';
 import 'widgets/last_workout_preview.dart';
-// --- REMOVED: No longer need this import ---
-// import 'widgets/llm_prompt_builder_card.dart';
+
+// Create a single WatchConnectivity instance you can reuse.
+final _watch = WatchConnectivity();
 
 // -----------------------------------------------------------------------------
 // --- TODAY SCREEN WIDGET -----------------------------------------------------
@@ -49,8 +52,43 @@ class TodayScreen extends ConsumerWidget {
               SizedBox(height: AppTheme.sizing.verticalRhythm),
               const LastWorkoutPreview(),
               SizedBox(height: AppTheme.sizing.verticalRhythm),
-              // --- REMOVED: The LlmPromptBuilderCard is no longer displayed here ---
               const PRsBadge(),
+
+              // --- CORRECTED: Ping Watch button using watch_connectivity ---
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () async {
+                  try {
+                    final reachable = await _watch.isReachable;
+                    if (!reachable) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Watch not reachable — open the watch app.'),
+                          ),
+                        );
+                      }
+                      return;
+                    }
+
+                    // watch_connectivity uses simple Map payloads.
+                    await _watch.sendMessage({'type': 'ping'});
+
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Ping sent to watch!')),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error sending ping: $e')),
+                      );
+                    }
+                  }
+                },
+                child: const Text('Ping Watch'),
+              ),
             ],
           ),
         ),
