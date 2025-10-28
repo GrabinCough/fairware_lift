@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- FIX: Added the package attribute to match the phone app -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.fairware_lift">
 
     <uses-feature android:name="android.hardware.type.watch" />
+
+    <!-- FIX: Added WAKE_LOCK permission for reliable background communication -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:label="Fairware Lift">

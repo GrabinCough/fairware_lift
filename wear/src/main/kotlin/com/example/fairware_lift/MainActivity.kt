@@ -3,6 +3,7 @@ package com.example.fairware_lift
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log // --- NEW: Import for logging ---
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -47,22 +48,33 @@ object TimerRepository {
 
 class MainActivity : ComponentActivity() {
 
+    // --- NEW: A tag for filtering logs ---
+    private val TAG = "FairwareLiftWear"
+
     private val messageClient by lazy { Wearable.getMessageClient(this) }
     private val dataClient by lazy { Wearable.getDataClient(this) }
 
     // Listener for high-frequency messages (for live updates)
     private val messageListener = MessageClient.OnMessageReceivedListener { event ->
+        // --- NEW: Log when a message is received ---
+        Log.d(TAG, "Message received on path: ${event.path}")
         if (event.path.startsWith("/timer")) {
             val jsonString = String(event.data)
+            // --- NEW: Log the actual data payload ---
+            Log.d(TAG, "Payload: $jsonString")
             TimerRepository.updateFromJson(jsonString)
         }
     }
 
     // Listener for persistent data items (for state recovery)
     private val dataListener = DataClient.OnDataChangedListener { events ->
+        // --- NEW: Log when a data event occurs ---
+        Log.d(TAG, "Data changed event received.")
         for (event in events) {
             if (event.type == DataEvent.TYPE_CHANGED && event.dataItem.uri.path?.startsWith("/timer") == true) {
                 val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
+                // --- NEW: Log the data map contents ---
+                Log.d(TAG, "DataMap updated: $dataMap")
                 TimerRepository.updateFromDataMap(dataMap)
             }
         }
@@ -77,6 +89,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        // --- NEW: Log that listeners are being attached ---
+        Log.d(TAG, "Attaching Wearable listeners...")
         // Register listeners when the app is in the foreground
         messageClient.addListener(
             messageListener,
@@ -88,6 +102,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
+        // --- NEW: Log that listeners are being removed ---
+        Log.d(TAG, "Removing Wearable listeners.")
         // Unregister listeners to save battery when the app is not visible
         messageClient.removeListener(messageListener)
         dataClient.removeListener(dataListener)
