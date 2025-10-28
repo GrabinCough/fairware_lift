@@ -1,6 +1,9 @@
-// This file is intentionally left minimal.
-// Top-level plugin versions are defined in settings.gradle.kts.
-// Repository management is handled in settings.gradle.kts.
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)

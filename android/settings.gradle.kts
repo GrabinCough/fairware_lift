@@ -27,6 +27,11 @@ plugins {
 
 include(":app")
 
+// --- FINAL STEP: Re-include the root-level 'wear' module ---
+include(":wear")
+project(":wear").projectDir = file("../wear")
+
+
 dependencyResolutionManagement {
     repositories {
         google()
