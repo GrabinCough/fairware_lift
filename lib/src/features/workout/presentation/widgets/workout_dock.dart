@@ -1,4 +1,3 @@
-// ----- lib/src/features/workout/presentation/widgets/workout_dock.dart -----
 // lib/src/features/workout/presentation/widgets/workout_dock.dart
 
 // -----------------------------------------------------------------------------
@@ -107,8 +106,9 @@ class WorkoutDock extends ConsumerWidget {
     final bool isThisTimerActive =
         timerState.isRunning && timerState.initialDuration == presetDuration;
 
+    // --- FIX: Use the new 'seconds' field name ---
     final double timerProgress = isThisTimerActive && timerState.initialDuration > 0
-        ? timerState.secondsRemaining / timerState.initialDuration
+        ? timerState.seconds / timerState.initialDuration
         : 0.0;
 
     return GestureDetector(
@@ -139,8 +139,9 @@ class WorkoutDock extends ConsumerWidget {
                 ),
               ),
             Text(
+              // --- FIX: Use the new 'seconds' field name ---
               isThisTimerActive
-                  ? '${timerState.secondsRemaining}s'
+                  ? '${timerState.seconds}s'
                   : '${presetDuration}s',
               style: AppTheme.typography.body.copyWith(
                 fontSize: 14,

@@ -1,58 +1,42 @@
 plugins {
     id("com.android.application")
+    // --- FIX: Added Firebase plugins back ---
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-    kotlin("android")
-    id("dev.flutter.flutter-plugin-loader")
+    // --- FIX: Corrected Kotlin plugin ID ---
+    id("org.jetbrains.kotlin.android")
+    id("dev.flutter.flutter-gradle-plugin")
 }
-
-fun localProperties(): java.util.Properties {
-    val properties = java.util.Properties()
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        properties.load(java.io.FileInputStream(localPropertiesFile))
-    }
-    return properties
-}
-
-val flutterVersionCode: String by localProperties()
-val flutterVersionName: String by localProperties()
 
 android {
+    // --- FIX: Restored correct namespace ---
     namespace = "com.fairware.fairware_lift"
-    compileSdk = 34
-    ndkVersion = "25.1.8937393"
+    compileSdk = 35
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
-    sourceSets {
-        getByName("main") {
-            java.srcDirs("src/main/kotlin")
-        }
+        jvmTarget = "11"
     }
 
     defaultConfig {
-        // This is the critical line that was missing.
+        // --- FIX: Restored correct application ID ---
         applicationId = "com.fairware.fairware_lift"
-        
-        minSdk = 21
-        targetSdk = 34
-        versionCode = flutterVersionCode.toInt()
-        versionName = flutterVersionName
+        // --- FIX: Set minSdk required by dependencies ---
+        minSdk = 23
+        targetSdk = 35
+        versionCode = 1 // Flutter tool will override this from pubspec.yaml
+        versionName = "1.0" // Flutter tool will override this from pubspec.yaml
     }
 
     buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -63,5 +47,7 @@ flutter {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk7"))
+    // --- FIX: Added necessary dependencies ---
+    implementation(kotlin("stdlib"))
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }

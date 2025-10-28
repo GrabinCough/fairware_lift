@@ -1,4 +1,3 @@
-// ----- lib/src/features/workout/application/timer_state.dart -----
 // lib/src/features/workout/application/timer_state.dart
 
 // -----------------------------------------------------------------------------
@@ -83,35 +82,52 @@ final workoutMetricsProvider =
 const int kDefaultRestDuration = 90;
 
 // -----------------------------------------------------------------------------
-// --- TIMER STATE DATA MODEL --------------------------------------------------
+// --- TIMER STATE DATA MODEL (MODIFIED) ---------------------------------------
 // -----------------------------------------------------------------------------
 
+/// Represents the state of the workout timer.
+/// This class is now aligned with the SSOT for watch communication.
 class TimerState {
-  final int secondsRemaining;
-  final int initialDuration;
+  /// The remaining seconds on the timer.
+  final int seconds;
   final bool isRunning;
+  /// The timestamp of the last state change, used to resolve stale data on the watch.
+  final int epochMillis;
+  // This is kept locally on the phone for progress bar calculations.
+  final int initialDuration;
 
   const TimerState({
-    this.secondsRemaining = 0,
+    required this.seconds,
+    required this.isRunning,
+    required this.epochMillis,
     this.initialDuration = kDefaultRestDuration,
-    this.isRunning = false,
   });
 
+  /// Creates a serializable map for sending to the watch.
+  Map<String, dynamic> toMap() => {
+    "seconds": seconds,
+    "isRunning": isRunning,
+    "ts": epochMillis,
+    "v": 1, // Payload versioning
+  };
+
   TimerState copyWith({
-    int? secondsRemaining,
-    int? initialDuration,
+    int? seconds,
     bool? isRunning,
+    int? epochMillis,
+    int? initialDuration,
   }) {
     return TimerState(
-      secondsRemaining: secondsRemaining ?? this.secondsRemaining,
-      initialDuration: initialDuration ?? this.initialDuration,
+      seconds: seconds ?? this.seconds,
       isRunning: isRunning ?? this.isRunning,
+      epochMillis: epochMillis ?? this.epochMillis,
+      initialDuration: initialDuration ?? this.initialDuration,
     );
   }
 }
 
 // -----------------------------------------------------------------------------
-// --- TIMER STATE NOTIFIER ----------------------------------------------------
+// --- TIMER STATE NOTIFIER (MODIFIED) -----------------------------------------
 // -----------------------------------------------------------------------------
 
 class TimerStateNotifier extends Notifier<TimerState> {
@@ -122,9 +138,15 @@ class TimerStateNotifier extends Notifier<TimerState> {
     ref.onDispose(() {
       _timer?.cancel();
     });
-    return const TimerState();
+    // The initial state now requires all fields.
+    return TimerState(
+      seconds: 0,
+      isRunning: false,
+      epochMillis: DateTime.now().millisecondsSinceEpoch,
+    );
   }
 
+  /// Starts the rest timer for a given duration.
   void startTimer({int? duration}) {
     _timer?.cancel();
 
@@ -137,17 +159,22 @@ class TimerStateNotifier extends Notifier<TimerState> {
     final timerDuration = duration ?? defaultTimerPreset;
 
     state = TimerState(
-      secondsRemaining: timerDuration,
+      seconds: timerDuration,
       initialDuration: timerDuration,
       isRunning: true,
+      epochMillis: DateTime.now().millisecondsSinceEpoch,
     );
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (state.secondsRemaining > 0) {
-        if (state.secondsRemaining == 3) {
+      if (state.seconds > 0) {
+        if (state.seconds == 3) {
           ref.read(alertServiceProvider).triggerTimerWarningAlert();
         }
-        state = state.copyWith(secondsRemaining: state.secondsRemaining - 1);
+        // Every tick is a state change, so we update the timestamp.
+        state = state.copyWith(
+          seconds: state.seconds - 1,
+          epochMillis: DateTime.now().millisecondsSinceEpoch,
+        );
       } else {
         ref.read(alertServiceProvider).triggerTimerCompletionAlert();
         stopTimer(isFinished: true);
@@ -155,20 +182,28 @@ class TimerStateNotifier extends Notifier<TimerState> {
     });
   }
 
+  /// Adds a specified number of seconds to the running timer.
   void addTime({int seconds = 30}) {
     if (state.isRunning) {
       state = state.copyWith(
-        secondsRemaining: state.secondsRemaining + seconds,
+        seconds: state.seconds + seconds,
+        epochMillis: DateTime.now().millisecondsSinceEpoch,
       );
     }
   }
 
+  /// Stops the timer, optionally marking it as a completed rest period.
   void stopTimer({bool isFinished = false}) {
     if (isFinished) {
       ref.read(workoutMetricsProvider.notifier).addActivityTime(seconds: state.initialDuration, isRest: true);
     }
     _timer?.cancel();
-    state = const TimerState(secondsRemaining: 0, isRunning: false);
+    state = TimerState(
+      seconds: 0,
+      isRunning: false,
+      epochMillis: DateTime.now().millisecondsSinceEpoch,
+      initialDuration: state.initialDuration,
+    );
   }
 }
 

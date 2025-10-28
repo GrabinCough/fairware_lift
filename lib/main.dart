@@ -20,8 +20,12 @@ import 'src/core/theme/app_theme.dart';
 // The main application shell widget which contains the bottom navigation.
 import 'src/app/shell.dart';
 
+// --- NEW IMPORTS ---
+import 'dart:io'; // Used to check the operating system.
+import 'src/features/workout/application/wear_timer_sync_service.dart';
+
 // -----------------------------------------------------------------------------
-// --- APP ENTRY POINT ---------------------------------------------------------
+// --- APP ENTRY POINT (MODIFIED) ----------------------------------------------
 // -----------------------------------------------------------------------------
 
 /// The main function is the entry point for the application.
@@ -34,8 +38,25 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Run the app within the ProviderScope for Riverpod state management.
-  runApp(const ProviderScope(child: FairwareLiftApp()));
+  // --- NEW: Initialize Riverpod container and services ---
+  // Create a ProviderContainer to manage our application's state.
+  final container = ProviderContainer();
+
+  // Initialize the Wear OS sync service only on the Android platform.
+  // This prevents errors when running on iOS in the future.
+  if (Platform.isAndroid) {
+    // We read the provider to create the service instance and then call its
+    // async init() method to configure the underlying native APIs.
+    await container.read(wearTimerSyncServiceProvider).init();
+  }
+
+  // Run the app within an UncontrolledProviderScope to use the pre-initialized container.
+  runApp(
+    UncontrolledProviderScope(
+      container: container,
+      child: const FairwareLiftApp(),
+    ),
+  );
 }
 
 // -----------------------------------------------------------------------------
