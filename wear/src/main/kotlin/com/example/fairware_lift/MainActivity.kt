@@ -1,4 +1,5 @@
-package com.fairware.fairware_lift.wear
+// --- FIX: Package declaration updated to match the new file path ---
+package com.example.fairware_lift
 
 import android.net.Uri
 import android.os.Bundle
@@ -105,7 +106,8 @@ fun TimerScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if (running) "Resting…" else "Timer Paused",
+                // --- FIX: Corrected the garbled "Resting..." text ---
+                text = if (running) "Resting..." else "Timer Paused",
                 style = MaterialTheme.typography.title3.copy(fontWeight = FontWeight.SemiBold)
             )
             Spacer(Modifier.height(8.dp))

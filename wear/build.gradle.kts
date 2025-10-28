@@ -5,11 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.fairware.fairware_lift.wear"
+    // --- FIX: Namespace changed to match the phone app's package structure ---
+    namespace = "com.example.fairware_lift"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.fairware.fairware_lift"
+        // --- FIX: Application ID changed to match the phone app exactly ---
+        applicationId = "com.example.fairware_lift"
         minSdk = 30
         targetSdk = 35
         versionCode = 1
