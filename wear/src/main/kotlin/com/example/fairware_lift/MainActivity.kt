@@ -3,7 +3,9 @@ package com.example.fairware_lift
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log // --- NEW: Import for logging ---
+import android.util.Log
+// --- NEW: Import Toast for showing notifications ---
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -48,7 +50,6 @@ object TimerRepository {
 
 class MainActivity : ComponentActivity() {
 
-    // --- NEW: A tag for filtering logs ---
     private val TAG = "FairwareLiftWear"
 
     private val messageClient by lazy { Wearable.getMessageClient(this) }
@@ -56,24 +57,35 @@ class MainActivity : ComponentActivity() {
 
     // Listener for high-frequency messages (for live updates)
     private val messageListener = MessageClient.OnMessageReceivedListener { event ->
-        // --- NEW: Log when a message is received ---
         Log.d(TAG, "Message received on path: ${event.path}")
         if (event.path.startsWith("/timer")) {
             val jsonString = String(event.data)
-            // --- NEW: Log the actual data payload ---
             Log.d(TAG, "Payload: $jsonString")
-            TimerRepository.updateFromJson(jsonString)
+
+            // --- NEW: Handle different message types ---
+            try {
+                val json = JSONObject(jsonString)
+                if (json.optString("type") == "ping") {
+                    // This is a simple ping. Show a Toast message for feedback.
+                    runOnUiThread {
+                        Toast.makeText(this, "Ping Received!", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    // This is a regular timer state update.
+                    TimerRepository.updateFromJson(jsonString)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error parsing message JSON", e)
+            }
         }
     }
 
     // Listener for persistent data items (for state recovery)
     private val dataListener = DataClient.OnDataChangedListener { events ->
-        // --- NEW: Log when a data event occurs ---
         Log.d(TAG, "Data changed event received.")
         for (event in events) {
             if (event.type == DataEvent.TYPE_CHANGED && event.dataItem.uri.path?.startsWith("/timer") == true) {
                 val dataMap = DataMapItem.fromDataItem(event.dataItem).dataMap
-                // --- NEW: Log the data map contents ---
                 Log.d(TAG, "DataMap updated: $dataMap")
                 TimerRepository.updateFromDataMap(dataMap)
             }
@@ -89,7 +101,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        // --- NEW: Log that listeners are being attached ---
         Log.d(TAG, "Attaching Wearable listeners...")
         // Register listeners when the app is in the foreground
         messageClient.addListener(
@@ -102,7 +113,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
-        // --- NEW: Log that listeners are being removed ---
         Log.d(TAG, "Removing Wearable listeners.")
         // Unregister listeners to save battery when the app is not visible
         messageClient.removeListener(messageListener)
@@ -122,7 +132,6 @@ fun TimerScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                // --- FIX: Corrected the garbled "Resting..." text ---
                 text = if (running) "Resting..." else "Timer Paused",
                 style = MaterialTheme.typography.title3.copy(fontWeight = FontWeight.SemiBold)
             )

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Defines a capability string that both the phone and watch apps will share.
+      This helps the system identify them as a pair for communication.
+    -->
+    <string-array name="android_wear_capabilities">
+        <item>fairware_lift_wear_app</item>
+    </string-array>
+</resources>

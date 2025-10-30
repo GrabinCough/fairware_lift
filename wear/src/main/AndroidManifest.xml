@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- FIX: Removed the deprecated 'package' attribute from the manifest tag. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-feature android:name="android.hardware.type.watch" />
 
-    <!-- FIX: Added WAKE_LOCK permission for reliable background communication -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
@@ -18,6 +16,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--
+          NEW: Add a metadata tag to link to the wear.xml file.
+          This tells the Wear OS system to read the capabilities we defined.
+        -->
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="false" />
+        <meta-data
+            android:name="com.google.android.wearable.capabilities"
+            android:resource="@array/android_wear_capabilities" />
+
     </application>
 
 </manifest>
